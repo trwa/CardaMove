@@ -1,0 +1,175 @@
+{
+  "preamble": {
+    "title": "trwa/cardamove",
+    "description": "Aiken contracts for project 'trwa/cardamove'",
+    "version": "0.0.0",
+    "plutusVersion": "v2",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.0.26-alpha+unknown"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "auction.run",
+      "datum": {
+        "title": "datum",
+        "schema": {
+          "$ref": "#/definitions/auction~1Datum"
+        }
+      },
+      "redeemer": {
+        "title": "redeemer",
+        "schema": {
+          "$ref": "#/definitions/auction~1Redeemer"
+        }
+      },
+      "compiledCode": "5901d10100003232323232322323232322322533300932533300a300800113232324a2602060220046eb8c03c004c030dd50020a99980518030008991919191925130123013002375c602200260220046eb8c03c004c030dd5002099251375c601c60186ea8010c028dd50018a4c26cac64a666010600c002264646464a66601e60220042649318048008b180780098078011bae300d001300a37540042a66601060080022646464646464a66602260260042649318058008b180880098088011bae300f001300f002375c601a00260146ea800854ccc020cdc3a400800226464a66601a601e0042930b1bae300d001300a37540042c60106ea80054ccc014c00cc018dd5002099191919299980618070010991924ca666014601060166ea80084c8c94ccc03cc0440084c926300900116300f001300c37540042ca666012600e60146ea800c4c8c8c8c8c8c94ccc048c0500085261632533301230110011533300f300b301000114a22a66601e601a602000229405858dd5180900098090011bae30100013010002375c601c00260166ea800c5858c030004c030008c028004c01cdd50020b1b874800894ccc010c008c014dd50008a99980398031baa00114985858dc3a4000ae6955ceaab9e5573eae855d11",
+      "hash": "1e84bf13634ab6ab75969c728746d454addd93580bf5f8f504bbb539"
+    }
+  ],
+  "definitions": {
+    "Bool": {
+      "title": "Bool",
+      "anyOf": [
+        {
+          "title": "False",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        },
+        {
+          "title": "True",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": []
+        }
+      ]
+    },
+    "ByteArray": {
+      "dataType": "bytes"
+    },
+    "auction/Auction": {
+      "title": "Auction",
+      "anyOf": [
+        {
+          "title": "Auction",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "auctioneer",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "top_bidder",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "expired",
+              "$ref": "#/definitions/Bool"
+            }
+          ]
+        }
+      ]
+    },
+    "auction/Bid": {
+      "title": "Bid",
+      "anyOf": [
+        {
+          "title": "Bid",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "coin",
+              "$ref": "#/definitions/auction~1Coin"
+            }
+          ]
+        }
+      ]
+    },
+    "auction/Coin": {
+      "title": "Coin",
+      "anyOf": [
+        {
+          "title": "Coin",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        }
+      ]
+    },
+    "auction/Datum": {
+      "title": "Datum",
+      "anyOf": [
+        {
+          "title": "Datum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "auction",
+              "$ref": "#/definitions/auction~1Auction"
+            },
+            {
+              "title": "bid",
+              "$ref": "#/definitions/auction~1Bid"
+            }
+          ]
+        }
+      ]
+    },
+    "auction/Redeemer": {
+      "title": "Redeemer",
+      "anyOf": [
+        {
+          "title": "StartFunc",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "auctioneer",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "base",
+              "$ref": "#/definitions/auction~1Coin"
+            }
+          ]
+        },
+        {
+          "title": "BidFunc",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": [
+            {
+              "title": "bidder",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "auctioneer",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "coins",
+              "$ref": "#/definitions/auction~1Coin"
+            }
+          ]
+        },
+        {
+          "title": "EndFunc",
+          "dataType": "constructor",
+          "index": 2,
+          "fields": [
+            {
+              "title": "auctioneer",
+              "$ref": "#/definitions/ByteArray"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
