@@ -18,27 +18,27 @@ type Datum {
 }
 
 type Redeemer {
-  RedeemStart { auctioneer: Signer, base: Coin }
-  RedeemBid { bidder: Signer, auctioneer: Address, coins: Coin }
-  RedeemEnd { auctioneer: Signer }
+  RedeemerStart { auctioneer: Signer, base: Coin }
+  RedeemerBid { bidder: Signer, auctioneer: Address, coins: Coin }
+  RedeemerEnd { auctioneer: Signer }
 }
 
 fn start(
-  auctioneer: Address,
-  base: Coin,
-  datum: Datum,
-  ctx: ScriptContext,
+  _datum: Datum,
+  _auctioneer: Signer,
+  _base: Coin,
+  _context: ScriptContext,
 ) -> Bool {
   // TODO: Use code from Hammad
   False
 }
 
 fn bid(
-  bidder: Address,
+  datum: Datum,
+  bidder: Signer,
   auctioneer: Address,
   coins: Coin,
-  datum: Datum,
-  ctx: ScriptContext,
+  context: ScriptContext,
 ) -> Bool {
   // Ensure the auction is not expired and the new bid is higher than the current top bid
   let auction_not_expired = !datum.auction.expired
@@ -49,7 +49,7 @@ fn bid(
   auction_not_expired && higher_bid && valid_bidder
 }
 
-fn end(auctioneer: Address, datum: Datum, ctx: ScriptContext) -> Bool {
+fn end(_datum: Datum, _auctioneer: Address, _context: ScriptContext) -> Bool {
   // TODO: Use code from Hammad
   False
 }
@@ -57,11 +57,11 @@ fn end(auctioneer: Address, datum: Datum, ctx: ScriptContext) -> Bool {
 validator {
   fn run(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
     when redeemer is {
-      RedeemStart { auctioneer, base } ->
-        start(auctioneer, base, datum, context)
-      RedeemBid { bidder, auctioneer, coins } ->
-        bid(bidder, auctioneer, coins, datum, context)
-      RedeemEnd { auctioneer } -> end(auctioneer, datum, context)
+      RedeemerStart { auctioneer, base } ->
+        start(datum, auctioneer, base, context)
+      RedeemerBid { bidder, auctioneer, coins } ->
+        bid(datum, bidder, auctioneer, coins, context)
+      RedeemerEnd { auctioneer } -> end(datum, auctioneer, context)
     }
   }
 }
