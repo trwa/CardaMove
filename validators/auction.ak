@@ -12,56 +12,73 @@ type Bid {
   coins: Coin,
 }
 
-type Datum {
+type GlobalState {
   auction: Auction,
   bid: Bid,
 }
 
+type Dispatch {
+  CallStart { auctioneer: Signer, base: Coin }
+  CallBid { bidder: Signer, auctioneer: Address, coins: Coin }
+  CallEnd { auctioneer: Signer }
+}
+
+// Encodes what was **after** the transaction (in Move)
+type Datum {
+  state_after: GlobalState,
+}
+
+// Encodes what was **before** the transaction (in Move) and what function was called to modify it
 type Redeemer {
-  RedeemerStart { auctioneer: Signer, base: Coin }
-  RedeemerBid { bidder: Signer, auctioneer: Address, coins: Coin }
-  RedeemerEnd { auctioneer: Signer }
+  state_before: GlobalState,
+  dispatch: Dispatch,
 }
 
 fn start(
-  _datum: Datum,
-  _auctioneer: Signer,
-  _base: Coin,
-  _context: ScriptContext,
+  _state_before: GlobalState,
+  auctioneer: Signer,
+  base: Coin,
+  state_after: GlobalState,
 ) -> Bool {
-  // TODO: Use code from Hammad
-  False
+  let check_auctioneer = state_after.auction.auctioneer == auctioneer
+  let check_top_bidder = state_after.auction.top_bidder == auctioneer
+  let check_expired = state_after.auction.expired == False
+  let check_bid = state_after.bid.coins == base
+
+  check_auctioneer && check_top_bidder && check_expired && check_bid
 }
 
 fn bid(
-  datum: Datum,
-  bidder: Signer,
-  auctioneer: Address,
-  coins: Coin,
-  context: ScriptContext,
+  _state_before: GlobalState,
+  _bidder: Signer,
+  _auctioneer: Address,
+  _coins: Coin,
+  _state_after: GlobalState,
 ) -> Bool {
-  // Ensure the auction is not expired and the new bid is higher than the current top bid
-  let auction_not_expired = !datum.auction.expired
-  let higher_bid = gt(coins, datum.bid.coins)
-  // Validate bidder is not the same as the top bidder
-  let valid_bidder = datum.auction.top_bidder != bidder
-
-  auction_not_expired && higher_bid && valid_bidder
+  // TODO: Do this with Hammad
+  False
 }
 
-fn end(_datum: Datum, _auctioneer: Address, _context: ScriptContext) -> Bool {
-  // TODO: Use code from Hammad
+fn end(
+  _state_before: GlobalState,
+  _auctioneer: Address,
+  _state_after: GlobalState,
+) -> Bool {
+  // TODO: Do this with Hammad
   False
 }
 
 validator {
-  fn run(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
-    when redeemer is {
-      RedeemerStart { auctioneer, base } ->
-        start(datum, auctioneer, base, context)
-      RedeemerBid { bidder, auctioneer, coins } ->
-        bid(datum, bidder, auctioneer, coins, context)
-      RedeemerEnd { auctioneer } -> end(datum, auctioneer, context)
+  fn run(datum: Datum, redeemer: Redeemer, _context: ScriptContext) -> Bool {
+    let state_before = redeemer.state_before
+    let state_after = datum.state_after
+    let dispatch = redeemer.dispatch
+    when dispatch is {
+      CallStart { auctioneer, base } ->
+        start(state_before, auctioneer, base, state_after)
+      CallBid { bidder, auctioneer, coins } ->
+        bid(state_before, bidder, auctioneer, coins, state_after)
+      CallEnd { auctioneer } -> end(state_before, auctioneer, state_after)
     }
   }
 }

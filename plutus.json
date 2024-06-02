@@ -25,8 +25,8 @@
           "$ref": "#/definitions/auction~1Redeemer"
         }
       },
-      "compiledCode": "5902680100003232323232322323232322322533300932533300a300800113233224a06eb8c03c004c03cc040004c030dd50020a999805180300089919199919111919299980919980919299980b180a8008a9998099807980a0008a51153330133011301400114a02c2c6ea8c058c05cc05cc050dd51803180a1baa0114a094454ccc04800840045280a503330113371e6eb8c010c04cdd5180298099baa0100034a0944cdc41bad300430123754600860246ea8c00cc048dd50079bad3004301237546028602a00a460246026002460220026eb8c040008dd71808000980800098061baa0041324a06eb8c038c030dd500218051baa00314984d958c94ccc020c0180044c8c8c8c94ccc03cc0440084c926300900116300f001300f002375c601a00260146ea800854ccc020c0100044c8c8c8c8c8c94ccc044c04c0084c926300b0011630110013011002375c601e002601e0046eb8c034004c028dd50010a99980419b87480100044c8c94ccc034c03c00852616375c601a00260146ea800858c020dd5000a999802980198031baa004132323232533300c300e002132324994ccc028c020c02cdd5001099192999807980880109924c60120022c601e00260186ea8008594ccc024c01cc028dd500189919191919192999809180a0010a4c2c64a66602460220022a66601e60166020002294454ccc03cc034c0400045280b0b1baa30120013012002375c602000260200046eb8c038004c02cdd50018b0b18060009806001180500098039baa00416370e900112999802180118029baa001132325333009300b002149858dd6980480098031baa00116370e90002b9a5573aaae7955cfaba157441",
-      "hash": "1cde6a871cfc6a553c447cf73d2c6453cd6fa8e71b6d47f26bfb605f"
+      "compiledCode": "5902e5010000323232323232232323232322322533300a3232323232325333010300e0011323232323253330153371e6eb8c02cc05cdd51805980b9baa0090041533301500315333015002100114a0294052819baf300a30163754600e602c6ea8020c060c0640114ccc04cc94ccc05cc05800454ccc050c040c0540045288a99980a1809180a8008a5016163754602e60306030602a6ea8c024c054dd50038a5013330134a09412899b8f375c600a60286ea8c020c050dd50030009bae3015001301237540042a666020601800226464666444940dd7180b0011bae301600130163017001301600130123754004264940dd7180a18091baa00230103754002600260206ea801c8c048c04c004c008c038dd5005980098069baa0042300f00114984d9594ccc020c018c024dd5000899191919299980798088010991924c64a66601c6018002264646464a66602a602e0042649318078008b180a800980a8011bae3013001301037540062a66601c60140022646464646464a66602e60320042649318088008b180b800980b8011bae30150013015002375c602600260206ea800c54ccc038cdc3a400800226464a666026602a0042930b1bae3013001301037540062c601c6ea8008c01c00c58c03c004c03c008c034004c028dd50008b2999803180218039baa00513232533300b300d002132498c00c00458c02c004c020dd50028b12999803180218039baa001132323232533300d300f002132324994ccc02cc024c030dd5001099192999808180900109924c60140022c6020002601a6ea8008594ccc028c020c02cdd500189919191919192999809980a8010a4c2c64a66602660240022a66602060186022002294454ccc040c038c0440045280b0b1baa30130013013002375c602200260220046eb8c03c004c030dd50018b0b18068009806801180580098041baa00116370e900112999802180118029baa001132325333009300b002149858dd6980480098031baa00116370e90002b9a5573aaae7955cfaba157441",
+      "hash": "adf33549bd2751cf5624c79e49e08b3c8825fbe99d0fc5d3c7804e0e"
     }
   ],
   "definitions": {
@@ -102,22 +102,18 @@
           "index": 0,
           "fields": [
             {
-              "title": "auction",
-              "$ref": "#/definitions/auction~1Auction"
-            },
-            {
-              "title": "bid",
-              "$ref": "#/definitions/auction~1Bid"
+              "title": "state_after",
+              "$ref": "#/definitions/auction~1GlobalState"
             }
           ]
         }
       ]
     },
-    "auction/Redeemer": {
-      "title": "Redeemer",
+    "auction/Dispatch": {
+      "title": "Dispatch",
       "anyOf": [
         {
-          "title": "RedeemerStart",
+          "title": "CallStart",
           "dataType": "constructor",
           "index": 0,
           "fields": [
@@ -132,7 +128,7 @@
           ]
         },
         {
-          "title": "RedeemerBid",
+          "title": "CallBid",
           "dataType": "constructor",
           "index": 1,
           "fields": [
@@ -151,13 +147,53 @@
           ]
         },
         {
-          "title": "RedeemerEnd",
+          "title": "CallEnd",
           "dataType": "constructor",
           "index": 2,
           "fields": [
             {
               "title": "auctioneer",
               "$ref": "#/definitions/ByteArray"
+            }
+          ]
+        }
+      ]
+    },
+    "auction/GlobalState": {
+      "title": "GlobalState",
+      "anyOf": [
+        {
+          "title": "GlobalState",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "auction",
+              "$ref": "#/definitions/auction~1Auction"
+            },
+            {
+              "title": "bid",
+              "$ref": "#/definitions/auction~1Bid"
+            }
+          ]
+        }
+      ]
+    },
+    "auction/Redeemer": {
+      "title": "Redeemer",
+      "anyOf": [
+        {
+          "title": "Redeemer",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "state_before",
+              "$ref": "#/definitions/auction~1GlobalState"
+            },
+            {
+              "title": "dispatch",
+              "$ref": "#/definitions/auction~1Dispatch"
             }
           ]
         }
