@@ -14,6 +14,24 @@ use cardamove/unit.{Unit}
 pub type RunState<s, a> =
   fn(s) -> (a, s)
 
+// =====================================================================================================================
+// State operations.
+// ---------------------------------------------------------------------------------------------------------------------
+// https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-State-Lazy.html#v:get
+// =====================================================================================================================
+
+pub fn get() -> RunState<s, s> {
+  fn(s) { (s, s) }
+}
+
+pub fn put(s: s) -> RunState<s, Unit> {
+  fn(_) { (Unit, s) }
+}
+
+pub fn modify(f: fn(s) -> s) -> RunState<s, Unit> {
+  fn(s) { (Unit, f(s)) }
+}
+
 pub fn run_state(m: RunState<s, a>, s: s) -> (a, s) {
   m(s)
 }
@@ -35,22 +53,8 @@ pub fn map_state(f: fn(a, s) -> (b, s), m: RunState<s, a>) -> RunState<s, b> {
   }
 }
 
-// =====================================================================================================================
-// State operations.
-// ---------------------------------------------------------------------------------------------------------------------
-// https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-State-Lazy.html#v:get
-// =====================================================================================================================
-
-pub fn get() -> RunState<s, s> {
-  fn(s) { (s, s) }
-}
-
-pub fn put(s: s) -> RunState<s, Unit> {
-  fn(_) { (Unit, s) }
-}
-
-pub fn modify(f: fn(s) -> s) -> RunState<s, Unit> {
-  fn(s) { (Unit, f(s)) }
+pub fn with_state(f: fn(s) -> s, m: RunState<s, a>) -> RunState<s, a> {
+  then(modify(f), m)
 }
 
 // =====================================================================================================================
