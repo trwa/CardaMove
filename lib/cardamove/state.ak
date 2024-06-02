@@ -96,3 +96,8 @@ pub fn bind(m: RunState<s, a>, f: fn(a) -> RunState<s, b>) -> RunState<s, b> {
     run_state(f(x), s1)
   }
 }
+
+// (>>) :: Monad m => m a -> m b -> m b
+pub fn then(ma: RunState<s, a>, mb: RunState<s, b>) -> RunState<s, b> {
+  bind(ma, fn(_) { mb })
+}
