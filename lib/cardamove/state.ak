@@ -1,6 +1,9 @@
+use cardamove/unit.{Unit}
+
 // =====================================================================================================================
 // RunState
 // ---------------------------------------------------------------------------------------------------------------------
+// https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-State-Lazy.html#v:state
 // Aiken data types cannot hold functions, so we need to use a type alias.
 // In Haskell, this would have been properly:
 // data State s a = State { runState :: s -> (a, s) }
@@ -30,6 +33,24 @@ pub fn map_state(f: fn(a, s) -> (b, s), m: RunState<s, a>) -> RunState<s, b> {
     let (x, s1) = run_state(m, s)
     f(x, s1)
   }
+}
+
+// =====================================================================================================================
+// State operations.
+// ---------------------------------------------------------------------------------------------------------------------
+// https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-State-Lazy.html#v:get
+// =====================================================================================================================
+
+pub fn get() -> RunState<s, s> {
+  fn(s) { (s, s) }
+}
+
+pub fn put(s: s) -> RunState<s, Unit> {
+  fn(_) { (Unit, s) }
+}
+
+pub fn modify(f: fn(s) -> s) -> RunState<s, Unit> {
+  fn(s) { (Unit, f(s)) }
 }
 
 // =====================================================================================================================
