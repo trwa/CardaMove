@@ -79,17 +79,19 @@ fn bid(
 }
 
 fn end(
-  _state_before: GlobalState,
-  _auctioneer: Address,
-  _state_after: GlobalState,
+  state_before: GlobalState,
+  auctioneer: Address,
+  state_after: GlobalState,
 ) -> Bool {
-  // TODO: Do this with Hammad
-  False
+
+let check_auctioneer = state_before.auction.auctioneer == auctioneer
+let auction_expired=  state_after.auction.expired == True
+    check_auctioneer && auction_expired
 }
 
 validator {
   fn run(datum: Datum, redeemer: Redeemer, _context: ScriptContext) -> Bool {
-    let state_before = redeemer.state_before
+  let state_before = redeemer.state_before
     let state_after = datum.state_after
     let dispatch = redeemer.dispatch
     when dispatch is {
