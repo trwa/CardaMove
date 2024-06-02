@@ -1,14 +1,8 @@
-use aiken/bytearray
-use aiken/hash.{Blake2b_224, Hash}
-use aiken/list
-use aiken/transaction
-use aiken/transaction/credential.{Script}
-
 // =====================================================================================================================
 // Types
 // =====================================================================================================================
 
-type Value {
+pub type Value {
   ada: Int,
 }
 
@@ -16,10 +10,10 @@ type Value {
 // Functions
 // =====================================================================================================================
 
-fn zero() -> Value {
+pub fn zero() -> Value {
   Value { ada: 0 }
 }
 
-fn gt(value1: Value, value2: Value) -> Bool {
+pub fn gt(value1: Value, value2: Value) -> Bool {
   value1.ada > value2.ada
 }
