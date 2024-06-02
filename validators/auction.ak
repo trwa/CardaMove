@@ -1,6 +1,6 @@
 use aiken/transaction.{ScriptContext}
 use aiken/transaction/credential.{VerificationKey}
-use aiken/transaction/value.{Value, zero}
+use cardamove/util.{Value, gt}
 
 // =====================================================================================================================
 // Types of our framework's prelude
