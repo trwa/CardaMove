@@ -31,9 +31,9 @@ type GlobalState {
 // =====================================================================================================================
 
 type Dispatch {
-  CallStart { auctioneer: Signer, base: Coin }
-  CallBid { bidder: Signer, auctioneer: Address, coins: Coin }
-  CallEnd { auctioneer: Signer }
+  CheckStart { auctioneer: Signer, base: Coin }
+  CheckBid { bidder: Signer, auctioneer: Address, coins: Coin }
+  CheckEnd { auctioneer: Signer }
 }
 
 // =====================================================================================================================
@@ -131,11 +131,12 @@ validator {
     let state_after = datum.state_after
     let dispatch = redeemer.dispatch
     when dispatch is {
-      CallStart { auctioneer, base } ->
+      CheckStart { auctioneer, base } ->
         check_start(state_before, auctioneer, base, state_after)
-      CallBid { bidder, auctioneer, coins } ->
+      CheckBid { bidder, auctioneer, coins } ->
         check_bid(state_before, bidder, auctioneer, coins, state_after)
-      CallEnd { auctioneer } -> check_end(state_before, auctioneer, state_after)
+      CheckEnd { auctioneer } ->
+        check_end(state_before, auctioneer, state_after)
     }
   }
 }

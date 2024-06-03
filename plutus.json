@@ -113,7 +113,7 @@
       "title": "Dispatch",
       "anyOf": [
         {
-          "title": "CallStart",
+          "title": "CheckStart",
           "dataType": "constructor",
           "index": 0,
           "fields": [
@@ -128,7 +128,7 @@
           ]
         },
         {
-          "title": "CallBid",
+          "title": "CheckBid",
           "dataType": "constructor",
           "index": 1,
           "fields": [
@@ -147,7 +147,7 @@
           ]
         },
         {
-          "title": "CallEnd",
+          "title": "CheckEnd",
           "dataType": "constructor",
           "index": 2,
           "fields": [
