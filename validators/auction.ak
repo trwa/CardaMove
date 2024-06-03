@@ -74,7 +74,11 @@ fn check_start(
   check_auctioneer && check_top_bidder && check_expired && check_bid
 }
 
-fn run_bid(bidder: Signer, coins: Coin) -> RunState<GlobalState, Bool> {
+fn sim_bid(
+  bidder: Signer,
+  _auctioneer: Address,
+  coins: Coin,
+) -> RunState<GlobalState, Bool> {
   let s0: GlobalState <- bind(get())
   let assert_expired = s0.auction.expired == False
   let assert_top_bid = gt(coins, s0.top_bid.coins)
@@ -102,11 +106,12 @@ fn run_bid(bidder: Signer, coins: Coin) -> RunState<GlobalState, Bool> {
 fn check_bid(
   state_before: GlobalState,
   bidder: Signer,
-  _auctioneer: Address,
+  auctioneer: Address,
   coins: Coin,
   state_after: GlobalState,
 ) -> Bool {
-  let (assert, state) = run_state(run_bid(bidder, coins), state_before)
+  let expected = sim_bid(bidder, auctioneer, coins)
+  let (assert, state) = run_state(expected, state_before)
   assert && state == state_after
 }
 
@@ -115,15 +120,14 @@ fn check_end(
   auctioneer: Address,
   state_after: GlobalState,
 ) -> Bool {
-
-let check_auctioneer = state_before.auction.auctioneer == auctioneer
-let auction_expired=  state_after.auction.expired == True
-    check_auctioneer && auction_expired
+  let check_auctioneer = state_before.auction.auctioneer == auctioneer
+  let auction_expired = state_after.auction.expired == True
+  check_auctioneer && auction_expired
 }
 
 validator {
   fn run(datum: Datum, redeemer: Redeemer, _context: ScriptContext) -> Bool {
-  let state_before = redeemer.state_before
+    let state_before = redeemer.state_before
     let state_after = datum.state_after
     let dispatch = redeemer.dispatch
     when dispatch is {
