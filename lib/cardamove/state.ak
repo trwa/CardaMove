@@ -28,6 +28,10 @@ pub fn put(s: s) -> RunState<s, Unit> {
   fn(_) { (Unit, s) }
 }
 
+pub fn state(f: fn(s) -> (a, s)) -> RunState<s, a> {
+  f
+}
+
 pub fn modify(f: fn(s) -> s) -> RunState<s, Unit> {
   fn(s) { (Unit, f(s)) }
 }
