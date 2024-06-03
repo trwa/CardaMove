@@ -1,6 +1,11 @@
 use aiken/transaction.{ScriptContext}
 use cardamove/coin.{Coin, gt}
 use cardamove/move.{Address, Signer}
+use cardamove/state.{RunState, bind, get, put, return, run_state}
+
+// =====================================================================================================================
+// Types defined in the Move code
+// =====================================================================================================================
 
 type Auction {
   auctioneer: Address,
@@ -12,10 +17,18 @@ type Bid {
   coins: Coin,
 }
 
+// =====================================================================================================================
+// Implicit global state
+// =====================================================================================================================
+
 type GlobalState {
   auction: Auction,
   top_bid: Bid,
 }
+
+// =====================================================================================================================
+// Function calls
+// =====================================================================================================================
 
 type Dispatch {
   CallStart { auctioneer: Signer, base: Coin }
@@ -23,19 +36,31 @@ type Dispatch {
   CallEnd { auctioneer: Signer }
 }
 
+// =====================================================================================================================
+// Datum contains the state after the transaction
+// =====================================================================================================================
+
 // Encodes what was **after** the transaction (in Move)
 type Datum {
   state_after: GlobalState,
 }
 
+// =====================================================================================================================
+// Redeemer contains the state before the transaction and the function that was called
+// =====================================================================================================================
+
 // Encodes what was **before** the transaction (in Move) and what function was called to modify it
 type Redeemer {
-  // TODO: Maybe this should be taken elsewhere...
+  // TODO: Maybe this should be taken from elsewhere, here it seems not safe at all...
   state_before: GlobalState,
   dispatch: Dispatch,
 }
 
-fn start(
+// =====================================================================================================================
+// Validator functions
+// =====================================================================================================================
+
+fn check_start(
   _state_before: GlobalState,
   auctioneer: Signer,
   base: Coin,
@@ -49,36 +74,43 @@ fn start(
   check_auctioneer && check_top_bidder && check_expired && check_bid
 }
 
-fn bid(
+fn run_bid(bidder: Signer, coins: Coin) -> RunState<GlobalState, Bool> {
+  let s0: GlobalState <- bind(get())
+  let assert_expired = s0.auction.expired == False
+  let assert_top_bid = gt(coins, s0.top_bid.coins)
+  // TODO: How do we model this? 
+  // Should we add accounts to the global state?
+  // coins::deposit(auction.top_bidder, top_bid.coins)
+  let _ <-
+    bind(
+      put(
+        GlobalState {
+          auction: Auction {
+            auctioneer: s0.auction.auctioneer,
+            top_bidder: bidder,
+            expired: s0.auction.expired,
+          },
+          top_bid: Bid { coins },
+        },
+      ),
+    )
+  // TODO: Same as above.
+  // move_to(bidder, coins)
+  return(assert_expired && assert_top_bid)
+}
+
+fn check_bid(
   state_before: GlobalState,
   bidder: Signer,
   _auctioneer: Address,
   coins: Coin,
   state_after: GlobalState,
 ) -> Bool {
-  // Here we take values from the state before the transaction...
-  let auction = state_before.auction
-  let top_bid = state_before.top_bid
-  // ... and check them.
-  let check_expired = auction.expired == False
-  let check_top_bid = gt(coins, top_bid.coins)
-
-  // TODO: How do we model this? Should we add actual accounts to the global state?
-  // coins::deposit(auction.top_bidder, top_bid.coins)
-  // ---
-  // Here we take values from the state after the transaction...
-  let top_bidder1 = state_after.auction.top_bidder
-  let top_bid1 = state_after.top_bid
-  // ... and check them.
-  let check_top_bidder1 = top_bidder1 == bidder
-  let check_top_bid1 = top_bid1.coins == coins
-
-  check_expired && check_top_bid && check_top_bidder1 && check_top_bid1
-  // TODO: Same as above
-  // move_to(bidder, coins)
+  let (assert, state) = run_state(run_bid(bidder, coins), state_before)
+  assert && state == state_after
 }
 
-fn end(
+fn check_end(
   _state_before: GlobalState,
   _auctioneer: Address,
   _state_after: GlobalState,
@@ -94,10 +126,10 @@ validator {
     let dispatch = redeemer.dispatch
     when dispatch is {
       CallStart { auctioneer, base } ->
-        start(state_before, auctioneer, base, state_after)
+        check_start(state_before, auctioneer, base, state_after)
       CallBid { bidder, auctioneer, coins } ->
-        bid(state_before, bidder, auctioneer, coins, state_after)
-      CallEnd { auctioneer } -> end(state_before, auctioneer, state_after)
+        check_bid(state_before, bidder, auctioneer, coins, state_after)
+      CallEnd { auctioneer } -> check_end(state_before, auctioneer, state_after)
     }
   }
 }
