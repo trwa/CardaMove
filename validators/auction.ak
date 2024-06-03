@@ -110,9 +110,8 @@ fn check_bid(
   coins: Coin,
   state_after: GlobalState,
 ) -> Bool {
-  let expected = sim_bid(bidder, auctioneer, coins)
-  let (assert, state) = run_state(expected, state_before)
-  assert && state == state_after
+  let (assert, expected) = run_state(sim_bid(bidder, auctioneer, coins), state_before)
+  assert && expected == state_after
 }
 
 fn check_end(
