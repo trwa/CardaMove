@@ -1,4 +1,4 @@
-use aiken/transaction.{ScriptContext}
+use aiken/transaction.{ScriptContext, Spend}
 use cardamove/move.{
   Address, FailState, Signer, Storage, assert, from_list, guard, move_from,
   move_to, success,
@@ -188,7 +188,7 @@ type Redeemer {
 // =====================================================================================================================
 
 validator {
-  fn run(datum: Datum, redeemer: Redeemer, _context: ScriptContext) -> Bool {
+  fn run(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
     let before =
       Global {
         auction: from_list(datum.state.auction),
@@ -202,12 +202,17 @@ validator {
         coin: from_list(redeemer.state.coin),
       }
     let dispatch = redeemer.dispatch
-    when dispatch is {
-      CheckStart { auctioneer, base } ->
-        check_start(before, auctioneer, base, after)
-      CheckBid { bidder, auctioneer, coins } ->
-        check_bid(before, bidder, auctioneer, coins, after)
-      CheckEnd { auctioneer } -> check_end(before, auctioneer, after)
+    let purpose = context.purpose
+    when purpose is {
+      Spend(_) ->
+        when dispatch is {
+          CheckStart { auctioneer, base } ->
+            check_start(before, auctioneer, base, after)
+          CheckBid { bidder, auctioneer, coins } ->
+            check_bid(before, bidder, auctioneer, coins, after)
+          CheckEnd { auctioneer } -> check_end(before, auctioneer, after)
+        }
+      _ -> False
     }
   }
 }
