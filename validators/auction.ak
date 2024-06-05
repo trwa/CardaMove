@@ -1,7 +1,7 @@
 use aiken/transaction.{ScriptContext, Spend}
 use cardamove/move.{
-  Address, FailState, Signer, Storage, assert, from_list, guard, move_from,
-  move_to, success,
+  Address, FailState, Signer, Storage, assert, bind, borrow_global_mut,
+  from_list, move_from, move_to, return,
 }
 use cardamove/prelude.{Coin, Unit, gt}
 use cardamove/state.{run_state}
@@ -62,7 +62,7 @@ fn set_storage_coin(g: Global, s: Storage<Coin>) -> Global {
 
 fn sim_start(auctioneer: Signer, base: Coin) -> FailState<Global, Unit> {
   let _: Unit <-
-    guard(
+    bind(
       move_to(
         auctioneer,
         Auction { auctioneer, top_bidder: auctioneer, expired: False },
@@ -71,10 +71,10 @@ fn sim_start(auctioneer: Signer, base: Coin) -> FailState<Global, Unit> {
       ),
     )
   let _: Unit <-
-    guard(
+    bind(
       move_to(auctioneer, Bid { coins: base }, get_storage_bid, set_storage_bid),
     )
-  success(Unit)
+  return(Unit)
 }
 
 fn sim_bid(
@@ -82,35 +82,32 @@ fn sim_bid(
   auctioneer: Address,
   coins: Coin,
 ) -> FailState<Global, Unit> {
-  let auction: Auction <-
-    guard(move_from(auctioneer, get_storage_auction, set_storage_auction))
-  let bid: Bid <- guard(move_from(bidder, get_storage_bid, set_storage_bid))
-  let _: Unit <- guard(assert(auction.expired == False))
-  let _: Unit <- guard(assert(gt(coins, bid.coins)))
-  let _: Unit <-
-    guard(
-      move_to(auction.top_bidder, coins, get_storage_coin, set_storage_coin),
-    )
-  let _: Unit <-
-    guard(
-      move_to(
-        auctioneer,
-        Auction { ..auction, top_bidder: bidder },
-        get_storage_auction,
-        set_storage_auction,
-      ),
-    )
-  let _: Unit <-
-    guard(move_to(bidder, Bid { coins }, get_storage_bid, set_storage_bid))
-  success(Unit)
+  borrow_global_mut(
+    auctioneer,
+    get_storage_auction,
+    set_storage_auction,
+    fn(ass0: Auction) {
+      let bid: Bid <- bind(move_from(bidder, get_storage_bid, set_storage_bid))
+      let _: Unit <- bind(assert(ass0.expired == False))
+      let _: Unit <- bind(assert(gt(coins, bid.coins)))
+      let _: Unit <-
+        bind(
+          move_to(ass0.top_bidder, coins, get_storage_coin, set_storage_coin),
+        )
+      let ass1 = Auction { ..ass0, top_bidder: bidder }
+      let _: Unit <-
+        bind(move_to(bidder, Bid { coins }, get_storage_bid, set_storage_bid))
+      return(ass1)
+    },
+  )
 }
 
 fn sim_end(auctioneer: Signer) -> FailState<Global, Unit> {
   let auction: Auction <-
-    guard(move_from(auctioneer, get_storage_auction, set_storage_auction))
-  let _: Unit <- guard(assert(auction.auctioneer == auctioneer))
+    bind(move_from(auctioneer, get_storage_auction, set_storage_auction))
+  let _: Unit <- bind(assert(auction.auctioneer == auctioneer))
   let _: Unit <-
-    guard(
+    bind(
       move_to(
         auctioneer,
         Auction { ..auction, expired: True },
@@ -118,7 +115,7 @@ fn sim_end(auctioneer: Signer) -> FailState<Global, Unit> {
         set_storage_auction,
       ),
     )
-  success(Unit)
+  return(Unit)
 }
 
 // =====================================================================================================================
@@ -134,7 +131,7 @@ fn check_start(
   let (assert, expected) = run_state(sim_start(auctioneer, base), before)
   when assert is {
     None -> False
-    _ -> after == expected
+    _ -> expected == after
   }
 }
 
