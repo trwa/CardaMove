@@ -63,15 +63,15 @@ pub fn assert(condition: Bool) -> FailState<g, Unit> {
 pub fn move_to(
   address: Address,
   value: t,
-  gets: fn(g) -> Storage<t>,
-  puts: fn(g, Storage<t>) -> g,
+  get_storage: fn(g) -> Storage<t>,
+  set_storage: fn(g, Storage<t>) -> g,
 ) -> FailState<g, Unit> {
   let s0: g <- state.bind(state.get())
-  let storage = gets(s0)
+  let storage = get_storage(s0)
   if has_key(storage, address) {
     state.return(None)
   } else {
-    let s1 = puts(s0, insert(storage, address, value))
+    let s1 = set_storage(s0, insert(storage, address, value))
     let _ <- state.bind(put(s1))
     state.return(Some(Unit))
   }
@@ -79,43 +79,54 @@ pub fn move_to(
 
 pub fn move_from(
   address: Address,
-  gets: fn(g) -> Storage<t>,
-  puts: fn(g, Storage<t>) -> g,
+  get_storage: fn(g) -> Storage<t>,
+  set_storage: fn(g, Storage<t>) -> g,
 ) -> FailState<g, t> {
   let s0: g <- state.bind(state.get())
-  let storage = gets(s0)
+  let storage = get_storage(s0)
   when get(storage, address) is {
     None -> state.return(None)
     some -> {
-      let s1 = puts(s0, delete(storage, address))
+      let s1 = set_storage(s0, delete(storage, address))
       let _ <- state.bind(put(s1))
       state.return(some)
     }
   }
 }
 
+pub opaque type Ref<t> {
+  address: Address,
+  value: t,
+}
+
+pub fn value(a: Ref<t>) -> t {
+  a.value
+}
+
 pub fn borrow(
   address: Address,
-  gets: fn(g) -> Storage<t>,
-  _puts: fn(g, Storage<t>) -> g,
-) -> FailState<g, t> {
+  get_storage: fn(g) -> Storage<t>,
+  _set_storage: fn(g, Storage<t>) -> g,
+) -> FailState<g, Ref<t>> {
   let s0: g <- state.bind(state.get())
-  let storage = gets(s0)
-  let value = get(storage, address)
-  state.return(value)
+  let opt = get(get_storage(s0), address)
+  when opt is {
+    None -> state.return(None)
+    Some(val) -> state.return(Some(Ref { address, value: val }))
+  }
 }
 
 pub fn assign(
-  address: Address,
+  what: Ref<t>,
   value: t,
-  gets: fn(g) -> Storage<t>,
-  puts: fn(g, Storage<t>) -> g,
-) -> FailState<g, Unit> {
+  get_storage: fn(g) -> Storage<t>,
+  set_storage: fn(g, Storage<t>) -> g,
+) -> FailState<g, Ref<t>> {
   let s0: g <- state.bind(state.get())
-  let storage = gets(s0)
-  let s1 = puts(s0, insert(storage, address, value))
+  let storage = get_storage(s0)
+  let s1 = set_storage(s0, insert(storage, what.address, value))
   let _ <- state.bind(put(s1))
-  return(Unit)
+  return(what)
 }
 
 // =====================================================================================================================
