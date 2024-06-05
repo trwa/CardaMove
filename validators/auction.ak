@@ -1,6 +1,6 @@
 use aiken/transaction.{ScriptContext, Spend}
 use cardamove/move.{
-  Address, FailState, Ref, Signer, Storage, assert, assign, bind, borrow,
+  Address, GuardState, Ref, Signer, Storage, assert, assign, bind, borrow,
   from_list, move_from, move_to, return, value,
 }
 use cardamove/prelude.{Coin, Unit, gt}
@@ -26,50 +26,34 @@ type Bid {
 // We **must** generate the record selectors and updaters for the global storage.
 // =====================================================================================================================
 
-type Global {
+type GlobalStorage {
   auction: Storage<Auction>,
   bid: Storage<Bid>,
   coin: Storage<Coin>,
 }
 
-fn get_storage_auction(g: Global) -> Storage<Auction> {
+fn get_storage_auction(g: GlobalStorage) -> Storage<Auction> {
   g.auction
 }
 
-fn set_storage_auction(g: Global, s: Storage<Auction>) -> Global {
-  Global { ..g, auction: s }
+fn set_storage_auction(g: GlobalStorage, s: Storage<Auction>) -> GlobalStorage {
+  GlobalStorage { ..g, auction: s }
 }
 
-fn get_storage_bid(g: Global) -> Storage<Bid> {
+fn get_storage_bid(g: GlobalStorage) -> Storage<Bid> {
   g.bid
 }
 
-fn set_storage_bid(g: Global, s: Storage<Bid>) -> Global {
-  Global { ..g, bid: s }
+fn set_storage_bid(g: GlobalStorage, s: Storage<Bid>) -> GlobalStorage {
+  GlobalStorage { ..g, bid: s }
 }
 
-fn get_storage_coin(g: Global) -> Storage<Coin> {
+fn get_storage_coin(g: GlobalStorage) -> Storage<Coin> {
   g.coin
 }
 
-fn set_storage_coin(g: Global, s: Storage<Coin>) -> Global {
-  Global { ..g, coin: s }
-}
-
-// =====================================================================================================================
-// State/Dispatch
-// =====================================================================================================================
-
-type State {
-  auction: List<(Address, Auction)>,
-  bid: List<(Address, Bid)>,
-  coin: List<(Address, Coin)>,
-}
-
-type Dispatch {
-  CheckStart { auctioneer: Signer, base: Coin }
-  CheckBid { bidder: Signer, auctioneer: Address, coins: Coin }
-  CheckEnd { auctioneer: Signer }
+fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
+  GlobalStorage { ..g, coin: s }
 }
 
 // =====================================================================================================================
@@ -77,19 +61,38 @@ type Dispatch {
 // =====================================================================================================================
 
 type Datum {
-  state: State,
+  auction: List<(Address, Auction)>,
+  bid: List<(Address, Bid)>,
+  coin: List<(Address, Coin)>,
 }
 
 type Redeemer {
-  state: State,
-  dispatch: Dispatch,
+  CheckStart { auctioneer: Signer, base: Coin }
+  CheckBid { bidder: Signer, auctioneer: Address, coins: Coin }
+  CheckEnd { auctioneer: Signer }
+}
+
+fn from_datum(d: Datum) -> GlobalStorage {
+  GlobalStorage {
+    auction: from_list(d.auction),
+    bid: from_list(d.bid),
+    coin: from_list(d.coin),
+  }
+}
+
+fn from_context(c: Datum) -> GlobalStorage {
+  GlobalStorage {
+    auction: from_list(c.auction),
+    bid: from_list(c.bid),
+    coin: from_list(c.coin),
+  }
 }
 
 // =====================================================================================================================
-// Actual functions (just for simulation)
+// Start
 // =====================================================================================================================
 
-fn start(auctioneer: Signer, base: Coin) -> FailState<Global, Unit> {
+fn start(auctioneer: Signer, base: Coin) -> GuardState<GlobalStorage, Unit> {
   let _: Unit <-
     bind(
       move_to(
@@ -106,11 +109,15 @@ fn start(auctioneer: Signer, base: Coin) -> FailState<Global, Unit> {
   return(Unit)
 }
 
+// =====================================================================================================================
+// Bid
+// =====================================================================================================================
+
 fn bid(
   bidder: Signer,
   auctioneer: Address,
   coins: Coin,
-) -> FailState<Global, Unit> {
+) -> GuardState<GlobalStorage, Unit> {
   let auction: Ref<Auction> <-
     bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
   let bid: Bid <- bind(move_from(bidder, get_storage_bid, set_storage_bid))
@@ -139,7 +146,11 @@ fn bid(
   return(Unit)
 }
 
-fn end(auctioneer: Signer) -> FailState<Global, Unit> {
+// =====================================================================================================================
+// Bid
+// =====================================================================================================================
+
+fn end(auctioneer: Signer) -> GuardState<GlobalStorage, Unit> {
   let auction: Ref<Auction> <-
     bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
   let _: Unit <- bind(assert(value(auction).auctioneer == auctioneer))
@@ -164,10 +175,10 @@ fn end(auctioneer: Signer) -> FailState<Global, Unit> {
 // =====================================================================================================================
 
 fn check_start(
-  before: Global,
+  before: GlobalStorage,
   auctioneer: Signer,
   base: Coin,
-  after: Global,
+  after: GlobalStorage,
 ) -> Bool {
   let (assert, expected) = run_state(start(auctioneer, base), before)
   when assert is {
@@ -177,11 +188,11 @@ fn check_start(
 }
 
 fn check_bid(
-  before: Global,
+  before: GlobalStorage,
   bidder: Signer,
   auctioneer: Address,
   coins: Coin,
-  after: Global,
+  after: GlobalStorage,
 ) -> Bool {
   let (assert, expected) = run_state(bid(bidder, auctioneer, coins), before)
   when assert is {
@@ -190,7 +201,11 @@ fn check_bid(
   }
 }
 
-fn check_end(before: Global, auctioneer: Address, after: Global) -> Bool {
+fn check_end(
+  before: GlobalStorage,
+  auctioneer: Address,
+  after: GlobalStorage,
+) -> Bool {
   let (assert, expected) = run_state(end(auctioneer), before)
   when assert is {
     None -> False
@@ -204,23 +219,11 @@ fn check_end(before: Global, auctioneer: Address, after: Global) -> Bool {
 
 validator {
   fn run(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
-    let before =
-      Global {
-        auction: from_list(datum.state.auction),
-        bid: from_list(datum.state.bid),
-        coin: from_list(datum.state.coin),
-      }
-    let after =
-      Global {
-        auction: from_list(redeemer.state.auction),
-        bid: from_list(redeemer.state.bid),
-        coin: from_list(redeemer.state.coin),
-      }
-    let dispatch = redeemer.dispatch
-    let purpose = context.purpose
-    when purpose is {
+    let before = from_datum(datum)
+    let after = from_context(datum)
+    when context.purpose is {
       Spend(_) ->
-        when dispatch is {
+        when redeemer is {
           CheckStart { auctioneer, base } ->
             check_start(before, auctioneer, base, after)
           CheckBid { bidder, auctioneer, coins } ->

@@ -1,11 +1,9 @@
 use aiken/dict.{Dict}
 use cardamove/prelude.{Unit}
-use cardamove/state.{RunState, put, state}
+use cardamove/state.{RunState}
 
 // =====================================================================================================================
-// Move Global Storage Operators
-// ---
-// https://move-language.github.io/move/global-storage-operators.html
+// Basic Types
 // =====================================================================================================================
 
 pub type Address =
@@ -14,12 +12,15 @@ pub type Address =
 pub type Signer =
   Address
 
+// =====================================================================================================================
+// Storage
+// ---
+// https://move-language.github.io/move/global-storage-operators.html
+// =====================================================================================================================
+
 pub type Storage<t> {
   internal: Dict<Address, t>,
 }
-
-pub type FailState<s, t> =
-  RunState<s, Option<t>>
 
 fn compare(lhs: Address, rhs: Address) -> Ordering {
   if lhs < rhs {
@@ -52,7 +53,34 @@ pub fn from_list(list: List<(Address, t)>) -> Storage<t> {
   Storage { internal }
 }
 
-pub fn assert(condition: Bool) -> FailState<g, Unit> {
+// =====================================================================================================================
+// GuardState Monad
+// =====================================================================================================================
+
+pub type GuardState<s, t> =
+  RunState<s, Option<t>>
+
+pub fn bind(
+  m: GuardState<s, a>,
+  k: fn(a) -> GuardState<s, b>,
+) -> GuardState<s, b> {
+  let s <- state.bind(state.get())
+  let o <- state.bind(m)
+  when o is {
+    Some(x) -> k(x)
+    None -> state.state(fn(_) { (None, s) })
+  }
+}
+
+pub fn return(a: a) -> GuardState<s, a> {
+  state.return(Some(a))
+}
+
+// =====================================================================================================================
+// assert, move_to, move_from
+// =====================================================================================================================
+
+pub fn assert(condition: Bool) -> GuardState<g, Unit> {
   if condition {
     state.return(Some(Unit))
   } else {
@@ -65,14 +93,14 @@ pub fn move_to(
   value: t,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> FailState<g, Unit> {
+) -> GuardState<g, Unit> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   if has_key(storage, address) {
     state.return(None)
   } else {
     let s1 = set_storage(s0, insert(storage, address, value))
-    let _ <- state.bind(put(s1))
+    let _ <- state.bind(state.put(s1))
     state.return(Some(Unit))
   }
 }
@@ -81,18 +109,22 @@ pub fn move_from(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> FailState<g, t> {
+) -> GuardState<g, t> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   when get(storage, address) is {
     None -> state.return(None)
     some -> {
       let s1 = set_storage(s0, delete(storage, address))
-      let _ <- state.bind(put(s1))
+      let _ <- state.bind(state.put(s1))
       state.return(some)
     }
   }
 }
+
+// =====================================================================================================================
+// Ref, borrow, assign
+// =====================================================================================================================
 
 pub opaque type Ref<t> {
   address: Address,
@@ -107,7 +139,7 @@ pub fn borrow(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
   _set_storage: fn(g, Storage<t>) -> g,
-) -> FailState<g, Ref<t>> {
+) -> GuardState<g, Ref<t>> {
   let s0: g <- state.bind(state.get())
   let opt = get(get_storage(s0), address)
   when opt is {
@@ -121,27 +153,10 @@ pub fn assign(
   value: t,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> FailState<g, Ref<t>> {
+) -> GuardState<g, Ref<t>> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   let s1 = set_storage(s0, insert(storage, what.address, value))
-  let _ <- state.bind(put(s1))
+  let _ <- state.bind(state.put(s1))
   return(what)
-}
-
-// =====================================================================================================================
-// FailState is a Monad
-// =====================================================================================================================
-
-pub fn bind(m: FailState<s, a>, f: fn(a) -> FailState<s, b>) -> FailState<s, b> {
-  let s <- state.bind(state.get())
-  let x <- state.bind(m)
-  when x is {
-    Some(v) -> f(v)
-    None -> state.state(fn(_) { (None, s) })
-  }
-}
-
-pub fn return(a: a) -> FailState<s, a> {
-  state.return(Some(a))
 }
