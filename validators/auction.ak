@@ -100,18 +100,16 @@ fn sim_bid(
 }
 
 fn sim_end(auctioneer: Signer) -> FailState<Global, Unit> {
-  let auction: Auction <-
-    bind(move_from(auctioneer, get_storage_auction, set_storage_auction))
-  let _: Unit <- bind(assert(auction.auctioneer == auctioneer))
+  let ass0: Auction <-
+    bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
+  let _: Unit <- bind(assert(ass0.auctioneer == auctioneer))
+  let ass1 = Auction { ..ass0, expired: True }
   let _: Unit <-
-    bind(
-      move_to(
-        auctioneer,
-        Auction { ..auction, expired: True },
-        get_storage_auction,
-        set_storage_auction,
-      ),
-    )
+    bind(assign(auctioneer, ass1, get_storage_auction, set_storage_auction))
+  let bid: Bid <-
+    bind(move_from(ass1.top_bidder, get_storage_bid, set_storage_bid))
+  let _: Unit <-
+    bind(move_to(auctioneer, bid.coins, get_storage_coin, set_storage_coin))
   return(Unit)
 }
 
