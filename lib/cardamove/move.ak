@@ -94,15 +94,27 @@ pub fn move_from(
   }
 }
 
-pub fn borrow_global_mut(
+pub fn borrow(
   address: Address,
   gets: fn(g) -> Storage<t>,
+  _puts: fn(g, Storage<t>) -> g,
+) -> FailState<g, t> {
+  let s0: g <- state.bind(state.get())
+  let storage = gets(s0)
+  let value = get(storage, address)
+  state.return(value)
+}
+
+pub fn assign(
+  address: Address,
+  value: t,
+  gets: fn(g) -> Storage<t>,
   puts: fn(g, Storage<t>) -> g,
-  comp: fn(t) -> FailState<g, t>,
 ) -> FailState<g, Unit> {
-  let res0: t <- bind(move_from(address, gets, puts))
-  let res1: t <- bind(comp(res0))
-  let _ <- bind(move_to(address, res1, gets, puts))
+  let s0: g <- state.bind(state.get())
+  let storage = gets(s0)
+  let s1 = puts(s0, insert(storage, address, value))
+  let _ <- state.bind(put(s1))
   return(Unit)
 }
 

@@ -1,7 +1,7 @@
 use aiken/transaction.{ScriptContext, Spend}
 use cardamove/move.{
-  Address, FailState, Signer, Storage, assert, bind, borrow_global_mut,
-  from_list, move_from, move_to, return,
+  Address, FailState, Signer, Storage, assert, assign, bind, borrow, from_list,
+  move_from, move_to, return,
 }
 use cardamove/prelude.{Coin, Unit, gt}
 use cardamove/state.{run_state}
@@ -82,24 +82,21 @@ fn sim_bid(
   auctioneer: Address,
   coins: Coin,
 ) -> FailState<Global, Unit> {
-  borrow_global_mut(
-    auctioneer,
-    get_storage_auction,
-    set_storage_auction,
-    fn(ass0: Auction) {
-      let bid: Bid <- bind(move_from(bidder, get_storage_bid, set_storage_bid))
-      let _: Unit <- bind(assert(ass0.expired == False))
-      let _: Unit <- bind(assert(gt(coins, bid.coins)))
-      let _: Unit <-
-        bind(
-          move_to(ass0.top_bidder, coins, get_storage_coin, set_storage_coin),
-        )
-      let ass1 = Auction { ..ass0, top_bidder: bidder }
-      let _: Unit <-
-        bind(move_to(bidder, Bid { coins }, get_storage_bid, set_storage_bid))
-      return(ass1)
-    },
-  )
+  let ass0: Auction <-
+    bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
+  let bid: Bid <- bind(move_from(bidder, get_storage_bid, set_storage_bid))
+  let _: Unit <- bind(assert(ass0.expired == False))
+  let _: Unit <- bind(assert(gt(coins, bid.coins)))
+  let _: Unit <-
+    bind(move_to(ass0.top_bidder, coins, get_storage_coin, set_storage_coin))
+  // It is important to **bind** the new value to a fresh variable
+  // Because in more complex scenarios, we might need to use the new value
+  let ass1 = Auction { ..ass0, top_bidder: bidder }
+  let _: Unit <-
+    bind(assign(auctioneer, ass1, get_storage_auction, set_storage_auction))
+  let _: Unit <-
+    bind(move_to(bidder, Bid { coins }, get_storage_bid, set_storage_bid))
+  return(Unit)
 }
 
 fn sim_end(auctioneer: Signer) -> FailState<Global, Unit> {
