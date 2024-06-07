@@ -148,7 +148,7 @@ fn check_start(
   base: Coin,
   after: GlobalStorage,
 ) -> Bool {
-  let (assert, expected) = run_state(start(auctioneer, base), before)
+  let (assert, expected) = start(auctioneer, base) |> run_state(before)
   when assert is {
     None -> False
     _ -> expected == after
@@ -162,7 +162,7 @@ fn check_bid(
   coins: Coin,
   after: GlobalStorage,
 ) -> Bool {
-  let (assert, expected) = run_state(bid(bidder, auctioneer, coins), before)
+  let (assert, expected) = bid(bidder, auctioneer, coins) |> run_state(before)
   when assert is {
     None -> False
     _ -> expected == after
@@ -174,7 +174,7 @@ fn check_end(
   auctioneer: Address,
   after: GlobalStorage,
 ) -> Bool {
-  let (assert, expected) = run_state(end(auctioneer), before)
+  let (assert, expected) = end(auctioneer) |> run_state(before)
   when assert is {
     None -> False
     _ -> expected == after
