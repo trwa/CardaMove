@@ -1,4 +1,4 @@
-use aiken/transaction.{ScriptContext, Spend}
+use aiken/transaction.{InlineDatum, ScriptContext, Spend}
 use cardamove/move.{
   Address, GuardState, Ref, Signer, Storage, assert, assign, bind, borrow,
   from_list, move_from, move_to, return, value,
@@ -54,38 +54,6 @@ fn get_storage_coin(g: GlobalStorage) -> Storage<Coin> {
 
 fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
   GlobalStorage { ..g, coin: s }
-}
-
-// =====================================================================================================================
-// Datum/Redeemer
-// =====================================================================================================================
-
-type Datum {
-  auction: List<(Address, Auction)>,
-  bid: List<(Address, Bid)>,
-  coin: List<(Address, Coin)>,
-}
-
-type Redeemer {
-  CheckStart { auctioneer: Signer, base: Coin }
-  CheckBid { bidder: Signer, auctioneer: Address, coins: Coin }
-  CheckEnd { auctioneer: Signer }
-}
-
-fn from_datum(d: Datum) -> GlobalStorage {
-  GlobalStorage {
-    auction: from_list(d.auction),
-    bid: from_list(d.bid),
-    coin: from_list(d.coin),
-  }
-}
-
-fn from_context(c: Datum) -> GlobalStorage {
-  GlobalStorage {
-    auction: from_list(c.auction),
-    bid: from_list(c.bid),
-    coin: from_list(c.coin),
-  }
 }
 
 // =====================================================================================================================
@@ -147,7 +115,7 @@ fn bid(
 }
 
 // =====================================================================================================================
-// Bid
+// End
 // =====================================================================================================================
 
 fn end(auctioneer: Signer) -> GuardState<GlobalStorage, Unit> {
@@ -217,18 +185,56 @@ fn check_end(
 // Validator
 // =====================================================================================================================
 
+type SerializedGlobalStorage {
+  auction: List<(Address, Auction)>,
+  bid: List<(Address, Bid)>,
+  coin: List<(Address, Coin)>,
+}
+
+type Dispatch {
+  CheckStart { auctioneer: Signer, base: Coin }
+  CheckBid { bidder: Signer, auctioneer: Address, coins: Coin }
+  CheckEnd { auctioneer: Signer }
+}
+
+fn parse(dump: SerializedGlobalStorage) -> GlobalStorage {
+  GlobalStorage {
+    auction: from_list(dump.auction),
+    bid: from_list(dump.bid),
+    coin: from_list(dump.coin),
+  }
+}
+
 validator {
-  fn run(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
-    let before = from_datum(datum)
-    let after = from_context(datum)
+  fn run(
+    output_datum: SerializedGlobalStorage,
+    redeemer: Dispatch,
+    context: ScriptContext,
+  ) -> Bool {
     when context.purpose is {
-      Spend(_) ->
-        when redeemer is {
-          CheckStart { auctioneer, base } ->
-            check_start(before, auctioneer, base, after)
-          CheckBid { bidder, auctioneer, coins } ->
-            check_bid(before, bidder, auctioneer, coins, after)
-          CheckEnd { auctioneer } -> check_end(before, auctioneer, after)
+      Spend(output) ->
+        when context.transaction.inputs |> transaction.find_input(output) is {
+          Some(input) ->
+            when input.output.datum is {
+              InlineDatum(data) -> {
+                //! Unsafe conversion here
+                expect input_datum: SerializedGlobalStorage = data
+
+                // Normal code starts here
+                let before: GlobalStorage = parse(input_datum)
+                let after: GlobalStorage = parse(output_datum)
+                when redeemer is {
+                  CheckStart { auctioneer, base } ->
+                    check_start(before, auctioneer, base, after)
+                  CheckBid { bidder, auctioneer, coins } ->
+                    check_bid(before, bidder, auctioneer, coins, after)
+                  CheckEnd { auctioneer } ->
+                    check_end(before, auctioneer, after)
+                }
+              }
+              _ -> False
+            }
+          _ -> False
         }
       _ -> False
     }
