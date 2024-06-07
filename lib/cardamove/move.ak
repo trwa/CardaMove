@@ -158,5 +158,5 @@ pub fn assign(
   let storage = get_storage(s0)
   let s1 = set_storage(s0, insert(storage, what.address, value))
   let _ <- state.bind(state.put(s1))
-  return(what)
+  return(Ref { address: what.address, value })
 }
