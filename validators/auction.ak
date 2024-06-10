@@ -61,15 +61,9 @@ fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
 // =====================================================================================================================
 
 fn start(auctioneer: Signer, base: Coin) -> GuardState<GlobalStorage, Unit> {
+  let auction = Auction { auctioneer, top_bidder: auctioneer, expired: False }
   let _: Unit <-
-    bind(
-      move_to(
-        auctioneer,
-        Auction { auctioneer, top_bidder: auctioneer, expired: False },
-        get_storage_auction,
-        set_storage_auction,
-      ),
-    )
+    bind(move_to(auctioneer, auction, get_storage_auction, set_storage_auction))
   let _: Unit <-
     bind(
       move_to(auctioneer, Bid { coins: base }, get_storage_bid, set_storage_bid),
@@ -88,9 +82,10 @@ fn bid(
 ) -> GuardState<GlobalStorage, Unit> {
   let auction: Ref<Auction> <-
     bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
-  let bid: Bid <- bind(move_from(bidder, get_storage_bid, set_storage_bid))
+  let Bid { coins: top_bid } <-
+    bind(move_from(bidder, get_storage_bid, set_storage_bid))
   let _: Unit <- bind(assert(value(auction).expired == False))
-  let _: Unit <- bind(assert(gt(coins, bid.coins)))
+  let _: Unit <- bind(assert(gt(coins, top_bid)))
   let _: Unit <-
     bind(
       move_to(
@@ -131,10 +126,10 @@ fn end(auctioneer: Signer) -> GuardState<GlobalStorage, Unit> {
         set_storage_auction,
       ),
     )
-  let bid: Bid <-
+  let Bid { coins: top_bid } <-
     bind(move_from(value(auction).top_bidder, get_storage_bid, set_storage_bid))
   let _: Unit <-
-    bind(move_to(auctioneer, bid.coins, get_storage_coin, set_storage_coin))
+    bind(move_to(auctioneer, top_bid, get_storage_coin, set_storage_coin))
   return(Unit)
 }
 
