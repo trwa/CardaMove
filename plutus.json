@@ -16,7 +16,7 @@
       "datum": {
         "title": "output_datum",
         "schema": {
-          "$ref": "#/definitions/auction~1SerializedGlobalStorage"
+          "$ref": "#/definitions/auction~1StorageSnapshot"
         }
       },
       "redeemer": {
@@ -167,11 +167,11 @@
         }
       ]
     },
-    "auction/SerializedGlobalStorage": {
-      "title": "SerializedGlobalStorage",
+    "auction/StorageSnapshot": {
+      "title": "StorageSnapshot",
       "anyOf": [
         {
-          "title": "SerializedGlobalStorage",
+          "title": "StorageSnapshot",
           "dataType": "constructor",
           "index": 0,
           "fields": [

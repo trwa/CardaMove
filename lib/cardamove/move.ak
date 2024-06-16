@@ -131,11 +131,11 @@ pub opaque type Ref<t> {
   value: t,
 }
 
-pub fn value(a: Ref<t>) -> t {
+pub fn deref(a: Ref<t>) -> t {
   a.value
 }
 
-pub fn borrow(
+pub fn borrow_global(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
   _set_storage: fn(g, Storage<t>) -> g,
@@ -148,15 +148,46 @@ pub fn borrow(
   }
 }
 
-pub fn assign(
-  what: Ref<t>,
+pub opaque type RefMut<t> {
+  address: Address,
+  value: t,
+}
+
+pub fn deref_mut(a: RefMut<t>) -> t {
+  a.value
+}
+
+pub fn borrow_global_mut(
+  address: Address,
+  get_storage: fn(g) -> Storage<t>,
+  _set_storage: fn(g, Storage<t>) -> g,
+) -> GuardState<g, RefMut<t>> {
+  let s0: g <- state.bind(state.get())
+  let opt = get(get_storage(s0), address)
+  when opt is {
+    None -> state.return(None)
+    Some(val) -> state.return(Some(RefMut { address, value: val }))
+  }
+}
+
+pub fn assign_mut(
+  what: RefMut<t>,
   value: t,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> GuardState<g, Ref<t>> {
+) -> GuardState<g, RefMut<t>> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   let s1 = set_storage(s0, insert(storage, what.address, value))
   let _ <- state.bind(state.put(s1))
-  return(Ref { address: what.address, value })
+  return(RefMut { address: what.address, value })
+}
+
+pub fn exists(
+  address: Address,
+  get_storage: fn(g) -> Storage<t>,
+) -> GuardState<g, Bool> {
+  let st: g <- state.bind(state.get())
+  let storage = get_storage(st)
+  return(has_key(storage, address))
 }

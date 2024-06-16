@@ -1,7 +1,7 @@
 use aiken/transaction.{InlineDatum, ScriptContext, Spend}
 use cardamove/move.{
-  Address, GuardState, Ref, Signer, Storage, assert, assign, bind, borrow,
-  from_list, move_from, move_to, return, value,
+  Address, GuardState, RefMut, Signer, Storage, assert, assign_mut, bind,
+  borrow_global_mut, deref_mut, from_list, move_from, move_to, return,
 }
 use cardamove/prelude.{Coin, Unit, gt}
 use cardamove/state.{run_state}
@@ -80,26 +80,28 @@ fn bid(
   auctioneer: Address,
   coins: Coin,
 ) -> GuardState<GlobalStorage, Unit> {
-  let auction: Ref<Auction> <-
-    bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
+  let auction: RefMut<Auction> <-
+    bind(
+      borrow_global_mut(auctioneer, get_storage_auction, set_storage_auction),
+    )
   let Bid { coins: top_bid } <-
     bind(move_from(bidder, get_storage_bid, set_storage_bid))
-  let _: Unit <- bind(assert(value(auction).expired == False))
+  let _: Unit <- bind(assert(deref_mut(auction).expired == False))
   let _: Unit <- bind(assert(gt(coins, top_bid)))
   let _: Unit <-
     bind(
       move_to(
-        value(auction).top_bidder,
+        deref_mut(auction).top_bidder,
         coins,
         get_storage_coin,
         set_storage_coin,
       ),
     )
-  let _: Ref<Auction> <-
+  let _: RefMut<Auction> <-
     bind(
-      assign(
+      assign_mut(
         auction,
-        Auction { ..value(auction), top_bidder: bidder },
+        Auction { ..deref_mut(auction), top_bidder: bidder },
         get_storage_auction,
         set_storage_auction,
       ),
@@ -114,20 +116,24 @@ fn bid(
 // =====================================================================================================================
 
 fn end(auctioneer: Signer) -> GuardState<GlobalStorage, Unit> {
-  let auction: Ref<Auction> <-
-    bind(borrow(auctioneer, get_storage_auction, set_storage_auction))
-  let _: Unit <- bind(assert(value(auction).auctioneer == auctioneer))
-  let auction: Ref<Auction> <-
+  let auction: RefMut<Auction> <-
     bind(
-      assign(
+      borrow_global_mut(auctioneer, get_storage_auction, set_storage_auction),
+    )
+  let _: Unit <- bind(assert(deref_mut(auction).auctioneer == auctioneer))
+  let auction: RefMut<Auction> <-
+    bind(
+      assign_mut(
         auction,
-        Auction { ..value(auction), expired: True },
+        Auction { ..deref_mut(auction), expired: True },
         get_storage_auction,
         set_storage_auction,
       ),
     )
   let Bid { coins: top_bid } <-
-    bind(move_from(value(auction).top_bidder, get_storage_bid, set_storage_bid))
+    bind(
+      move_from(deref_mut(auction).top_bidder, get_storage_bid, set_storage_bid),
+    )
   let _: Unit <-
     bind(move_to(auctioneer, top_bid, get_storage_coin, set_storage_coin))
   return(Unit)
@@ -180,7 +186,7 @@ fn check_end(
 // Validator
 // =====================================================================================================================
 
-type SerializedGlobalStorage {
+type StorageSnapshot {
   auction: List<(Address, Auction)>,
   bid: List<(Address, Bid)>,
   coin: List<(Address, Coin)>,
@@ -192,7 +198,7 @@ type Dispatch {
   CheckEnd { auctioneer: Signer }
 }
 
-fn parse(dump: SerializedGlobalStorage) -> GlobalStorage {
+fn parse(dump: StorageSnapshot) -> GlobalStorage {
   GlobalStorage {
     auction: from_list(dump.auction),
     bid: from_list(dump.bid),
@@ -202,7 +208,7 @@ fn parse(dump: SerializedGlobalStorage) -> GlobalStorage {
 
 validator {
   fn run(
-    output_datum: SerializedGlobalStorage,
+    output_datum: StorageSnapshot,
     redeemer: Dispatch,
     context: ScriptContext,
   ) -> Bool {
@@ -213,7 +219,7 @@ validator {
             when input.output.datum is {
               InlineDatum(data) -> {
                 //! Unsafe conversion here
-                expect input_datum: SerializedGlobalStorage = data
+                expect input_datum: StorageSnapshot = data
 
                 // Normal code starts here
                 let before: GlobalStorage = parse(input_datum)
