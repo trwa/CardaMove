@@ -1,0 +1,34 @@
+name:                cardamove
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/trwa/cardamove#readme
+license:             MIT
+author:              Lorenzo Fanton
+maintainer:          887857@stud.unive.it
+copyright:           2024 Lorenzo Fanton
+category:            Blockchain
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+dependencies:
+  - base >= 4.7 && < 5
+
+language: GHC2021
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+executables:
+  cardamove:
+    source-dirs:      src
+    main:             Main.hs
