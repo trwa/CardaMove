@@ -25,6 +25,11 @@ library
       Move.Identifier
       Move.Module
       Move.Use
+      Parse.Address
+      Parse.Friend
+      Parse.Identifier
+      Parse.Module
+      Parse.Use
   other-modules:
       Paths_cardamove
   hs-source-dirs:
