@@ -18,7 +18,26 @@ extra-source-files:
     README.md
     CHANGELOG.md
 
-executable cardamove
+library
+  exposed-modules:
+      Move.Address
+      Move.Friend
+      Move.Identifier
+      Move.Module
+      Move.Use
+  other-modules:
+      Paths_cardamove
+  hs-source-dirs:
+      lib
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , megaparsec ==9.5.0
+    , text ==2.0.2
+    , wide-word ==0.1.6.0
+  default-language: GHC2021
+
+executable cardamove-cli
   main-is: Main.hs
   other-modules:
       Paths_cardamove
@@ -27,5 +46,26 @@ executable cardamove
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , cardamove
     , megaparsec ==9.5.0
+    , text ==2.0.2
+    , wide-word ==0.1.6.0
+  default-language: GHC2021
+
+test-suite cardamove-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_cardamove
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      QuickCheck
+    , base >=4.7 && <5
+    , cardamove
+    , hspec ==2.11.*
+    , megaparsec ==9.5.0
+    , text ==2.0.2
+    , wide-word ==0.1.6.0
   default-language: GHC2021

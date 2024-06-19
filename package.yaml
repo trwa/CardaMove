@@ -15,6 +15,8 @@ extra-source-files:
 dependencies:
   - base >= 4.7 && < 5
   - megaparsec == 9.5.0
+  - text == 2.0.2
+  - wide-word == 0.1.6.0
 
 language: GHC2021
 
@@ -29,7 +31,21 @@ ghc-options:
 - -Wpartial-fields
 - -Wredundant-constraints
 
+library:
+  source-dirs:        lib
+
 executables:
-  cardamove:
+  cardamove-cli:
     source-dirs:      src
     main:             Main.hs
+    dependencies:
+      - cardamove
+
+tests:
+  cardamove-test:
+    source-dirs:      test
+    main:             Spec.hs
+    dependencies:
+      - cardamove
+      - hspec >= 2.11 && < 2.12
+      - QuickCheck
