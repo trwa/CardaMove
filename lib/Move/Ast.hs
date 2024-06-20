@@ -25,6 +25,7 @@ data UnOp
   | Not
   deriving (Show, Eq)
 
+{-
 data Expr
   = LitAddr Int
   | LitBool Bool
@@ -45,3 +46,4 @@ data Expr
   | -- | used for dangling if's
     Noexpr
   deriving (Show, Eq)
+  -}

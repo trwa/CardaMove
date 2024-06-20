@@ -20,6 +20,7 @@ extra-source-files:
 
 library
   exposed-modules:
+      Lexer
       Move.Ast
       Move.Module
       Move.Term
@@ -28,8 +29,13 @@ library
   hs-source-dirs:
       lib
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-tools:
+      alex
+    , happy
   build-depends:
-      base >=4.7 && <5
+      array
+    , base >=4.7 && <5
+    , bytestring
     , megaparsec ==9.5.0
     , text ==2.0.2
     , wide-word ==0.1.6.0
@@ -42,8 +48,13 @@ executable cardamove-cli
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-tools:
+      alex
+    , happy
   build-depends:
-      base >=4.7 && <5
+      array
+    , base >=4.7 && <5
+    , bytestring
     , cardamove
     , megaparsec ==9.5.0
     , text ==2.0.2
@@ -58,9 +69,14 @@ test-suite cardamove-test
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-tools:
+      alex
+    , happy
   build-depends:
       QuickCheck
+    , array
     , base >=4.7 && <5
+    , bytestring
     , cardamove
     , hspec ==2.11.*
     , megaparsec ==9.5.0

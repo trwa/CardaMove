@@ -1,4 +1,7 @@
-module Move.Module (Module (..)) where
+module Move.Module
+  ( Module (..),
+  )
+where
 
 import Move.Term (Address, Identifier)
 

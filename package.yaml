@@ -13,10 +13,16 @@ extra-source-files:
 - CHANGELOG.md
 
 dependencies:
+  - array
   - base >= 4.7 && < 5
+  - bytestring 
   - megaparsec == 9.5.0
   - text == 2.0.2
   - wide-word == 0.1.6.0
+
+build-tools:
+  - alex
+  - happy
 
 language: GHC2021
 
