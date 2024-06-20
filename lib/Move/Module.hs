@@ -1,12 +1,14 @@
 module Move.Module (Module (..)) where
 
-import Move.Address (Address)
--- import Constant (Constant)
-import Move.Friend (Friend)
--- import Function (Function)
-import Move.Identifier (Identifier)
--- import Type (Type)
-import Move.Use (Use)
+import Move.Term (Address, Identifier)
+
+-- | Friend declaration.
+data Friend = Friend Address Identifier
+  deriving (Eq, Show)
+
+-- | Use declaration.
+data Use = Use Address Identifier
+  deriving (Eq, Show)
 
 {-
 https://move-language.github.io/move/modules-and-scripts.html

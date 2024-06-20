@@ -20,16 +20,9 @@ extra-source-files:
 
 library
   exposed-modules:
-      Move.Address
-      Move.Friend
-      Move.Identifier
+      Move.Ast
       Move.Module
-      Move.Use
-      Parse.Address
-      Parse.Friend
-      Parse.Identifier
-      Parse.Module
-      Parse.Use
+      Move.Term
   other-modules:
       Paths_cardamove
   hs-source-dirs:
