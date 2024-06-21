@@ -1,48 +1,44 @@
+-- Simple lexer for arithmetic expressions
+-- https://nadia-polikarpova.github.io/cse130-web/lectures/06-parsing.html
 {
-module Lexer
-  ( Alex,
-    AlexPosn (..), 
-    alexGetInput,
-    alexError,
-    runAlex,
-    alexMonadScan,
-    
-    Range (..),
-    RangedToken (..),
-    Token (..)
-  ) where
+module Lexer where
 }
 
 %wrapper "basic"
 
+$digit = 0-9
 $alpha = [a-zA-Z]
-$digit = [0-9]
 
 tokens :-
 
-<0> $white+ ;
+  $white+                       ;
+  "--".*                        ;
+  let                           { \s -> TokenLet          }
+  in                            { \s -> TokenIn           }
+  $digit+                       { \s -> TokenInt (read s) }
+  \=                            { \s -> TokenEq           }
+  \+                            { \s -> TokenPlus         }
+  \-                            { \s -> TokenMinus        }
+  \*                            { \s -> TokenTimes        }
+  \/                            { \s -> TokenDiv          }
+  \(                            { \s -> TokenLParen       }
+  \)                            { \s -> TokenRParen       }
+  $alpha [$alpha $digit \_ \']* { \s -> TokenSym s        }
 
 {
-data AlexUserState = AlexUserState {}
+data Token 
+  = TokenLet
+  | TokenIn
+  | TokenInt Int
+  | TokenSym String
+  | TokenEq
+  | TokenPlus
+  | TokenMinus
+  | TokenTimes
+  | TokenDiv
+  | TokenLParen
+  | TokenRParen
+  deriving (Eq,Show)
 
-alexInitUserState :: AlexUserState
-alexInitUserState = AlexUserState
-
-alexEOF :: Alex RangedToken
-alexEOF = do
-  (pos, _, _, _) <- alexGetInput
-  pure $ RangedToken EOF (Range pos pos)
-
-data Range = Range
-  { start :: AlexPosn,
-    stop :: AlexPosn
-  } deriving (Eq, Show)
-
-data RangedToken = RangedToken
-  { rtToken :: Token,
-    rtRange :: Range
-  } deriving (Eq, Show)
-
-data Token = EOF
-  deriving (Eq, Show)
+scanTokens = alexScanTokens
 }

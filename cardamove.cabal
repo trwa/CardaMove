@@ -24,6 +24,7 @@ library
       Move.Ast
       Move.Module
       Move.Term
+      Parser
   other-modules:
       Paths_cardamove
   hs-source-dirs:
