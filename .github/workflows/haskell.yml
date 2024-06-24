@@ -1,0 +1,20 @@
+name: haskell
+
+on:
+  push:
+    branches: ["lore"]
+  pull_request:
+
+jobs:
+  runhaskell:
+    name: Hello World
+    runs-on: ubuntu-latest # or macOS-latest, or windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: haskell-actions/setup@v2
+        with:
+          ghc-version: "9.6.5" # Exact version of ghc to use
+          # cabal-version: 'latest'. Omitted, but defaults to 'latest'
+          enable-stack: true
+          stack-version: "latest"
+      - run: stack test
