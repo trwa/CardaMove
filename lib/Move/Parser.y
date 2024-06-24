@@ -1,10 +1,10 @@
 {
-module Parser (
+module Move.Parser (
   Exp(..),
   parseMove,
   parseError
   ) where
-import Lexer
+import Move.Lexer
 }
 
 %name parseMove
