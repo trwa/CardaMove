@@ -1,6 +1,8 @@
 {
 module Move.Parser (
-  Exp(..),
+  Expr(..),
+  Module(..),
+  Term(..),
   parseMove,
   parseError
   ) where
@@ -54,18 +56,38 @@ import Move.Lexer
 
 %%
 
-Exp : let ident '=' Exp in Exp { Let $2 $4 $6 }
-    | ident                    { Var $1       }
+term :: { Term }
+  : mod                          { TermMod $1   }
+  | expr                         { TermExpr $1  }
+  | stmts                        { TermStmts $1 }
 
-Smt : Exp ';' Smt            { $1 }
-    | Exp                    { $1 }
+
+expr :: { Expr }
+  : let ident '=' expr in expr  { Let $2 $4 $6  }
+  | ident                       { Var $1        }
+
+stmts :: { [Expr] }
+  : stmts ';' expr               { $3 : $1   }
+
+mod :: { Module }
+  : mod ident '{' stmts '}'      { Module $2 $4  }
 
 {
-parseError :: [Token] -> a
-parseError _ = error "Parse error"
+data Term 
+  = TermMod Module
+  | TermExpr Expr
+  | TermStmts [Expr]
+  deriving (Eq, Show)
 
-data Exp 
-  = Let String Exp Exp
+data Expr
+  = Let String Expr Expr
   | Var String
   deriving (Eq, Show)
+
+data Module
+  = Module String [Expr]
+  deriving (Eq, Show)
+
+parseError :: [Token] -> a
+parseError _ = error "Parse error"
 }
