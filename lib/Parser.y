@@ -1,5 +1,9 @@
 {
-module Parser where
+module Parser (
+  Exp(..),
+  parseCalc,
+  parseError
+  ) where
 import Lexer
 }
 
@@ -8,17 +12,25 @@ import Lexer
 %error { parseError }
 
 %token
-  let { TokenLet }
-  in  { TokenIn }
-  int { TokenInt $$ }
-  var { TokenSym $$ }
-  '=' { TokenEq }
-  '+' { TokenPlus }
-  '-' { TokenMinus }
-  '*' { TokenTimes }
-  '/' { TokenDiv }
-  '(' { TokenLParen }
-  ')' { TokenRParen }
+  '('   { TokenLParen }
+  ')'   { TokenRParen }
+  '{'   { TokenLBrace }
+  '}'   { TokenRBrace }
+  ';'   { TokenSemiColon }
+  ':'   { TokenColon }
+  '::'  { TokenDColon }
+  ','   { TokenComma }
+  if    { TokenIf }
+  else  { TokenElse }
+  let   { TokenLet }
+  in    { TokenIn }
+  int   { TokenInt $$ }
+  var   { TokenSym $$ }
+  '='   { TokenEq }
+  '+'   { TokenPlus }
+  '-'   { TokenMinus }
+  '*'   { TokenTimes }
+  '/'   { TokenDiv }
 
 %right in
 %nonassoc '>' '<'
@@ -37,6 +49,9 @@ Exp : let var '=' Exp in Exp { Let $2 $4 $6 }
     | '-' Exp %prec NEG      { Negate $2 }
     | int                    { Int $1 }
     | var                    { Var $1 }
+
+Smt : Exp ';' Smt            { $1 }
+    | Exp                    { $1 }
 
 {
 parseError :: [Token] -> a

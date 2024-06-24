@@ -34,7 +34,8 @@ run e = eval e emptyEnv
 
 main :: IO ()
 main = do
-  let s = "2 + 2"
-  let ast = parseCalc (scanTokens s)
+  let prog = "let x = 5 in x + 3"
+  let toks = scanTokens prog
+  let ast = parseCalc toks
   print ast
   print (run ast)
