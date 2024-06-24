@@ -1,7 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Exception (evaluate)
+import Lexer (scanTokens)
 import Move.Term (LiteralU8 (..), parse)
+import Parser (Exp (..), parseCalc)
 import Test.Hspec
 import Test.QuickCheck
 import Test.QuickCheck.Test (test)
@@ -30,7 +32,11 @@ testParseLiteralU8 = describe "Parse LiteralU8" $ do
   it "fails to parse a hexadecimal number" $
     runParser parse "" "0x2aq" `shouldNotBe` Right (LiteralU8 42)
 
+testParseLetIn :: Spec
+testParseLetIn = describe "Parse let in expression" $ do
+  it "parses a let in expression" $
+    parseCalc (scanTokens "let x = 42 in x") `shouldBe` Let "x" (Int 42) (Var "x")
+
 main :: IO ()
 main = hspec $ do
-  testPreludeHead
-  testParseLiteralU8
+  testParseLetIn

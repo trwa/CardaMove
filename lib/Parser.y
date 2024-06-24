@@ -67,5 +67,5 @@ data Exp
   | Brack Exp
   | Int Int
   | Var String
-  deriving Show
+  deriving (Show, Eq)
 }
