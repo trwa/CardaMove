@@ -1,54 +1,61 @@
 {
 module Parser (
   Exp(..),
-  parseCalc,
+  parseMove,
   parseError
   ) where
 import Lexer
 }
 
-%name parseCalc
+%name parseMove
 %tokentype { Token }
 %error { parseError }
 
 %token
-  '('   { TokenLParen }
-  ')'   { TokenRParen }
-  '{'   { TokenLBrace }
-  '}'   { TokenRBrace }
-  ';'   { TokenSemiColon }
-  ':'   { TokenColon }
-  '::'  { TokenDColon }
-  ','   { TokenComma }
-  if    { TokenIf }
-  else  { TokenElse }
-  let   { TokenLet }
-  in    { TokenIn }
-  int   { TokenInt $$ }
-  var   { TokenSym $$ }
-  '='   { TokenEq }
-  '+'   { TokenPlus }
-  '-'   { TokenMinus }
-  '*'   { TokenTimes }
-  '/'   { TokenDiv }
+  -- Special characters
+  '('       { TokenLParen     }
+  ')'       { TokenRParen     }
+  '{'       { TokenLBrace     }
+  '}'       { TokenRBrace     }
+  ','       { TokenComma      }
+  ':'       { TokenColon      }
+  ';'       { TokenSemiColon  }
+  '::'      { TokenDColon     }
+  -- Top level
+  address   { TokenAddress    }
+  const     { TokenConst      }
+  friend    { TokenFriend     }
+  fun       { TokenFun        }
+  script    { TokenScript     }
+  module    { TokenModule     }
+  use       { TokenUse        }
+  -- Structs
+  struct    { TokenStruct     }
+  has       { TokenHas        }
+  key       { TokenKey        }
+  store     { TokenStore      }
+  drop      { TokenDrop       }
+  copy      { TokenCopy       }
+  -- Control flow
+  if        { TokenIf         }
+  else      { TokenElse       }
+  while     { TokenWhile      }
+  loop      { TokenLoop       }
+  break     { TokenBreak      }
+  continue  { TokenContinue   }
+  -- Let/bind
+  let       { TokenLet        }
+  in        { TokenIn         }
+  '='       { TokenBind       }
+  -- Identifiers
+  ident     { TokenIdent $$   }
 
 %right in
-%nonassoc '>' '<'
-%left '+' '-'
-%left '*' '/'
-%left NEG
 
 %%
 
-Exp : let var '=' Exp in Exp { Let $2 $4 $6 }
-    | Exp '+' Exp            { Plus $1 $3 }
-    | Exp '-' Exp            { Minus $1 $3 }
-    | Exp '*' Exp            { Times $1 $3 }
-    | Exp '/' Exp            { Div $1 $3 }
-    | '(' Exp ')'            { $2 }
-    | '-' Exp %prec NEG      { Negate $2 }
-    | int                    { Int $1 }
-    | var                    { Var $1 }
+Exp : let ident '=' Exp in Exp { Let $2 $4 $6 }
+    | ident                    { Var $1       }
 
 Smt : Exp ';' Smt            { $1 }
     | Exp                    { $1 }
@@ -59,13 +66,6 @@ parseError _ = error "Parse error"
 
 data Exp 
   = Let String Exp Exp
-  | Plus Exp Exp
-  | Minus Exp Exp
-  | Times Exp Exp
-  | Div Exp Exp
-  | Negate Exp
-  | Brack Exp
-  | Int Int
   | Var String
-  deriving (Show, Eq)
+  deriving (Eq, Show)
 }

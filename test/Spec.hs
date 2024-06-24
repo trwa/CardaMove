@@ -3,7 +3,7 @@
 import Control.Exception (evaluate)
 import Lexer (scanTokens)
 import Move.Term (LiteralU8 (..), parse)
-import Parser (Exp (..), parseCalc)
+import Parser (Exp (..), parseMove)
 import Test.Hspec
 import Test.QuickCheck
 import Test.QuickCheck.Test (test)
@@ -35,7 +35,7 @@ testParseLiteralU8 = describe "Parse LiteralU8" $ do
 testParseLetIn :: Spec
 testParseLetIn = describe "Parse let in expression" $ do
   it "parses a let in expression" $
-    parseCalc (scanTokens "let x = 42 in x") `shouldBe` Let "x" (Int 42) (Var "x")
+    parseMove (scanTokens "let x = s in x") `shouldBe` Let "x" (Var "s") (Var "x")
 
 main :: IO ()
 main = hspec $ do

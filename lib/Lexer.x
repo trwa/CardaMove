@@ -21,9 +21,9 @@ tokens :-
   \)                            { \_ -> TokenRParen       }
   \{                            { \_ -> TokenLBrace       }
   \}                            { \_ -> TokenRBrace       }
-  \;                            { \_ -> TokenSemiColon    }
   \,                            { \_ -> TokenComma        }
   \:                            { \_ -> TokenColon        }
+  \;                            { \_ -> TokenSemiColon    }
   \:\:                          { \_ -> TokenDColon       }
   -- Top level
   address                       { \_ -> TokenAddress      }
@@ -47,17 +47,12 @@ tokens :-
   loop                          { \_ -> TokenLoop         }
   break                         { \_ -> TokenBreak        }
   continue                      { \_ -> TokenContinue     }
-  -- Operators
+  -- Let/bind
   let                           { \_ -> TokenLet          }
   in                            { \_ -> TokenIn           }
-  $digit+                       { \s -> TokenInt (read s) }
-  \=                            { \_ -> TokenEq           }
-  \+                            { \_ -> TokenPlus         }
-  \-                            { \_ -> TokenMinus        }
-  \*                            { \_ -> TokenTimes        }
-  \/                            { \_ -> TokenDiv          }
-  
-  $alpha [$alpha $digit \_ \']* { \s -> TokenSym s        }
+  \=                            { \_ -> TokenBind         }
+  -- Identifiers
+  $alpha($alpha | $digit)*      { \s -> TokenIdent s      }
 
 {
 data Token 
@@ -90,14 +85,8 @@ data Token
   | TokenContinue
   | TokenLet
   | TokenIn
-  | TokenInt Int
-  | TokenEq
-  | TokenPlus
-  | TokenMinus
-  | TokenTimes
-  | TokenDiv
-  | TokenSym String
-
+  | TokenBind
+  | TokenIdent String
   deriving (Eq,Show)
 
 scanTokens :: String -> [Token]
