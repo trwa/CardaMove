@@ -1,7 +1,10 @@
 -- Simple lexer for arithmetic expressions
 -- https://nadia-polikarpova.github.io/cse130-web/lectures/06-parsing.html
 {
-module Lexer where
+module Lexer (
+  Token (..),
+  scanTokens
+  ) where
 }
 
 %wrapper "basic"
