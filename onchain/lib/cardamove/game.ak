@@ -32,7 +32,7 @@ pub fn start(
   let c1 = length(ks) == length(unique(ks))
 
   // TODO: validate the outputs
-  let outputs = ctx.outputs
+  //let outputs = ctx.outputs
 
   c1
 }

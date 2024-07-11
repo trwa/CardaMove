@@ -29,17 +29,17 @@
       "hash": "a02c6a0d8d39b1ce66575dd0c9fff899784c331e2f30a99ed6507ab9"
     },
     {
-      "title": "game/extend.run",
+      "title": "framework/start.run",
       "datum": {
         "title": "datum",
         "schema": {
-          "$ref": "#/definitions/game~1extend~1ExtendScriptDatum"
+          "$ref": "#/definitions/cardamove~1framework~1start~1Datum"
         }
       },
       "redeemer": {
         "title": "redeemer",
         "schema": {
-          "$ref": "#/definitions/game~1extend~1ExtendScriptRedeemer"
+          "$ref": "#/definitions/cardamove~1framework~1start~1Redeemer"
         }
       },
       "parameters": [
@@ -50,33 +50,8 @@
           }
         }
       ],
-      "compiledCode": "5901af010000323232323232223232323232322322533300c4a229309b2b2999805180318059baa00113232533300f3011002132498cc0240048c01800458dd6180780098061baa00116533300830043009375400c26464a66601a601e0042649319803800918020008b1bac300d001300a375400c2c4a666010600860126ea80044c8c8c8c94ccc03cc0440084c8c92632533300e300a0011323253330133015002132498c94ccc044c0340044c8c94ccc058c0600084c926300d001163016001301337540042a66602260180022646464646464a66603460380042930b1bad301a001301a002375a603000260300046eb4c058004c04cdd50010b18089baa001163013001301037540062a66601c60120022a66602260206ea800c5261616300e3754004600c0062c601e002601e004601a00260146ea8004588c94ccc020c0100044c8c94ccc034c03c00852616375c601a00260146ea800854ccc020c00c0044c8c94ccc034c03c00852616375c601a00260146ea800858c020dd50009b8748008dc3a400044646600200200644a66601400229309919801801980680118019805800ab9a5573aaae7955cfaba157441",
-      "hash": "81e80262af4cef0950bb4c5cf4bdb145aca61a40a067fbfc134bb379"
-    },
-    {
-      "title": "game/start.run",
-      "datum": {
-        "title": "datum",
-        "schema": {
-          "$ref": "#/definitions/game~1start~1StartScriptDatum"
-        }
-      },
-      "redeemer": {
-        "title": "redeemer",
-        "schema": {
-          "$ref": "#/definitions/game~1start~1StartScriptRedeemer"
-        }
-      },
-      "parameters": [
-        {
-          "title": "contract",
-          "schema": {
-            "$ref": "#/definitions/aiken~1transaction~1credential~1Address"
-          }
-        }
-      ],
-      "compiledCode": "59018f010000323232323232223232232253330084a229309b2b19192999804180298049baa00313232533300d300f002132498c8cc004004008894ccc03c00452613233003003301200232533300d300a300e3754002264646464a666028602c0042646493192999809980800089919299980c180d00109924c64a66602c602600226464a666036603a0042649318088008b180d800980c1baa0021533301630100011323232323232533301f3021002149858dd6980f800980f8011bad301d001301d002375a603600260306ea800858c058dd50008b180c000980a9baa00315333013300d00115333016301537540062930b0b18099baa002300a00316301400130140023012001300f37540022c60200022c6eb0c034004c028dd50018b1192999804980300089919299980718080010a4c2c6eb8c038004c02cdd50010a999804980180089919299980718080010a4c2c6eb8c038004c02cdd50010b18049baa001370e90012999802180098029baa00215333007300637540042930b0b1b87480015cd2ab9d5573caae7d5d0aba201",
-      "hash": "c78a1df37a533c2e3a1684a2b82a3dd478ab7bd254c996730f5a8d5a"
+      "compiledCode": "5901ba010000323232323232223232323232322322533300c4a229309b2b2999805180318059baa00113232323253330113013002132498cc02c00c8c02000458dd7180880098088011bac300f001300c37540022ca666010600860126ea80184c8c94ccc034c03c0084c9263300700123004001163758601a00260146ea80185894ccc020c010c024dd5000899191919299980798088010991924c64a66601c601400226464a666026602a00426493192999808980680089919299980b180c00109924c601a0022c602c00260266ea800854ccc044c0300044c8c8c8c8c8c94ccc068c07000852616375a603400260340046eb4c060004c060008dd6980b00098099baa00216301137540022c602600260206ea800c54ccc038c02400454ccc044c040dd50018a4c2c2c601c6ea8008c01800c58c03c004c03c008c034004c028dd50008b1192999804180200089919299980698078010a4c2c6eb8c034004c028dd50010a999804180180089919299980698078010a4c2c6eb8c034004c028dd50010b18041baa001370e90011b874800088c8cc00400400c894ccc02800452613233003003300d0023003300b0015734aae7555cf2ab9f5742ae881",
+      "hash": "3103c82f5fa4937220226f9eed01120612745b18415a839469477fb8"
     },
     {
       "title": "simple.run",
@@ -94,31 +69,6 @@
       },
       "compiledCode": "5863010000323232323232232232253330064a229309b2b299980219b8748000c014dd50008a99980398031baa001149858594ccc008cdc3a400060066ea80044c8c94ccc01cc02400852616375c600e00260086ea8004595cd2ab9d5573caae7d5d0aba21",
       "hash": "0bbf7a8a0ef3dbb2ea04c39b68c46c5f6ceb08382f32501a3a5bb091"
-    },
-    {
-      "title": "start.run",
-      "datum": {
-        "title": "datum",
-        "schema": {
-          "$ref": "#/definitions/cardamove~1start~1types~1Datum"
-        }
-      },
-      "redeemer": {
-        "title": "redeemer",
-        "schema": {
-          "$ref": "#/definitions/cardamove~1start~1types~1Redeemer"
-        }
-      },
-      "parameters": [
-        {
-          "title": "contract",
-          "schema": {
-            "$ref": "#/definitions/ByteArray"
-          }
-        }
-      ],
-      "compiledCode": "5901a90100003232323232323223223232232253330093232323232323253330103370e600a60066eb0c01cc048dd500698029bac30073012375401a2a66602000420022940528191919b873006300432330010010032253330160011003133017301800133002002301900133700600c004600c0026eb0c01cc048dd50051bac30063011375401866e1cc00cc004dd6180298081baa00830033758600a60206ea8020c004004894ccc04400452f5c0264660266ea4004cc00c00cc8cc004004c05800c894ccc05000452f5c026464a66602666602666e3c0080152825113301737520046600800800226600800800260300046eb8c058004dd7180980098008009129998078008a4000266e0120023300200230120012300f00114984d9594ccc01ccdc3a400060106ea80044c8c94ccc030c03c0084c926330050012375c0022c6eb0c034004c024dd50008b299980299b8748000c018dd5001099192999805180680109924c6600600246eb800458dd6180580098039baa0021622323300100100322533300b00114984c8cc00c00cc03c008c00cc034004dd7000ab9a5573aaae7955cfaba05742ae881",
-      "hash": "e0a549cbcf7df2368a47bb6b1d5f236676eb0e48aa90819533dd2bc5"
     }
   ],
   "definitions": {
@@ -144,12 +94,6 @@
     },
     "Int": {
       "dataType": "integer"
-    },
-    "List$ByteArray": {
-      "dataType": "list",
-      "items": {
-        "$ref": "#/definitions/ByteArray"
-      }
     },
     "List$Tuple$Int_auction/Auction": {
       "dataType": "map",
@@ -403,6 +347,42 @@
         }
       ]
     },
+    "cardamove/framework/start/Datum": {
+      "title": "Datum",
+      "anyOf": [
+        {
+          "title": "Datum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "keys",
+              "$ref": "#/definitions/List$aiken~1transaction~1credential~1Address"
+            }
+          ]
+        }
+      ]
+    },
+    "cardamove/framework/start/Redeemer": {
+      "title": "Redeemer",
+      "anyOf": [
+        {
+          "title": "Redeemer",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "keys",
+              "$ref": "#/definitions/List$aiken~1transaction~1credential~1Address"
+            },
+            {
+              "title": "tx_body",
+              "$ref": "#/definitions/ByteArray"
+            }
+          ]
+        }
+      ]
+    },
     "cardamove/prelude/Coin": {
       "title": "Coin",
       "anyOf": [
@@ -414,97 +394,6 @@
             {
               "title": "ada",
               "$ref": "#/definitions/Int"
-            }
-          ]
-        }
-      ]
-    },
-    "cardamove/start/types/Datum": {
-      "title": "Datum",
-      "anyOf": [
-        {
-          "title": "Datum",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "players",
-              "$ref": "#/definitions/List$ByteArray"
-            }
-          ]
-        }
-      ]
-    },
-    "cardamove/start/types/Redeemer": {
-      "title": "Redeemer",
-      "anyOf": [
-        {
-          "title": "Redeemer",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "players",
-              "$ref": "#/definitions/List$ByteArray"
-            }
-          ]
-        }
-      ]
-    },
-    "game/extend/ExtendScriptDatum": {
-      "title": "ExtendScriptDatum",
-      "anyOf": [
-        {
-          "title": "ExtendScriptDatum",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "current_players",
-              "$ref": "#/definitions/List$aiken~1transaction~1credential~1Address"
-            }
-          ]
-        }
-      ]
-    },
-    "game/extend/ExtendScriptRedeemer": {
-      "title": "ExtendScriptRedeemer",
-      "anyOf": [
-        {
-          "title": "ExtendScriptRedeemer",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "new_player",
-              "$ref": "#/definitions/List$aiken~1transaction~1credential~1Address"
-            }
-          ]
-        }
-      ]
-    },
-    "game/start/StartScriptDatum": {
-      "title": "StartScriptDatum",
-      "anyOf": [
-        {
-          "title": "StartScriptDatum",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": []
-        }
-      ]
-    },
-    "game/start/StartScriptRedeemer": {
-      "title": "StartScriptRedeemer",
-      "anyOf": [
-        {
-          "title": "StartScriptRedeemer",
-          "dataType": "constructor",
-          "index": 0,
-          "fields": [
-            {
-              "title": "new_players",
-              "$ref": "#/definitions/List$aiken~1transaction~1credential~1Address"
             }
           ]
         }
