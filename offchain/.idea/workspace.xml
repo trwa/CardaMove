@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="sortByType" value="true" />
+    <option name="sortKey" value="BY_TYPE" />
+  </component>
+  <component name="PropertiesComponent">{}</component>
+  <component name="RunManager">
+    <configuration name="Deno: main.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/main.ts" programParameters="run --allow-net --allow-read">
+      <method v="2" />
+    </configuration>
+  </component>
+</project>

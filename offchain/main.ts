@@ -9,13 +9,13 @@ if (import.meta.main) {
 
     const contract = new Contract(
         lucid,
-        "/data/Workspace/cardamove/contract/plutus.json",
+        "/data/Workspace/cardamove/onchain/plutus.json",
         "simple.run",
     );
 
     const start = new Start(
         lucid,
-        "/data/Workspace/cardamove/contract/plutus.json",
+        "/data/Workspace/cardamove/onchain/plutus.json",
         "simple.run",
         contract,
     );
