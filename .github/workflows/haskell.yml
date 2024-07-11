@@ -2,12 +2,11 @@ name: haskell
 
 on:
   push:
-    branches: ["lore"]
+    branches: ["master"]
   pull_request:
 
 jobs:
   runhaskell:
-    name: Hello World
     runs-on: ubuntu-latest # or macOS-latest, or windows-latest
     steps:
       - uses: actions/checkout@v3
