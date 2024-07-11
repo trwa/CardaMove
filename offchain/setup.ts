@@ -1,7 +1,7 @@
 import { lucidGetWalletFromSeedWithBlockfrostProvider } from "./framework/lucid.ts";
 import { Lucid } from "https://deno.land/x/lucid@0.10.7/src/lucid/lucid.ts";
 
-export function setupLucid(): Promise<Lucid> {
+export function setup(): Promise<Lucid> {
     return lucidGetWalletFromSeedWithBlockfrostProvider(
         "https://cardano-preprod.blockfrost.io/api/v0",
         "preprodJhvjyIJRht5PD65tHuPS6TA0Vh06GElp",
