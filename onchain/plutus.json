@@ -33,13 +33,13 @@
       "datum": {
         "title": "datum",
         "schema": {
-          "$ref": "#/definitions/cardamove~1cardano~1start~1Datum"
+          "$ref": "#/definitions/cardamove~1cardano~1start~1StartDatum"
         }
       },
       "redeemer": {
         "title": "redeemer",
         "schema": {
-          "$ref": "#/definitions/cardamove~1cardano~1start~1Redeemer"
+          "$ref": "#/definitions/cardamove~1cardano~1start~1StartRedeemer"
         }
       },
       "parameters": [
@@ -216,11 +216,11 @@
         }
       ]
     },
-    "cardamove/cardano/start/Datum": {
-      "title": "Datum",
+    "cardamove/cardano/start/StartDatum": {
+      "title": "StartDatum",
       "anyOf": [
         {
-          "title": "Datum",
+          "title": "StartDatum",
           "dataType": "constructor",
           "index": 0,
           "fields": [
@@ -232,11 +232,11 @@
         }
       ]
     },
-    "cardamove/cardano/start/Redeemer": {
-      "title": "Redeemer",
+    "cardamove/cardano/start/StartRedeemer": {
+      "title": "StartRedeemer",
       "anyOf": [
         {
-          "title": "Redeemer",
+          "title": "StartRedeemer",
           "dataType": "constructor",
           "index": 0,
           "fields": [
