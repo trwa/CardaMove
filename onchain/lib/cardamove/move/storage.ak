@@ -1,6 +1,6 @@
 use aiken/dict.{Dict}
-use cardamove/prelude.{Unit}
-use cardamove/state.{RunState}
+use cardamove/move/prelude.{Unit}
+use cardamove/move/state.{RunState}
 
 // =====================================================================================================================
 // Basic Types

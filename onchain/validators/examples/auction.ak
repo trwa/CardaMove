@@ -1,10 +1,10 @@
 use aiken/transaction.{InlineDatum, ScriptContext, Spend}
-use cardamove/move.{
+use cardamove/move/prelude.{Coin, Unit, gt}
+use cardamove/move/state.{run_state}
+use cardamove/move/storage.{
   Address, GuardState, RefMut, Signer, Storage, assert, assign_mut, bind,
   borrow_global_mut, deref_mut, from_list, move_from, move_to, return,
 }
-use cardamove/prelude.{Coin, Unit, gt}
-use cardamove/state.{run_state}
 
 // =====================================================================================================================
 // All the types that have the 'key' ability and are defined at module level

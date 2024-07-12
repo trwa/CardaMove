@@ -1,6 +1,6 @@
 use aiken/transaction.{ScriptContext}
 use aiken/transaction/credential.{Address}
-use cardamove/framework/start.{Datum, Redeemer, validate}
+use cardamove/cardano/start.{Datum, Redeemer, validate}
 
 validator(contract: Address) {
   fn run(
