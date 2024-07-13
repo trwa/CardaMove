@@ -36,6 +36,7 @@ fn gt(lhs: Coin, rhs: Coin) -> Bool {
 // =====================================================================================================================
 
 type StorageUtxo {
+  address: Address,
   auction: Option<Auction>,
   bid: Option<Bid>,
   coin: Option<Coin>,
