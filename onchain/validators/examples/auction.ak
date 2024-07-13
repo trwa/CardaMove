@@ -1,3 +1,4 @@
+use aiken/list.{filter_map}
 use aiken/transaction.{InlineDatum, ScriptContext, Spend}
 use cardamove/move/prelude.{Coin, Unit, gt}
 use cardamove/move/state.{run_state}
@@ -54,6 +55,57 @@ fn get_storage_coin(g: GlobalStorage) -> Storage<Coin> {
 
 fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
   GlobalStorage { ..g, coin: s }
+}
+
+// =====================================================================================================================
+// NEW
+// =====================================================================================================================
+
+type LocalStorage {
+  auction: Option<Auction>,
+  bid: Option<Bid>,
+  coin: Option<Coin>,
+}
+
+fn aggregate_storage(storage: List<(Address, LocalStorage)>) -> GlobalStorage {
+  let auctions =
+    filter_map(
+      storage,
+      fn(pair) {
+        when pair.2nd.auction is {
+          Some(x) -> Some((pair.1st, x))
+          None -> None
+        }
+      },
+    )
+
+  let bids =
+    filter_map(
+      storage,
+      fn(pair) {
+        when pair.2nd.bid is {
+          Some(x) -> Some((pair.1st, x))
+          None -> None
+        }
+      },
+    )
+
+  let coins =
+    filter_map(
+      storage,
+      fn(pair) {
+        when pair.2nd.coin is {
+          Some(x) -> Some((pair.1st, x))
+          None -> None
+        }
+      },
+    )
+
+  GlobalStorage {
+    auction: from_list(auctions),
+    bid: from_list(bids),
+    coin: from_list(coins),
+  }
 }
 
 // =====================================================================================================================
