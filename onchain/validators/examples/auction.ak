@@ -1,7 +1,9 @@
 use aiken/list.{filter_map}
-use aiken/transaction.{InlineDatum, ScriptContext, Spend}
+use aiken/transaction.{ScriptContext}
+use cardamove/cardano/contract.{
+  ContractDatum, ContractRedeemer, contract_validate,
+}
 use cardamove/move/prelude.{Coin, Unit, gt}
-use cardamove/move/state.{run_state}
 use cardamove/move/storage.{
   Address, GuardState, RefMut, Signer, Storage, assert, assign_mut, bind,
   borrow_global_mut, deref_mut, from_list, move_from, move_to, return,
@@ -22,7 +24,7 @@ type Bid {
 }
 
 // =====================================================================================================================
-// Global Storage
+// Local/Global Storage
 // ---
 // We **must** generate the record selectors and updaters for the global storage.
 // =====================================================================================================================
@@ -56,10 +58,6 @@ fn get_storage_coin(g: GlobalStorage) -> Storage<Coin> {
 fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
   GlobalStorage { ..g, coin: s }
 }
-
-// =====================================================================================================================
-// NEW
-// =====================================================================================================================
 
 type LocalStorage {
   auction: Option<Auction>,
@@ -192,57 +190,8 @@ fn end(auctioneer: Signer) -> GuardState<GlobalStorage, Unit> {
 }
 
 // =====================================================================================================================
-// Check functions
+// Script
 // =====================================================================================================================
-
-fn check_start(
-  before: GlobalStorage,
-  auctioneer: Signer,
-  base: Coin,
-  after: GlobalStorage,
-) -> Bool {
-  let (assert, expected) = start(auctioneer, base) |> run_state(before)
-  when assert is {
-    None -> False
-    _ -> expected == after
-  }
-}
-
-fn check_bid(
-  before: GlobalStorage,
-  bidder: Signer,
-  auctioneer: Address,
-  coins: Coin,
-  after: GlobalStorage,
-) -> Bool {
-  let (assert, expected) = bid(bidder, auctioneer, coins) |> run_state(before)
-  when assert is {
-    None -> False
-    _ -> expected == after
-  }
-}
-
-fn check_end(
-  before: GlobalStorage,
-  auctioneer: Address,
-  after: GlobalStorage,
-) -> Bool {
-  let (assert, expected) = end(auctioneer) |> run_state(before)
-  when assert is {
-    None -> False
-    _ -> expected == after
-  }
-}
-
-// =====================================================================================================================
-// Validator
-// =====================================================================================================================
-
-type StorageSnapshot {
-  auction: List<(Address, Auction)>,
-  bid: List<(Address, Bid)>,
-  coin: List<(Address, Coin)>,
-}
 
 type Dispatch {
   CheckStart { auctioneer: Signer, base: Coin }
@@ -250,46 +199,24 @@ type Dispatch {
   CheckEnd { auctioneer: Signer }
 }
 
-fn parse(dump: StorageSnapshot) -> GlobalStorage {
-  GlobalStorage {
-    auction: from_list(dump.auction),
-    bid: from_list(dump.bid),
-    coin: from_list(dump.coin),
+fn script(funcall: Dispatch) -> GuardState<GlobalStorage, Unit> {
+  when funcall is {
+    CheckStart { auctioneer, base } -> start(auctioneer, base)
+    CheckBid { bidder, auctioneer, coins } -> bid(bidder, auctioneer, coins)
+    CheckEnd { auctioneer } -> end(auctioneer)
   }
 }
 
+// =====================================================================================================================
+// Validator
+// =====================================================================================================================
+
 validator {
   fn run(
-    output_datum: StorageSnapshot,
-    redeemer: Dispatch,
+    datum: ContractDatum<LocalStorage>,
+    redeemer: ContractRedeemer<Dispatch>,
     context: ScriptContext,
   ) -> Bool {
-    when context.purpose is {
-      Spend(output) ->
-        when context.transaction.inputs |> transaction.find_input(output) is {
-          Some(input) ->
-            when input.output.datum is {
-              InlineDatum(data) -> {
-                //! Unsafe conversion here
-                expect input_datum: StorageSnapshot = data
-
-                // Normal code starts here
-                let before: GlobalStorage = parse(input_datum)
-                let after: GlobalStorage = parse(output_datum)
-                when redeemer is {
-                  CheckStart { auctioneer, base } ->
-                    check_start(before, auctioneer, base, after)
-                  CheckBid { bidder, auctioneer, coins } ->
-                    check_bid(before, bidder, auctioneer, coins, after)
-                  CheckEnd { auctioneer } ->
-                    check_end(before, auctioneer, after)
-                }
-              }
-              _ -> False
-            }
-          _ -> False
-        }
-      _ -> False
-    }
+    contract_validate(datum, redeemer, context, script, aggregate_storage)
   }
 }

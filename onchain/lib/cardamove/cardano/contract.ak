@@ -1,8 +1,7 @@
 use aiken/transaction.{ScriptContext}
-use aiken/transaction/credential.{Address}
 use cardamove/move/prelude.{Unit}
 use cardamove/move/state.{run_state}
-use cardamove/move/storage.{GuardState}
+use cardamove/move/storage.{Address, GuardState}
 
 // s is expected to be a record of optional fields.
 pub type ContractDatum<s> {
@@ -20,13 +19,16 @@ pub fn contract_validate(
   _datum: ContractDatum<s>,
   redeemer: ContractRedeemer<f>,
   _context: ScriptContext,
-  aggregate_storage: fn(List<(Address, s)>) -> g,
   script: fn(f) -> GuardState<g, Unit>,
+  aggregate_storage: fn(List<(Address, s)>) -> g,
 ) -> Bool {
+  // TODO: remove this dummy placeholder
+  let dummy_placeholder: List<(Address, s)> =
+    []
   // TODO: take list from all inputs
-  let before = aggregate_storage([])
+  let before: g = aggregate_storage(dummy_placeholder)
   // TODO: take list from all outputs
-  let after = aggregate_storage([])
+  let after: g = aggregate_storage(dummy_placeholder)
   let (assert, expected) = script(redeemer.funcall) |> run_state(before)
   when assert is {
     None -> False
