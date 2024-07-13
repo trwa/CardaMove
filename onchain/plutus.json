@@ -300,7 +300,7 @@
           "index": 0,
           "fields": [
             {
-              "title": "local_storage",
+              "title": "storage",
               "$ref": "#/definitions/Tuple$Int_examples~1auction~1StorageUtxo"
             }
           ]
@@ -316,7 +316,7 @@
           "index": 0,
           "fields": [
             {
-              "title": "funcall",
+              "title": "dispatch",
               "$ref": "#/definitions/examples~1auction~1CallFunction"
             }
           ]
