@@ -3,6 +3,10 @@ import {scriptApplyToString,} from "./internal/script.ts";
 import {Lucid} from "https://deno.land/x/lucid@0.10.7/src/lucid/lucid.ts";
 import {Validator} from "./internal/validator.ts";
 import {Contract} from "./contract.ts";
+import {Data} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
+import {StartDatum} from "./internal/datum.ts";
+
+export const makeStartDatum = (keys: string[]) => Data.to({ keys: keys }, StartDatum);
 
 export class Start extends Validator {
     constructor(

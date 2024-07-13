@@ -5,12 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bdf0ffc6-c9ed-4e00-9297-5e8a2210cd1d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/framework/transaction.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deno.lock" beforeDir="false" afterPath="$PROJECT_DIR$/deno.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/framework/internal/validator.ts" beforeDir="false" afterPath="$PROJECT_DIR$/framework/internal/validator.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/framework/start.ts" beforeDir="false" afterPath="$PROJECT_DIR$/framework/start.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.ts" beforeDir="false" afterPath="$PROJECT_DIR$/setupLucid.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../onchain/plutus.json" beforeDir="false" afterPath="$PROJECT_DIR$/../onchain/plutus.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
@@ -38,26 +53,35 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Deno.Deno:  main.ts.executor&quot;: &quot;Run&quot;,
-    &quot;Deno.Deno: main.ts.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;deno.use.library&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;lore&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/data/Workspace/cardamove/offchain/main.ts&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Deno.Deno:  main.ts.executor": "Run",
+    "Deno.Deno: main.ts.executor": "Run",
+    "Deno.Deno: query.ts.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "deno.use.library": "true",
+    "git-widget-placeholder": "lore",
+    "last_opened_file_path": "/data/Workspace/cardamove/offchain/main.ts",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/home/lore/.local/share/JetBrains/Toolbox/apps/webstorm/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager">
+}]]></component>
+  <component name="RunManager" selected="Deno.Deno: main.ts">
     <configuration name="Deno: main.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/main.ts" programParameters="run --allow-net --allow-read">
       <method v="2" />
     </configuration>
+    <configuration name="Deno: query.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/query.ts" programParameters="run --allow-net">
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Deno.Deno: main.ts" />
+      <item itemvalue="Deno.Deno: query.ts" />
+    </list>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -75,6 +99,9 @@
       <option name="presentableId" value="Default" />
       <updated>1720694498721</updated>
       <workItem from="1720694500280" duration="905000" />
+      <workItem from="1720853999997" duration="264000" />
+      <workItem from="1720854327764" duration="71000" />
+      <workItem from="1720854416731" duration="8565000" />
     </task>
     <servers />
   </component>

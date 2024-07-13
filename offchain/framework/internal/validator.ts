@@ -12,4 +12,8 @@ export class Validator {
     public getAddress(): string {
         return this.lucid.utils.validatorToAddress(this.script);
     }
+
+    public getScript(): SpendingValidator {
+        return this.script;
+    }
 }
