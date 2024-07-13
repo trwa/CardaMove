@@ -1,3 +1,4 @@
+use aiken/bytearray.{compare}
 use aiken/dict.{Dict}
 use cardamove/move/prelude.{Unit}
 use cardamove/move/state.{RunState}
@@ -7,7 +8,7 @@ use cardamove/move/state.{RunState}
 // =====================================================================================================================
 
 pub type Address =
-  Int
+  ByteArray
 
 pub type Signer =
   Address
@@ -20,16 +21,6 @@ pub type Signer =
 
 pub type Storage<t> {
   internal: Dict<Address, t>,
-}
-
-fn compare(lhs: Address, rhs: Address) -> Ordering {
-  if lhs < rhs {
-    Less
-  } else if lhs > rhs {
-    Greater
-  } else {
-    Equal
-  }
 }
 
 fn has_key(storage: Storage<t>, address: Address) -> Bool {
