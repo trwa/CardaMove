@@ -4,7 +4,17 @@ import {ContractDatum} from "./framework/internal/datum.ts";
 import {Contract} from "./framework/contract.ts";
 import {makeStartDatum, Start} from "./framework/start.ts";
 import {Buffer} from "jsr:@std/io/buffer";
-import {serializeTxBody} from "./framework/transaction.ts";
+import {
+    llBlake2b256,
+    llBlake2b256Hex,
+    llTxCompleteBody,
+    llTxCompleteHash,
+    llTxCompleteToBytes,
+    llTxSignedBody,
+    llTxSignedHash,
+    llTxSignedToBytes,
+    serializeTxBody
+} from "./framework/ll.ts";
 
 if (import.meta.main) {
     const lucid = await setupLucid();
@@ -22,43 +32,67 @@ if (import.meta.main) {
         contract,
     );
 
-    const utxos = await contract.run([]);
+   const utxos = /*await start.run([]);*/await lucid.utxosAt(contract.getAddress());
 
     //utxos[0].txHash;
 
-    console.log("Address: ", contract.getAddress());
-    console.log("Utxos: ", utxos);
+    //console.log("Address: ", contract.getAddress());
+    //console.log("Utxos: ", utxos);
     //console.log("Datum: ", Data.from<typeof ContractDatum>(utxos[0].datum!));
 
-    console.log("Address: ", start.getAddress());
+    //console.log("Address: ", start.getAddress());
 
     // Build the transaction
     const tx: Tx = lucid
         .newTx()
-        .payToContract(start.getAddress(), {
+        .collectFrom(utxos)
+        .payToContract(contract.getAddress(), {
             inline: makeStartDatum([]),
             scriptRef: start.getScript(),
         }, {
             lovelace: 100n,
         });
 
-
-
     // Complete the transaction
     const completedTx: TxComplete = await tx
         .complete();
+
+    console.log("======================================================================================");
+    console.log(llTxCompleteBody(completedTx).to_json());
+    console.log("======================================================================================");
+
 
     // Sign the transaction
     const signedTx: TxSigned = await completedTx
         .sign()
         .complete();
 
+    console.log("======================================================================================");
+    console.log(llTxSignedBody(signedTx).inputs().to_json());
+    console.log("======================================================================================");
+
     //console.log("Tx body (json): ", await serializeTxBody(tx));
-    serializeTxBody(signedTx);
+    // serializeTxBody(signedTx);
+
+    console.log("======================================================================================");
+    console.log(llTxCompleteHash(completedTx));
+    console.log(llTxSignedHash(signedTx));
+    console.log("======================================================================================");
+
+    console.log("======================================================================================");
+    console.log(llBlake2b256Hex(llTxCompleteToBytes(completedTx)));
+    console.log(llBlake2b256Hex(llTxSignedToBytes(signedTx)));
+    console.log("======================================================================================");
 
     // Submit the transaction
     const txHash = await signedTx
         .submit();
 
-    console.log("Tx hash: ", txHash);
+    console.log("======================================================================================");
+    console.log(txHash);
+    console.log("======================================================================================");
+
+    //console.log("Tx hash: ", txHash);
+
+    //console.log("Utxos: ", utxos);
 }
