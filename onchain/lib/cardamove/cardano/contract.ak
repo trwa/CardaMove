@@ -5,7 +5,8 @@ use cardamove/move/storage.{Address, GuardState}
 
 // s is expected to be a record of optional fields.
 pub type ContractDatum<s> {
-  storage: (Address, s),
+  address: Address,
+  data: s,
 }
 
 // f is expected to represent the different possible function calls
