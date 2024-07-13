@@ -1,10 +1,8 @@
-use aiken/dict.{Dict}
-use aiken/list.{concat, filter, length, unique}
 use aiken/transaction.{ScriptContext}
 use aiken/transaction/credential.{Address}
-use cardamove/cardano/script.{script_address}
-use cardamove/cardano/transaction.{transaction_inputs,
-  transaction_outputs} as transaction2
+use cardamove/move/prelude.{Unit}
+use cardamove/move/state.{run_state}
+use cardamove/move/storage.{GuardState}
 
 // s is expected to be a record of optional fields.
 pub type ContractDatum<s> {
@@ -20,10 +18,18 @@ pub type ContractRedeemer<f> {
 // Fully validate the contract
 pub fn contract_validate(
   _datum: ContractDatum<s>,
-  _edeemer: ContractRedeemer<f>,
+  redeemer: ContractRedeemer<f>,
   _context: ScriptContext,
-  _aggregate_storage: fn(List<(Address, s)>) -> g,
-  _run: fn(g) -> (Bool, g),
+  aggregate_storage: fn(List<(Address, s)>) -> g,
+  script: fn(f) -> GuardState<g, Unit>,
 ) -> Bool {
-  True
+  // TODO: take list from all inputs
+  let before = aggregate_storage([])
+  // TODO: take list from all outputs
+  let after = aggregate_storage([])
+  let (assert, expected) = script(redeemer.funcall) |> run_state(before)
+  when assert is {
+    None -> False
+    _ -> expected == after
+  }
 }
