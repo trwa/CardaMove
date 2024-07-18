@@ -32,11 +32,11 @@ async function fundSimple(lucid: Lucid, contract: Contract) {
                     lovelace: 2n * 1000000n,
                 })
                 // 2nd UTxO
-                .payToContract(contract.getAddress(), {
-                    inline: emptyDatum("987654321"),
-                }, {
-                    lovelace: 2n * 1000000n,
-                })
+                //.payToContract(contract.getAddress(), {
+                //    inline: emptyDatum("987654321"),
+                //}, {
+                //    lovelace: 2n * 1000000n,
+                //})
                 .complete()
         ).sign().complete()
     ).submit();
@@ -54,14 +54,14 @@ async function spendCorrect2UTxO(lucid: Lucid, contract: Contract) {
                 .payToContract(contract.getAddress(), {
                     inline: emptyDatum("12345678"),
                 }, {
-                    lovelace: 4n * 1000000n,
+                    lovelace: 1000n * 1000000n,
                 })
                 // 2nd UTxO
-                .payToContract(contract.getAddress(), {
-                    inline: emptyDatum("987654321"),
-                }, {
-                    lovelace: 4n * 1000000n,
-                })
+                //.payToContract(contract.getAddress(), {
+                //    inline: emptyDatum("987654321"),
+                //}, {
+                //    lovelace: 1000n * 1000000n,
+                //})
                 .attachSpendingValidator(contract.getScript())
                 .complete()
         ).sign().complete()
@@ -84,7 +84,7 @@ if (import.meta.main) {
     console.log("Contract address: ", contract.getAddress());
     console.log("Contract utxos: ", utxos);
 
-    //await fundSimple(lucid, contract);
+    //console.log(await fundSimple(lucid, contract));
     console.log(await spendCorrect2UTxO(lucid, contract));
 
     /*

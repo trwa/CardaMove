@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bdf0ffc6-c9ed-4e00-9297-5e8a2210cd1d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/simple.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auction.ts" beforeDir="false" afterPath="$PROJECT_DIR$/wip/auction.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/wip/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/wip/query.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setupLorenzoLucid.ts" beforeDir="false" afterPath="$PROJECT_DIR$/setup.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simple.ts" beforeDir="false" afterPath="$PROJECT_DIR$/simple.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../onchain/plutus.json" beforeDir="false" afterPath="$PROJECT_DIR$/../onchain/plutus.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +113,7 @@
       <workItem from="1720854416731" duration="9632000" />
       <workItem from="1720882859435" duration="5356000" />
       <workItem from="1721031601138" duration="2598000" />
-      <workItem from="1721331970980" duration="1804000" />
+      <workItem from="1721331970980" duration="2857000" />
     </task>
     <servers />
   </component>

@@ -72,10 +72,11 @@ pub fn contract_validate(
     }
   let input_addresses = unique(all_input_addresses(context))
   let output_addresses = unique(all_output_addresses(context))
-  expect and {
-      length(input_addresses) == 1,
-      input_addresses == output_addresses,
-    }
+  expect
+    //and {
+    //length(input_addresses) == 2,
+    input_addresses == output_addresses
+  //}
   let state_before: g = storage(input_datums)
   let state_after: g = storage(output_datums)
   let (assert, state_expected) =
