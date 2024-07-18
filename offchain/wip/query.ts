@@ -1,5 +1,5 @@
 import {C, TxSigned} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
-import {setupBlockfrostQuery, setupLorenzoLucid} from "./setupLorenzoLucid.ts";
+import {setupBlockfrostQuery, setup} from "../setup.ts";
 
 if (import.meta.main) {
   const query = setupBlockfrostQuery();

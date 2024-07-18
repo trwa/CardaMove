@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bdf0ffc6-c9ed-4e00-9297-5e8a2210cd1d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/auction.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/simple.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/query.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setupLucid.ts" beforeDir="false" afterPath="$PROJECT_DIR$/setupLorenzoLucid.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../onchain/plutus.json" beforeDir="false" afterPath="$PROJECT_DIR$/../onchain/plutus.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/auction.ts" beforeDir="false" afterPath="$PROJECT_DIR$/wip/auction.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/wip/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/query.ts" beforeDir="false" afterPath="$PROJECT_DIR$/wip/query.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setupLorenzoLucid.ts" beforeDir="false" afterPath="$PROJECT_DIR$/setup.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,10 +56,11 @@
     "Deno.Deno:  main.ts.executor": "Run",
     "Deno.Deno: main.ts.executor": "Run",
     "Deno.Deno: query.ts.executor": "Run",
+    "Deno.Deno: simple.ts.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "deno.use.library": "true",
     "git-widget-placeholder": "lore",
-    "last_opened_file_path": "/data/Workspace/cardamove/offchain/main.ts",
+    "last_opened_file_path": "/data/Workspace/cardamove/auction",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -69,19 +70,28 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
-  <component name="RunManager" selected="Deno.Deno:  auction.ts">
-    <configuration name="Deno:  auction.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/auction.ts" programParameters="run --allow-net --allow-read">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/wip" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Deno.Deno: simple.ts">
+    <configuration name="Deno: auction.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/wip/auction.ts" programParameters="run --allow-net --allow-read">
       <method v="2" />
     </configuration>
-    <configuration name="Deno: main.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/main.ts" programParameters="run --allow-net --allow-read">
+    <configuration name="Deno: main.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/wip/main.ts" programParameters="run --allow-net --allow-read">
       <method v="2" />
     </configuration>
-    <configuration name="Deno: query.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/query.ts" programParameters="run --allow-net">
+    <configuration name="Deno: query.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/wip/query.ts" programParameters="run --allow-net">
+      <method v="2" />
+    </configuration>
+    <configuration name="Deno: simple.ts" type="DenoConfigurationType" inputPath="$PROJECT_DIR$/simple.ts" programParameters="run --allow-net --allow-read">
       <method v="2" />
     </configuration>
     <list>
       <item itemvalue="Deno.Deno: main.ts" />
-      <item itemvalue="Deno.Deno:  auction.ts" />
+      <item itemvalue="Deno.Deno: auction.ts" />
+      <item itemvalue="Deno.Deno: simple.ts" />
       <item itemvalue="Deno.Deno: query.ts" />
     </list>
   </component>
@@ -106,6 +116,7 @@
       <workItem from="1720854416731" duration="9632000" />
       <workItem from="1720882859435" duration="5356000" />
       <workItem from="1721031601138" duration="2598000" />
+      <workItem from="1721331970980" duration="1804000" />
     </task>
     <servers />
   </component>
