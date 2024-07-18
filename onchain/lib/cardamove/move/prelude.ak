@@ -1,3 +1,5 @@
-pub type Unit {
-  Unit
-}
+pub type Address =
+  ByteArray
+
+pub type Signer =
+  Address

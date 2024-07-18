@@ -1,5 +1,3 @@
-use cardamove/move/prelude.{Unit}
-
 // =====================================================================================================================
 // RunState
 // ---------------------------------------------------------------------------------------------------------------------
@@ -24,16 +22,16 @@ pub fn get() -> RunState<s, s> {
   fn(s) { (s, s) }
 }
 
-pub fn put(s: s) -> RunState<s, Unit> {
-  fn(_) { (Unit, s) }
+pub fn put(s: s) -> RunState<s, Void> {
+  fn(_) { (Void, s) }
 }
 
 pub fn state(f: fn(s) -> (a, s)) -> RunState<s, a> {
   f
 }
 
-pub fn modify(f: fn(s) -> s) -> RunState<s, Unit> {
-  fn(s) { (Unit, f(s)) }
+pub fn modify(f: fn(s) -> s) -> RunState<s, Void> {
+  fn(s) { (Void, f(s)) }
 }
 
 pub fn run_state(m: RunState<s, a>, s: s) -> (a, s) {

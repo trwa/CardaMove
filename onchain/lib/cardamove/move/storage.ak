@@ -1,17 +1,7 @@
 use aiken/bytearray.{compare}
 use aiken/dict.{Dict}
-use cardamove/move/prelude.{Unit}
+use cardamove/move/prelude.{Address}
 use cardamove/move/state.{RunState}
-
-// =====================================================================================================================
-// Basic Types
-// =====================================================================================================================
-
-pub type Address =
-  ByteArray
-
-pub type Signer =
-  Address
 
 // =====================================================================================================================
 // Storage
@@ -45,16 +35,13 @@ pub fn from_list(list: List<(Address, t)>) -> Storage<t> {
 }
 
 // =====================================================================================================================
-// GuardState Monad
+// MoveState Monad
 // =====================================================================================================================
 
-pub type GuardState<s, t> =
+pub type MoveState<s, t> =
   RunState<s, Option<t>>
 
-pub fn bind(
-  m: GuardState<s, a>,
-  k: fn(a) -> GuardState<s, b>,
-) -> GuardState<s, b> {
+pub fn bind(m: MoveState<s, a>, k: fn(a) -> MoveState<s, b>) -> MoveState<s, b> {
   let s <- state.bind(state.get())
   let o <- state.bind(m)
   when o is {
@@ -63,7 +50,7 @@ pub fn bind(
   }
 }
 
-pub fn return(a: a) -> GuardState<s, a> {
+pub fn return(a: a) -> MoveState<s, a> {
   state.return(Some(a))
 }
 
@@ -71,9 +58,9 @@ pub fn return(a: a) -> GuardState<s, a> {
 // assert, move_to, move_from
 // =====================================================================================================================
 
-pub fn assert(condition: Bool) -> GuardState<g, Unit> {
+pub fn assert(condition: Bool) -> MoveState<g, Void> {
   if condition {
-    state.return(Some(Unit))
+    state.return(Some(Void))
   } else {
     state.return(None)
   }
@@ -84,7 +71,7 @@ pub fn move_to(
   value: t,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> GuardState<g, Unit> {
+) -> MoveState<g, Void> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   if has_key(storage, address) {
@@ -92,7 +79,7 @@ pub fn move_to(
   } else {
     let s1 = set_storage(s0, insert(storage, address, value))
     let _ <- state.bind(state.put(s1))
-    state.return(Some(Unit))
+    state.return(Some(Void))
   }
 }
 
@@ -100,7 +87,7 @@ pub fn move_from(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> GuardState<g, t> {
+) -> MoveState<g, t> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   when get(storage, address) is {
@@ -130,7 +117,7 @@ pub fn borrow_global(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
   _set_storage: fn(g, Storage<t>) -> g,
-) -> GuardState<g, Ref<t>> {
+) -> MoveState<g, Ref<t>> {
   let s0: g <- state.bind(state.get())
   let opt = get(get_storage(s0), address)
   when opt is {
@@ -152,7 +139,7 @@ pub fn borrow_global_mut(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
   _set_storage: fn(g, Storage<t>) -> g,
-) -> GuardState<g, RefMut<t>> {
+) -> MoveState<g, RefMut<t>> {
   let s0: g <- state.bind(state.get())
   let opt = get(get_storage(s0), address)
   when opt is {
@@ -166,7 +153,7 @@ pub fn assign_mut(
   value: t,
   get_storage: fn(g) -> Storage<t>,
   set_storage: fn(g, Storage<t>) -> g,
-) -> GuardState<g, RefMut<t>> {
+) -> MoveState<g, RefMut<t>> {
   let s0: g <- state.bind(state.get())
   let storage = get_storage(s0)
   let s1 = set_storage(s0, insert(storage, what.address, value))
@@ -177,7 +164,7 @@ pub fn assign_mut(
 pub fn exists(
   address: Address,
   get_storage: fn(g) -> Storage<t>,
-) -> GuardState<g, Bool> {
+) -> MoveState<g, Bool> {
   let st: g <- state.bind(state.get())
   let storage = get_storage(st)
   return(has_key(storage, address))

@@ -27,6 +27,8 @@ pub fn transaction_output_addresses(ctx: ScriptContext) -> List<Address> {
 }
 
 // The txbody is expected to be a Hex encoded (CBOR) string submitted by the off-chain code.
-pub fn transaction_body_hash(txbody: ByteArray) -> Hash<Blake2b_256, Transaction> {
+pub fn transaction_body_hash(
+  txbody: ByteArray,
+) -> Hash<Blake2b_256, Transaction> {
   blake2b_256(txbody)
 }
