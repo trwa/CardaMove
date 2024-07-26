@@ -23,9 +23,9 @@ fn all_input_inline_datums(
   downcast: fn(Data) -> ContractDatum<s>,
 ) -> List<ContractDatum<s>> {
   map(
-    transaction_inputs(ctx),
+    ctx.transaction.inputs,
     fn(i) {
-      expect InlineDatum(data) = i.1st.output.datum
+      expect InlineDatum(data) = i.output.datum
       downcast(data)
     },
   )
@@ -36,7 +36,7 @@ fn all_output_inline_datums(
   downcast: fn(Data) -> ContractDatum<s>,
 ) -> List<ContractDatum<s>> {
   map(
-    transaction_outputs(ctx),
+    ctx.transaction.outputs,
     fn(o) {
       expect InlineDatum(data) = o.datum
       downcast(data)
@@ -72,11 +72,10 @@ pub fn contract_validate(
     }
   let input_addresses = unique(all_input_addresses(context))
   let output_addresses = unique(all_output_addresses(context))
-  expect
-    //and {
-    //length(input_addresses) == 2,
-    input_addresses == output_addresses
-  //}
+  expect and {
+      length(input_addresses) == 2,
+      input_addresses == output_addresses,
+    }
   let state_before: g = storage(input_datums)
   let state_after: g = storage(output_datums)
   let (assert, state_expected) =

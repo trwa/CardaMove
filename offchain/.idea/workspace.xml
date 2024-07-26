@@ -7,6 +7,7 @@
     <list default="true" id="bdf0ffc6-c9ed-4e00-9297-5e8a2210cd1d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simple.ts" beforeDir="false" afterPath="$PROJECT_DIR$/simple.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../onchain/lib/cardamove/cardano/contract.ak" beforeDir="false" afterPath="$PROJECT_DIR$/../onchain/lib/cardamove/cardano/contract.ak" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../onchain/plutus.json" beforeDir="false" afterPath="$PROJECT_DIR$/../onchain/plutus.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -47,26 +48,26 @@
     <option name="sortByType" value="true" />
     <option name="sortKey" value="BY_TYPE" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Deno.Deno:  auction.ts.executor": "Run",
-    "Deno.Deno:  main.ts.executor": "Run",
-    "Deno.Deno: main.ts.executor": "Run",
-    "Deno.Deno: query.ts.executor": "Run",
-    "Deno.Deno: simple.ts.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "deno.use.library": "true",
-    "git-widget-placeholder": "lore",
-    "last_opened_file_path": "/data/Workspace/cardamove/auction",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/home/lore/.local/share/JetBrains/Toolbox/apps/webstorm/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Deno.Deno:  auction.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Deno.Deno:  main.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Deno.Deno: main.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Deno.Deno: query.ts.executor&quot;: &quot;Run&quot;,
+    &quot;Deno.Deno: simple.ts.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;deno.use.library&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;lore&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/data/Workspace/cardamove/auction&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/lore/.local/share/JetBrains/Toolbox/apps/webstorm/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/wip" />
@@ -113,7 +114,8 @@
       <workItem from="1720854416731" duration="9632000" />
       <workItem from="1720882859435" duration="5356000" />
       <workItem from="1721031601138" duration="2598000" />
-      <workItem from="1721331970980" duration="2857000" />
+      <workItem from="1721331970980" duration="6363000" />
+      <workItem from="1721377933959" duration="2648000" />
     </task>
     <servers />
   </component>
