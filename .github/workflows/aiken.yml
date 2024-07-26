@@ -15,8 +15,8 @@ jobs:
         with:
           version: v1.0.26-alpha
 
-      - run: cd examples && aiken fmt --check
-      - run: cd examples && aiken check -D
-      - run: cd examples && aiken build
+      - run: cd onchain && aiken fmt --check
+      - run: cd onchain && aiken check -D
+      - run: cd onchain && aiken build
 
 
