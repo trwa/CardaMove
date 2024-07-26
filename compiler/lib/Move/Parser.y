@@ -1,8 +1,11 @@
 {
 module Move.Parser (
-  Contract(..),
+  --Contract(..),
   Constant(..),
+  Module(..),
   Use(..),
+  Expr(..),
+  Identifier(..),
   parseMove,
   parseError
   ) where
@@ -56,8 +59,8 @@ import Move.Lexer
 
 %%
 
-Contract :: { Contract }
-  : script '{' Uses Constants '}' { Script $3 $4 }
+Module :: { Module }
+  : module '{' Expr '}' { Module "_" "_" $3 }
 
 Uses :: { [Use] }
   : Use { [$1] }
@@ -102,9 +105,8 @@ newtype Identifier = Identifier String
 newtype Type = Type String
   deriving (Eq, Show)
 
-data Contract
-  = Script [Use] [Constant]
-  -- | Module String String [Use] [Friend] [Struct] [Function] [Constant]
+data Module
+  = Module String String {-[Use] [Friend] [Struct] [Function] [Constant]-} Expr
   deriving (Eq, Show)
 
 data Use
