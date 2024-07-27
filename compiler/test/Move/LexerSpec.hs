@@ -8,37 +8,37 @@ testScan str toks = it str $ scanTokens str `shouldBe` toks
 
 testScanBraces :: Spec
 testScanBraces = describe "Parse {}" $ do
-  testScan "{}" [TokenLBrace, TokenRBrace]
-  testScan "{ }" [TokenLBrace, TokenRBrace]
-  testScan "{ } " [TokenLBrace, TokenRBrace]
-  testScan " { }" [TokenLBrace, TokenRBrace]
+  testScan "{}" [TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "{ }" [TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "{ } " [TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan " { }" [TokenSeparatorLBrace, TokenSeparatorRBrace]
 
 testScanModule :: Spec
 testScanModule = describe "Parse module" $ do
   testScan "module" [TokenModule]
   testScan "module " [TokenModule]
-  testScan "module {" [TokenModule, TokenLBrace]
-  testScan "module { }" [TokenModule, TokenLBrace, TokenRBrace]
-  testScan "module abc::def {}" [TokenModule, TokenIdent "abc", TokenDColon, TokenIdent "def", TokenLBrace, TokenRBrace]
-  testScan "module 0xABCD::culo {}" [TokenModule, TokenHex "0xABCD", TokenDColon, TokenIdent "culo", TokenLBrace, TokenRBrace]
+  testScan "module {" [TokenModule, TokenSeparatorLBrace]
+  testScan "module { }" [TokenModule, TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "module abc::def {}" [TokenModule, TokenIdent "abc", TokenSeparatorDColon, TokenIdent "def", TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "module 0xABCD::culo {}" [TokenModule, TokenLiteralIntHex "0xABCD", TokenSeparatorDColon, TokenIdent "culo", TokenSeparatorLBrace, TokenSeparatorRBrace]
 
 testScanDecimal :: Spec
 testScanDecimal = describe "Parse decimals" $ do
-  testScan "0" [TokenDec 0]
-  testScan "1" [TokenDec 1]
-  testScan "123" [TokenDec 123]
+  testScan "0" [TokenLiteralIntDec 0]
+  testScan "1" [TokenLiteralIntDec 1]
+  testScan "123" [TokenLiteralIntDec 123]
 
 testScanHex :: Spec
 testScanHex = describe "Parse hexadecimals" $ do
-  testScan "0x0" [TokenHex "0x0"]
-  testScan "0x1" [TokenHex "0x1"]
-  testScan "0x123" [TokenHex "0x123"]
-  testScan "0xFF2E" [TokenHex "0xFF2E"]
+  testScan "0x0" [TokenLiteralIntHex "0x0"]
+  testScan "0x1" [TokenLiteralIntHex "0x1"]
+  testScan "0x123" [TokenLiteralIntHex "0x123"]
+  testScan "0xFF2E" [TokenLiteralIntHex "0xFF2E"]
 
 testScanString :: Spec
 testScanString = describe "Parse strings" $ do
-  testScan "\"\"" [TokenString "\"\""]
-  testScan "\"hello\"" [TokenString "\"hello\""]
+  testScan "\"\"" [TokenLiteralString "\"\""]
+  testScan "\"hello\"" [TokenLiteralString "\"hello\""]
 
 spec :: Spec
 spec = do

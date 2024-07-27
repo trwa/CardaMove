@@ -2,25 +2,22 @@
 
 module Move.ParserSpec (spec) where
 
-import Control.Exception (evaluate)
-import Move.Lexer (scanTokens)
+import Move.Lexer
 import Move.Parser
-  ( Expr (..),
-    -- Term (..),
-    Identifier (..),
-    Module (..),
-    parseMove,
-  )
 import Test.Hspec
-import Test.QuickCheck (Testable (property))
-import Test.QuickCheck.Test (test)
 
 testScan :: String -> Module -> SpecWith ()
 testScan str ast = it str $ parseMove (scanTokens str) `shouldBe` ast
 
+testParseModule :: Spec
+testParseModule = describe "Parse module" $ do
+  testScan "module {}" $  Module "_" "_" 
+
+{-
 testParseLetIn :: Spec
 testParseLetIn = describe "Parse let in expression" $ do
   testScan "module { let x = s in x }" $ Module "_" "_" (Let (Identifier "x") (Var (Identifier "s")) (Var (Identifier "x")))
+-}
 
 {-
 testParseFakeModule :: Spec
@@ -31,4 +28,4 @@ testParseFakeModule = describe "Parse fake module" $ do
 
 spec :: Spec
 spec = do
-  testParseLetIn
+  testParseModule

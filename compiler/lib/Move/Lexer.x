@@ -18,18 +18,21 @@ tokens :-
   $white+                       ; -- skip white space
   "//".*                        ; -- skip comments
   -- Special characters
-  \(                            { \_ -> TokenLParen       }
-  \)                            { \_ -> TokenRParen       }
-  \{                            { \_ -> TokenLBrace       }
-  \}                            { \_ -> TokenRBrace       }
-  \,                            { \_ -> TokenComma        }
-  \:                            { \_ -> TokenColon        }
-  \;                            { \_ -> TokenSemiColon    }
-  \:\:                          { \_ -> TokenDColon       }
+  \(                            { \_ -> TokenSeparatorLParen        }
+  \)                            { \_ -> TokenSeparatorRParen        }
+  \{                            { \_ -> TokenSeparatorLBrace        }
+  \}                            { \_ -> TokenSeparatorRBrace        }
+  \,                            { \_ -> TokenSeparatorComma         }
+  \:                            { \_ -> TokenSeparatorColon         }
+  \;                            { \_ -> TokenSeparatorSemiColon     }
+  \:\:                          { \_ -> TokenSeparatorDColon        }
   -- Literals
-  0x$hex+                       { \s -> TokenHex s        }
-  $digit+                       { \s -> TokenDec (read s) }
-  \"($digit|$alpha)*\"          { \s -> TokenString s     }
+  $digit+                       { \s -> TokenLiteralIntDec (read s) }
+  0x$hex+                       { \s -> TokenLiteralIntHex s        }
+  \"($digit|$alpha)*\"          { \s -> TokenLiteralString s        }
+  true                          { \_ -> TokenLiteralBool True       }
+  false                         { \_ -> TokenLiteralBool False      }
+  @0x\$$hex+                     { \s -> TokenLiteralAddrExprHex s  }
   -- Top level
   address                       { \_ -> TokenAddress      }
   const                         { \_ -> TokenConst        }
@@ -59,20 +62,31 @@ tokens :-
   -- Identifiers
   $alpha($alpha | $digit)*      { \s -> TokenIdent s      }
   -- Numbers
-  0x$hex+                       { \s -> TokenHex s        }
-  $digit+                       { \s -> TokenDec (read s) }
+  0x$hex+                       { \s -> TokenLiteralIntHex s        }
+  $digit+                       { \s -> TokenLiteralIntDec (read s)      }
 
 
 {
 data Token 
-  = TokenLParen
-  | TokenRParen
-  | TokenLBrace
-  | TokenRBrace
-  | TokenSemiColon
-  | TokenComma
-  | TokenColon
-  | TokenDColon
+  -- Separators
+  = TokenSeparatorLParen
+  | TokenSeparatorRParen
+  | TokenSeparatorLBrace
+  | TokenSeparatorRBrace
+  | TokenSeparatorSemiColon
+  | TokenSeparatorComma
+  | TokenSeparatorColon
+  | TokenSeparatorDColon
+  -- Literals
+  | TokenLiteralIntDec Int
+  | TokenLiteralIntHex String
+  | TokenLiteralString String
+  | TokenLiteralBool Bool
+  | TokenLiteralAddrExprInt Int
+  | TokenLiteralAddrExprHex String
+  | TokenLiteralAddrInt Int
+  | TokenLiteralAddrHex String
+  -- Keywords
   | TokenAddress
   | TokenConst
   | TokenFriend
@@ -96,9 +110,6 @@ data Token
   | TokenIn
   | TokenBind
   | TokenIdent String
-  | TokenDec Int
-  | TokenHex String
-  | TokenString String
   deriving (Eq,Show)
 
 scanTokens :: String -> [Token]

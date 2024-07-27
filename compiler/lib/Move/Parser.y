@@ -1,11 +1,6 @@
 {
 module Move.Parser (
-  --Contract(..),
-  Constant(..),
   Module(..),
-  Use(..),
-  Expr(..),
-  Identifier(..),
   parseMove,
   parseError
   ) where
@@ -18,14 +13,14 @@ import Move.Lexer
 
 %token
   -- Special characters
-  '('       { TokenLParen     }
-  ')'       { TokenRParen     }
-  '{'       { TokenLBrace     }
-  '}'       { TokenRBrace     }
-  ','       { TokenComma      }
-  ':'       { TokenColon      }
-  ';'       { TokenSemiColon  }
-  '::'      { TokenDColon     }
+  '('       { TokenSeparatorLParen     }
+  ')'       { TokenSeparatorRParen     }
+  '{'       { TokenSeparatorLBrace     }
+  '}'       { TokenSeparatorRBrace     }
+  ','       { TokenSeparatorComma      }
+  ':'       { TokenSeparatorColon      }
+  ';'       { TokenSeparatorSemiColon  }
+  '::'      { TokenSeparatorDColon     }
   -- Top level
   address   { TokenAddress    }
   const     { TokenConst      }
@@ -60,14 +55,15 @@ import Move.Lexer
 %%
 
 Module :: { Module }
-  : module '{' Expr '}' { Module "_" "_" $3 }
+  : module '{' '}' { Module "_" "_" }
 
+{-}
 Uses :: { [Use] }
   : Use { [$1] }
   | Uses Use { $2 : $1 }
 
 Use :: { Use }
-  : use symbol '::' symbol { Use (Address $2) (Identifier $4) }
+  : use symbol '::' symbol { Use (AddressNamed $2) (Identifier $4) }
 
 Constants :: { [Constant] }
   : Constant { [$1] }
@@ -94,19 +90,23 @@ Args :: { [(Identifier, Type)] }
 
 Arg :: { (Identifier, Type) }
   : symbol ':' symbol { (Identifier $1, Type $3) }
+-}
 
 {
-newtype Address = Address String
+data Module
+  = Module String String {-[Use] [Friend] [Struct] [Function] [Constant] Expr-}
+  deriving (Eq, Show)
+
+{-
+data Address 
+  = AddressNumeric Int 
+  | AddressNamed String
   deriving (Eq, Show)
 
 newtype Identifier = Identifier String
   deriving (Eq, Show)
 
 newtype Type = Type String
-  deriving (Eq, Show)
-
-data Module
-  = Module String String {-[Use] [Friend] [Struct] [Function] [Constant]-} Expr
   deriving (Eq, Show)
 
 data Use
@@ -146,7 +146,7 @@ data Ability
 data Struct
   = Struct String [(String, String)] [Ability]
   deriving (Eq, Show)
-
+-}
 
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
