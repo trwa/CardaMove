@@ -1,40 +1,44 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Move.LexerSpec (spec) where
 
-import Control.Exception (evaluate)
-import Move.Lexer (scanTokens)
-import Move.Parser
-  ( Expr (..),
-    -- Term (..),
-    Identifier (..),
-    Module (..),
-    parseMove,
-  )
+import Move.Lexer
 import Test.Hspec
-  ( Spec,
-    anyException,
-    describe,
-    hspec,
-    it,
-    shouldBe,
-    shouldNotBe,
-    shouldThrow,
-  )
-import Test.QuickCheck (Testable (property))
 import Test.QuickCheck.Test (test)
 
-testParseLetIn :: Spec
-testParseLetIn = describe "Parse let in expression" $ do
-  it "parses a let in expression" $
-    parseMove (scanTokens "module { let x = s in x }") `shouldBe` Module "_" "_" (Let (Identifier "x") (Var (Identifier "s")) (Var (Identifier "x")))
+testScan :: String -> [Token] -> SpecWith ()
+testScan str toks = it str $ scanTokens str `shouldBe` toks
 
-{-
-testParseFakeModule :: Spec
-testParseFakeModule = describe "Parse fake module" $ do
-  it "parses a fake module" $
-    parseMove (scanTokens "module M { let x = s in x }") `shouldBe` TermMod (Module "M" [Let "x" (Var "s") (Var "x")])
--}
+testScanBraces :: Spec
+testScanBraces = describe "Parse {}" $ do
+  testScan "{}" [TokenLBrace, TokenRBrace]
+  testScan "{ }" [TokenLBrace, TokenRBrace]
+  testScan "{ } " [TokenLBrace, TokenRBrace]
+  testScan " { }" [TokenLBrace, TokenRBrace]
+
+testScanModule :: Spec
+testScanModule = describe "Parse module" $ do
+  testScan "module" [TokenModule]
+  testScan "module " [TokenModule]
+  testScan "module {" [TokenModule, TokenLBrace]
+  testScan "module { }" [TokenModule, TokenLBrace, TokenRBrace]
+  testScan "module abc::def {}" [TokenModule, TokenIdent "abc", TokenDColon, TokenIdent "def", TokenLBrace, TokenRBrace]
+  testScan "module 0xABCD::culo {}" [TokenModule, TokenHex "0xABCD", TokenDColon, TokenIdent "culo", TokenLBrace, TokenRBrace]
+
+testScanDecimal :: Spec
+testScanDecimal = describe "Parse decimals" $ do
+  testScan "0" [TokenDec 0]
+  testScan "1" [TokenDec 1]
+  testScan "123" [TokenDec 123]
+
+testScanHex :: Spec
+testScanHex = describe "Parse hexadecimals" $ do
+  testScan "0x0" [TokenHex "0x0"]
+  testScan "0x1" [TokenHex "0x1"]
+  testScan "0x123" [TokenHex "0x123"]
+  testScan "0xFF2E" [TokenHex "0xFF2E"]
 
 spec :: Spec
-spec = testParseLetIn
+spec = do
+  testScanBraces
+  testScanModule
+  testScanDecimal
+  testScanHex

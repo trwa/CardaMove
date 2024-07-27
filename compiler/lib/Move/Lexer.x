@@ -11,6 +11,7 @@ module Move.Lexer (
 
 $digit = [0-9]
 $alpha = [a-zA-Z]
+$hex = [0-9a-fA-F]
 
 tokens :-
   -- Ignored tokens
@@ -53,6 +54,10 @@ tokens :-
   \=                            { \_ -> TokenBind         }
   -- Identifiers
   $alpha($alpha | $digit)*      { \s -> TokenIdent s      }
+  -- Numbers
+  0x$hex+                       { \s -> TokenHex s        }
+  $digit+                       { \s -> TokenDec (read s) }
+
 
 {
 data Token 
@@ -87,6 +92,8 @@ data Token
   | TokenIn
   | TokenBind
   | TokenIdent String
+  | TokenDec Int
+  | TokenHex String
   deriving (Eq,Show)
 
 scanTokens :: String -> [Token]

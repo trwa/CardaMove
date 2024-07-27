@@ -64,6 +64,7 @@ test-suite cardamove-test
   main-is: Spec.hs
   other-modules:
       Move.LexerSpec
+      Move.ParserSpec
       Paths_cardamove
   hs-source-dirs:
       test
