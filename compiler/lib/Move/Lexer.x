@@ -17,54 +17,66 @@ tokens :-
   -- Ignored tokens
   $white+                       ; -- skip white space
   "//".*                        ; -- skip comments
-  -- Special characters
-  \(                            { \_ -> TokenSeparatorLParen        }
-  \)                            { \_ -> TokenSeparatorRParen        }
-  \{                            { \_ -> TokenSeparatorLBrace        }
-  \}                            { \_ -> TokenSeparatorRBrace        }
-  \,                            { \_ -> TokenSeparatorComma         }
-  \:                            { \_ -> TokenSeparatorColon         }
-  \;                            { \_ -> TokenSeparatorSemiColon     }
-  \:\:                          { \_ -> TokenSeparatorDColon        }
+  -- Separators
+  \(                            { \_ -> TokenSeparatorLParen              }
+  \)                            { \_ -> TokenSeparatorRParen              }
+  \{                            { \_ -> TokenSeparatorLBrace              }
+  \}                            { \_ -> TokenSeparatorRBrace              }
+  \,                            { \_ -> TokenSeparatorComma               }
+  \:                            { \_ -> TokenSeparatorColon               }
+  \;                            { \_ -> TokenSeparatorSemiColon           }
+  \:\:                          { \_ -> TokenSeparatorDColon              }
   -- Literals
-  $digit+                       { \s -> TokenLiteralIntDec (read s) }
-  0x$hex+                       { \s -> TokenLiteralIntHex s        }
-  \"($digit|$alpha)*\"          { \s -> TokenLiteralString s        }
-  true                          { \_ -> TokenLiteralBool True       }
-  false                         { \_ -> TokenLiteralBool False      }
-  @0x\$$hex+                     { \s -> TokenLiteralAddrExprHex s  }
-  -- Top level
-  address                       { \_ -> TokenAddress      }
-  const                         { \_ -> TokenConst        }
-  friend                        { \_ -> TokenFriend       }
-  fun                           { \_ -> TokenFun          }
-  script                        { \_ -> TokenScript       }
-  module                        { \_ -> TokenModule       }
-  use                           { \_ -> TokenUse          }
-  -- Structs
-  struct                        { \_ -> TokenStruct       }
-  has                           { \_ -> TokenHas          }
-  key                           { \_ -> TokenKey          }
-  store                         { \_ -> TokenStore        }
-  drop                          { \_ -> TokenDrop         }
-  copy                          { \_ -> TokenCopy         }
-  -- Control flow
-  if                            { \_ -> TokenIf           }
-  else                          { \_ -> TokenElse         }
-  while                         { \_ -> TokenWhile        }
-  loop                          { \_ -> TokenLoop         }
-  break                         { \_ -> TokenBreak        }
-  continue                      { \_ -> TokenContinue     }
-  -- Let/bind
-  let                           { \_ -> TokenLet          }
-  in                            { \_ -> TokenIn           }
-  \=                            { \_ -> TokenBind         }
+  $digit+                       { \s -> TokenLiteralIntDec (read s)       }
+  0x$hex+                       { \s -> TokenLiteralIntHex s              }
+  \"($digit|$alpha)*\"          { \s -> TokenLiteralString s              }
+  true                          { \_ -> TokenLiteralBool True             } 
+  false                         { \_ -> TokenLiteralBool False            }
   -- Identifiers
-  $alpha($alpha | $digit)*      { \s -> TokenIdent s      }
-  -- Numbers
-  0x$hex+                       { \s -> TokenLiteralIntHex s        }
-  $digit+                       { \s -> TokenLiteralIntDec (read s)      }
-
+  $alpha($alpha | $digit)*      { \s -> TokenIdentifier s                 }
+  -- Keywords: Module, Script
+  const                         { \_ -> TokenKeywordConst                 }
+  friend                        { \_ -> TokenKeywordFriend                }
+  fun                           { \_ -> TokenKeywordFun                   }
+  module                        { \_ -> TokenKeywordModule                }
+  script                        { \_ -> TokenKeywordScript                }
+  use                           { \_ -> TokenKeywordUse                   }
+  -- Keywords: Structs
+  struct                        { \_ -> TokenKeywordStruct                }
+  has                           { \_ -> TokenKeywordHas                   }
+  key                           { \_ -> TokenKeywordKey                   }
+  store                         { \_ -> TokenKeywordStore                 }
+  drop                          { \_ -> TokenKeywordDrop                  }
+  copy                          { \_ -> TokenKeywordCopy                  }
+  -- Keywords: Control flow
+  if                            { \_ -> TokenKeywordIf                    }
+  else                          { \_ -> TokenKeywordElse                  }
+  while                         { \_ -> TokenKeywordWhile                 }
+  loop                          { \_ -> TokenKeywordLoop                  }
+  break                         { \_ -> TokenKeywordBreak                 }
+  continue                      { \_ -> TokenKeywordContinue              }
+  -- Keywords: Let binding
+  let                           { \_ -> TokenKeywordLet                   }
+  in                            { \_ -> TokenKeywordIn                    }
+  -- Operators
+  \+                            { \_ -> TokenOperatorPlus                 }
+  \-                            { \_ -> TokenOperatorMinus                }
+  \*                            { \_ -> TokenOperatorTimes                }
+  \/                            { \_ -> TokenOperatorDiv                  }
+  \%                            { \_ -> TokenOperatorMod                  }
+  \=\=                          { \_ -> TokenOperatorEq                   }
+  \!\=                          { \_ -> TokenOperatorNeq                  }
+  \<                            { \_ -> TokenOperatorLt                   }
+  \<\=                          { \_ -> TokenOperatorLeq                  }
+  \>                            { \_ -> TokenOperatorGt                   }
+  \>\=                          { \_ -> TokenOperatorGeq                  }
+  \&\&                          { \_ -> TokenOperatorAnd                  }
+  \|\|                          { \_ -> TokenOperatorOr                   }
+  \!                            { \_ -> TokenOperatorNot                  }
+  \=                            { \_ -> TokenOperatorAssign               }
+  \&                            { \_ -> TokenOperatorRef                  }
+  \.                            { \_ -> TokenOperatorDot                  }
+  \@                            { \_ -> TokenOperatorAt                   }
 
 {
 data Token 
@@ -82,34 +94,51 @@ data Token
   | TokenLiteralIntHex String
   | TokenLiteralString String
   | TokenLiteralBool Bool
-  | TokenLiteralAddrExprInt Int
-  | TokenLiteralAddrExprHex String
-  | TokenLiteralAddrInt Int
-  | TokenLiteralAddrHex String
-  -- Keywords
-  | TokenAddress
-  | TokenConst
-  | TokenFriend
-  | TokenFun
-  | TokenScript
-  | TokenModule
-  | TokenUse
-  | TokenStruct
-  | TokenHas
-  | TokenKey
-  | TokenStore
-  | TokenDrop
-  | TokenCopy
-  | TokenIf
-  | TokenElse
-  | TokenWhile
-  | TokenLoop
-  | TokenBreak
-  | TokenContinue
-  | TokenLet
-  | TokenIn
-  | TokenBind
-  | TokenIdent String
+  -- Keywords: Module, Script
+  | TokenKeywordConst
+  | TokenKeywordFriend
+  | TokenKeywordFun
+  | TokenKeywordModule
+  | TokenKeywordScript
+  | TokenKeywordUse
+  -- Keywords: Structs
+  | TokenKeywordStruct
+  | TokenKeywordHas
+  | TokenKeywordKey
+  | TokenKeywordStore
+  | TokenKeywordDrop
+  | TokenKeywordCopy
+  -- Keywords: Control flow
+  | TokenKeywordIf
+  | TokenKeywordElse
+  | TokenKeywordWhile
+  | TokenKeywordLoop
+  | TokenKeywordBreak
+  | TokenKeywordContinue
+  -- Keywords: Let binding
+  | TokenKeywordLet
+  | TokenKeywordIn
+  -- Operators
+  | TokenOperatorPlus
+  | TokenOperatorMinus
+  | TokenOperatorTimes
+  | TokenOperatorDiv
+  | TokenOperatorMod
+  | TokenOperatorEq
+  | TokenOperatorNeq
+  | TokenOperatorLt
+  | TokenOperatorLeq
+  | TokenOperatorGt
+  | TokenOperatorGeq
+  | TokenOperatorAnd
+  | TokenOperatorOr
+  | TokenOperatorNot
+  | TokenOperatorAssign
+  | TokenOperatorRef
+  | TokenOperatorDot
+  | TokenOperatorAt
+  -- Identifiers
+  | TokenIdentifier String
   deriving (Eq,Show)
 
 scanTokens :: String -> [Token]

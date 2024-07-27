@@ -11,7 +11,7 @@ testScan str ast = it str $ parseMove (scanTokens str) `shouldBe` ast
 
 testParseModule :: Spec
 testParseModule = describe "Parse module" $ do
-  testScan "module {}" $  Module "_" "_" 
+  testScan "module 12 :: culo {}" $  Module (AddressInt 12) "culo"
 
 {-
 testParseLetIn :: Spec

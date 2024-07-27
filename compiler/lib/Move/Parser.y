@@ -1,6 +1,7 @@
 {
 module Move.Parser (
   Module(..),
+  Address(..),
   parseMove,
   parseError
   ) where
@@ -12,50 +13,59 @@ import Move.Lexer
 %error { parseError }
 
 %token
-  -- Special characters
-  '('       { TokenSeparatorLParen     }
-  ')'       { TokenSeparatorRParen     }
-  '{'       { TokenSeparatorLBrace     }
-  '}'       { TokenSeparatorRBrace     }
-  ','       { TokenSeparatorComma      }
-  ':'       { TokenSeparatorColon      }
-  ';'       { TokenSeparatorSemiColon  }
-  '::'      { TokenSeparatorDColon     }
-  -- Top level
-  address   { TokenAddress    }
-  const     { TokenConst      }
-  friend    { TokenFriend     }
-  fun       { TokenFun        }
-  script    { TokenScript     }
-  module    { TokenModule     }
-  use       { TokenUse        }
-  -- Structs
-  struct    { TokenStruct     }
-  has       { TokenHas        }
-  key       { TokenKey        }
-  store     { TokenStore      }
-  drop      { TokenDrop       }
-  copy      { TokenCopy       }
-  -- Control flow
-  if        { TokenIf         }
-  else      { TokenElse       }
-  while     { TokenWhile      }
-  loop      { TokenLoop       }
-  break     { TokenBreak      }
-  continue  { TokenContinue   }
-  -- Let/bind
-  let       { TokenLet        }
-  in        { TokenIn         }
-  '='       { TokenBind       }
+  -- Separators
+  '('       { TokenSeparatorLParen      }
+  ')'       { TokenSeparatorRParen      }
+  '{'       { TokenSeparatorLBrace      }
+  '}'       { TokenSeparatorRBrace      }
+  ','       { TokenSeparatorComma       }
+  ':'       { TokenSeparatorColon       }
+  ';'       { TokenSeparatorSemiColon   }
+  '::'      { TokenSeparatorDColon      }
+  -- Literals
+  int       { TokenLiteralIntDec $$     }
+  hex       { TokenLiteralIntHex $$     }
+  string    { TokenLiteralString $$     }
+  true      { TokenLiteralBool True     }
+  false     { TokenLiteralBool False    }
   -- Identifiers
-  symbol    { TokenIdent $$   }
+  symbol    { TokenIdentifier $$        }
+  -- Keywords: Module, Script
+  const     { TokenKeywordConst         }
+  friend    { TokenKeywordFriend        }
+  fun       { TokenKeywordFun           }
+  module    { TokenKeywordModule        }
+  script    { TokenKeywordScript        }
+  use       { TokenKeywordUse           }
+  -- Keywords: Structs
+  struct    { TokenKeywordStruct        }
+  has       { TokenKeywordHas           }
+  key       { TokenKeywordKey           }
+  store     { TokenKeywordStore         }
+  drop      { TokenKeywordDrop          }
+  copy      { TokenKeywordCopy          }
+  -- Keywords: Control flow
+  if        { TokenKeywordIf            }
+  else      { TokenKeywordElse          }
+  while     { TokenKeywordWhile         }
+  loop      { TokenKeywordLoop          }
+  break     { TokenKeywordBreak         }
+  continue  { TokenKeywordContinue      }
+  -- Keywords: Let binding
+  let       { TokenKeywordLet           }
+  in        { TokenKeywordIn            }
+  -- Operators
+  '+'       { TokenOperatorPlus         }
+  '-'       { TokenOperatorMinus        }
 
 %right in
 
 %%
 
 Module :: { Module }
-  : module '{' '}' { Module "_" "_" }
+  : module int '::' symbol '{' '}' { Module (AddressInt $2) $4 }
+  | module hex '::' symbol '{' '}' { Module (AddressHex $2) $4 }
+  | module symbol '::' symbol '{' '}' { Module (AddressSym $2) $4 }
 
 {-}
 Uses :: { [Use] }
@@ -94,15 +104,16 @@ Arg :: { (Identifier, Type) }
 
 {
 data Module
-  = Module String String {-[Use] [Friend] [Struct] [Function] [Constant] Expr-}
+  = Module Address String {-[Use] [Friend] [Struct] [Function] [Constant] Expr-}
+  deriving (Eq, Show)
+
+data Address 
+  = AddressInt Int
+  | AddressHex String
+  | AddressSym String
   deriving (Eq, Show)
 
 {-
-data Address 
-  = AddressNumeric Int 
-  | AddressNamed String
-  deriving (Eq, Show)
-
 newtype Identifier = Identifier String
   deriving (Eq, Show)
 

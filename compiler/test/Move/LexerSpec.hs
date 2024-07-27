@@ -15,12 +15,12 @@ testScanBraces = describe "Parse {}" $ do
 
 testScanModule :: Spec
 testScanModule = describe "Parse module" $ do
-  testScan "module" [TokenModule]
-  testScan "module " [TokenModule]
-  testScan "module {" [TokenModule, TokenSeparatorLBrace]
-  testScan "module { }" [TokenModule, TokenSeparatorLBrace, TokenSeparatorRBrace]
-  testScan "module abc::def {}" [TokenModule, TokenIdent "abc", TokenSeparatorDColon, TokenIdent "def", TokenSeparatorLBrace, TokenSeparatorRBrace]
-  testScan "module 0xABCD::culo {}" [TokenModule, TokenLiteralIntHex "0xABCD", TokenSeparatorDColon, TokenIdent "culo", TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "module" [TokenKeywordModule]
+  testScan "module " [TokenKeywordModule]
+  testScan "module {" [TokenKeywordModule, TokenSeparatorLBrace]
+  testScan "module { }" [TokenKeywordModule, TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "module abc::def {}" [TokenKeywordModule, TokenIdentifier "abc", TokenSeparatorDColon, TokenIdentifier "def", TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "module 0xABCD::culo {}" [TokenKeywordModule, TokenLiteralIntHex "0xABCD", TokenSeparatorDColon, TokenIdentifier "culo", TokenSeparatorLBrace, TokenSeparatorRBrace]
 
 testScanDecimal :: Spec
 testScanDecimal = describe "Parse decimals" $ do
