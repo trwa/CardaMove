@@ -63,6 +63,7 @@ test-suite cardamove-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Move.LexerSpec
       Paths_cardamove
   hs-source-dirs:
       test
