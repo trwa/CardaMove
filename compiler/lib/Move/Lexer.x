@@ -26,6 +26,10 @@ tokens :-
   \:                            { \_ -> TokenColon        }
   \;                            { \_ -> TokenSemiColon    }
   \:\:                          { \_ -> TokenDColon       }
+  -- Literals
+  0x$hex+                       { \s -> TokenHex s        }
+  $digit+                       { \s -> TokenDec (read s) }
+  \"($digit|$alpha)*\"          { \s -> TokenString s     }
   -- Top level
   address                       { \_ -> TokenAddress      }
   const                         { \_ -> TokenConst        }
@@ -94,6 +98,7 @@ data Token
   | TokenIdent String
   | TokenDec Int
   | TokenHex String
+  | TokenString String
   deriving (Eq,Show)
 
 scanTokens :: String -> [Token]

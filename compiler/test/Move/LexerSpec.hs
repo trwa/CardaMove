@@ -2,7 +2,6 @@ module Move.LexerSpec (spec) where
 
 import Move.Lexer
 import Test.Hspec
-import Test.QuickCheck.Test (test)
 
 testScan :: String -> [Token] -> SpecWith ()
 testScan str toks = it str $ scanTokens str `shouldBe` toks
@@ -36,9 +35,15 @@ testScanHex = describe "Parse hexadecimals" $ do
   testScan "0x123" [TokenHex "0x123"]
   testScan "0xFF2E" [TokenHex "0xFF2E"]
 
+testScanString :: Spec
+testScanString = describe "Parse strings" $ do
+  testScan "\"\"" [TokenString "\"\""]
+  testScan "\"hello\"" [TokenString "\"hello\""]
+
 spec :: Spec
 spec = do
   testScanBraces
   testScanModule
   testScanDecimal
   testScanHex
+  testScanString
