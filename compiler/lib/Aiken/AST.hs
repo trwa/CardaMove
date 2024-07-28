@@ -1,5 +1,15 @@
 module Aiken.AST where
 
+newtype Module
+  = Module
+  { moduleTopLevels :: [TopLevel]
+  }
+  deriving (Eq, Show)
+
+newtype TopLevel
+  = TopLevelTypeDefinition TypeDefinition
+  deriving (Eq, Show)
+
 data TypeDefinition
   = TypeDefinition
   { typeDefinitionIdentifier :: String,
@@ -16,7 +26,7 @@ data DataConstructor
 
 data Field
   = Field
-  { fieldName :: String,
+  { fieldIdentifier :: String,
     fieldType :: String
   }
   deriving (Eq, Show)

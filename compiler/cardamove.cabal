@@ -77,6 +77,7 @@ test-suite cardamove-test
       Aiken.WriterSpec
       Move.LexerSpec
       Move.ParserSpec
+      TranslatorSpec
       Paths_cardamove
   hs-source-dirs:
       test
