@@ -41,8 +41,6 @@ library
     , bytestring
     , megaparsec ==9.5.0
     , mtl
-    , optparse-applicative
-    , optparse-simple ==0.1.1.4
     , pretty-terminal
     , text ==2.0.2
     , wide-word ==0.1.6.0
@@ -66,7 +64,6 @@ executable cardamove-cli
     , megaparsec ==9.5.0
     , mtl
     , optparse-applicative
-    , optparse-simple ==0.1.1.4
     , pretty-terminal
     , text ==2.0.2
     , wide-word ==0.1.6.0
@@ -95,8 +92,6 @@ test-suite cardamove-test
     , hspec ==2.11.*
     , megaparsec ==9.5.0
     , mtl
-    , optparse-applicative
-    , optparse-simple ==0.1.1.4
     , pretty-terminal
     , text ==2.0.2
     , wide-word ==0.1.6.0

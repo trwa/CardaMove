@@ -40,8 +40,8 @@ packages:
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
-extra-deps:
-  - iris-0.1.0.0@sha256:dd6d664b87dc78b9a2f3b7316dedb5aacdaebb84083f97c50625c5d445edf288,3787
+#extra-deps:
+#  - iris-0.1.0.0@sha256:dd6d664b87dc78b9a2f3b7316dedb5aacdaebb84083f97c50625c5d445edf288,3787
 
 # Override default flag values for local packages and extra-deps
 # flags: {}
