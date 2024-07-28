@@ -82,20 +82,17 @@ TopLevel :: { TopLevel }
 -- Struct
 
 Struct :: { Struct }
-  : struct symbol '{' Fields '}' { 
+  : struct symbol HasAbilities '{' Fields '}'  {
       Struct {
         structIdentifier = $2,
-        structFields = $4,
-        structAbilities = []
+        structFields = $5,
+        structAbilities = $3
       }
     }
-  | struct symbol has Abilities '{' Fields '}'  {
-      Struct {
-        structIdentifier = $2,
-        structFields = $6,
-        structAbilities = $4
-      }
-    }
+
+HasAbilities :: { [Ability] }
+  : {- empty -}   { [] }
+  | has Abilities { $2 }
 
 Abilities ::  { [Ability] }
   : Ability               { [$1] }
