@@ -1,10 +1,11 @@
 module Move.LexerSpec (spec) where
 
 import Move.Lexer
+import Move.Token
 import Test.Hspec
 
 testScan :: String -> [Token] -> SpecWith ()
-testScan str toks = it str $ scanTokens str `shouldBe` toks
+testScan str toks = it str $ scan str `shouldBe` toks
 
 testScanBraces :: Spec
 testScanBraces = describe "Parse {}" $ do

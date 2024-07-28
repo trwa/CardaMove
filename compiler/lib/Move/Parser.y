@@ -1,11 +1,12 @@
 {
-module Move.Parser (parseMove, parseError) where
+module Move.Parser (parse) where
 
 import Move.AST
 import Move.Lexer
+import Move.Token
 }
 
-%name parseMove
+%name parse
 %tokentype { Token }
 %error { parseError }
 

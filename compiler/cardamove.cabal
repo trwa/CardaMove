@@ -25,6 +25,7 @@ library
       Move.AST
       Move.Lexer
       Move.Parser
+      Move.Token
       Translation
   other-modules:
       Paths_cardamove

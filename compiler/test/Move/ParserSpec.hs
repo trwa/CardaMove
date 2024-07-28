@@ -8,7 +8,7 @@ import Move.Parser
 import Test.Hspec
 
 testScan :: String -> Module -> SpecWith ()
-testScan str ast = it str $ parseMove (scanTokens str) `shouldBe` ast
+testScan str ast = it str $ parse (scan str) `shouldBe` ast
 
 testParseEmptyModule :: Spec
 testParseEmptyModule = describe "Parse an empty module" $ do
