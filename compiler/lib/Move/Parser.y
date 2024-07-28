@@ -8,7 +8,7 @@ import Move.Token
 
 %name parse
 %tokentype { Token }
-%error { parseError }
+%error { onError }
 
 %token
   -- Separators
@@ -156,6 +156,6 @@ Arg :: { (Identifier, Type) }
 -}
 
 {
-parseError :: [Token] -> a
-parseError tokens = error $ "Parse error on tokens: " ++ show tokens
+onError :: [Token] -> e
+onError tokens = error $ "Parse error on tokens: " ++ show tokens
 }

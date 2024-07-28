@@ -1,8 +1,8 @@
 module Move.Token where
 
-data Token 
-  -- Separators
-  = TokenSeparatorLParen
+data Token
+  = -- Separators
+    TokenSeparatorLParen
   | TokenSeparatorRParen
   | TokenSeparatorLBrace
   | TokenSeparatorRBrace
@@ -10,37 +10,37 @@ data Token
   | TokenSeparatorComma
   | TokenSeparatorColon
   | TokenSeparatorDColon
-  -- Literals
-  | TokenLiteralIntDec Int
+  | -- Literals
+    TokenLiteralIntDec Int
   | TokenLiteralIntHex String
   | TokenLiteralString String
   | TokenLiteralBool Bool
-  -- Keywords: Module, Script
-  | TokenKeywordConst
+  | -- Keywords: Module, Script
+    TokenKeywordConst
   | TokenKeywordFriend
   | TokenKeywordFun
   | TokenKeywordModule
   | TokenKeywordScript
   | TokenKeywordUse
-  -- Keywords: Structs
-  | TokenKeywordStruct
+  | -- Keywords: Structs
+    TokenKeywordStruct
   | TokenKeywordHas
   | TokenKeywordKey
   | TokenKeywordStore
   | TokenKeywordDrop
   | TokenKeywordCopy
-  -- Keywords: Control flow
-  | TokenKeywordIf
+  | -- Keywords: Control flow
+    TokenKeywordIf
   | TokenKeywordElse
   | TokenKeywordWhile
   | TokenKeywordLoop
   | TokenKeywordBreak
   | TokenKeywordContinue
-  -- Keywords: Let binding
-  | TokenKeywordLet
+  | -- Keywords: Let binding
+    TokenKeywordLet
   | TokenKeywordIn
-  -- Operators
-  | TokenOperatorPlus
+  | -- Operators
+    TokenOperatorPlus
   | TokenOperatorMinus
   | TokenOperatorTimes
   | TokenOperatorDiv
@@ -58,6 +58,6 @@ data Token
   | TokenOperatorRef
   | TokenOperatorDot
   | TokenOperatorAt
-  -- Identifiers
-  | TokenIdentifier String
-  deriving (Eq,Show)
+  | -- Identifiers
+    TokenIdentifier String
+  deriving (Eq, Show)
