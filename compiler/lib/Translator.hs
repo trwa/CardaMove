@@ -3,32 +3,35 @@ module Translator (translate) where
 import Aiken.AST qualified as Aiken
 import Move.AST qualified as Move
 
-translate :: Move.Module -> Aiken.Module
-translate m =
-  Aiken.Module
-    { Aiken.moduleTopLevels = map translateTopLevel $ Move.moduleTopLevels m
-    }
+class Translate a b where
+  translate :: a -> b
 
-translateTopLevel :: Move.TopLevel -> Aiken.TopLevel
-translateTopLevel (Move.TopLevelStruct s) = Aiken.TopLevelTypeDefinition td
-  where
-    td = translateStruct s
+instance Translate Move.Module Aiken.Module where
+  translate m =
+    Aiken.Module
+      { Aiken.moduleTopLevels = map translate $ Move.moduleTopLevels m
+      }
 
-translateStruct :: Move.Struct -> Aiken.TypeDefinition
-translateStruct s =
-  Aiken.TypeDefinition
-    { Aiken.typeDefinitionIdentifier = Move.structIdentifier s,
-      Aiken.typeDefinitionDataConstructors =
-        [ Aiken.DataConstructor
-            { Aiken.dataConstructorIdentifier = Move.structIdentifier s,
-              Aiken.dataConstructorFields = map translateField $ Move.structFields s
-            }
-        ]
-    }
+instance Translate Move.TopLevel Aiken.TopLevel where
+  translate (Move.TopLevelStruct s) = Aiken.TopLevelTypeDefinition td
+    where
+      td = translate s
 
-translateField :: Move.Field -> Aiken.Field
-translateField f =
-  Aiken.Field
-    { Aiken.fieldIdentifier = Move.fieldIdentifier f,
-      Aiken.fieldType = Move.fieldType f
-    }
+instance Translate Move.Struct Aiken.TypeDefinition where
+  translate s =
+    Aiken.TypeDefinition
+      { Aiken.typeDefinitionIdentifier = Move.structIdentifier s,
+        Aiken.typeDefinitionDataConstructors =
+          [ Aiken.DataConstructor
+              { Aiken.dataConstructorIdentifier = Move.structIdentifier s,
+                Aiken.dataConstructorFields = map translate $ Move.structFields s
+              }
+          ]
+      }
+
+instance Translate Move.Field Aiken.Field where
+  translate f =
+    Aiken.Field
+      { Aiken.fieldIdentifier = Move.fieldIdentifier f,
+        Aiken.fieldType = Move.fieldType f
+      }
