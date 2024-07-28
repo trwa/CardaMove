@@ -16,7 +16,12 @@ dependencies:
   - array
   - base >= 4.7 && < 5
   - bytestring 
+  #- iris == 0.1.0.0
   - megaparsec == 9.5.0
+  - mtl
+  - optparse-applicative
+  - optparse-simple == 0.1.1.4
+  - pretty-terminal
   - text == 2.0.2
   - wide-word == 0.1.6.0
 
