@@ -21,12 +21,13 @@ extra-source-files:
 library
   exposed-modules:
       Aiken.AST
+      Aiken.Token
       Aiken.Writer
       Move.AST
       Move.Lexer
       Move.Parser
       Move.Token
-      Translation
+      Translator
   other-modules:
       Paths_cardamove
   hs-source-dirs:
