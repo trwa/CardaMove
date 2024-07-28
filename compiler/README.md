@@ -2,15 +2,13 @@
 
 Simple POC for a transpiler from [Move](https://move-language.github.io/move/) to [Aiken](https://aiken-lang.org/).
 
-## Milestone 0
+## Notes
 
-Parse the following Move type definition:
+### Move function bodies
 
-```rust
-struct T has key, drop, copy {
-    f0: bool,
-    f1: bool,
-}
-```
+Function bodies in Move are a concatenation of "void expressions" (separated by ";") and a last expression which
+has type of the function's return type.
 
-Into some kind of AST.
+Void expressions are:
+* Let bindings 
+* Normal expression with void type
