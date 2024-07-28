@@ -23,14 +23,31 @@ testParseModuleOneEmptyStruct :: Spec
 testParseModuleOneEmptyStruct = describe "Parse module with one empty struct" $ do
   testScan "module foo::baz { struct A {} } " $
     Module
-      { moduleAddress= "foo",
+      { moduleAddress = "foo",
         moduleIdentifier = "baz",
         moduleTopLevels =
-          [ TopLevelStruct $ Struct
-              { structIdentifier = "A",
-                structFields = [],
-                structAbilities = []
-              }
+          [ TopLevelStruct $
+              Struct
+                { structIdentifier = "A",
+                  structFields = [],
+                  structAbilities = []
+                }
+          ]
+      }
+
+testParseModuleKeyAbility :: Spec
+testParseModuleKeyAbility = describe "Parse module with one empty struct with key ability" $ do
+  testScan "module foo::baz { struct K has key {} }" $
+    Module
+      { moduleAddress = "foo",
+        moduleIdentifier = "baz",
+        moduleTopLevels =
+          [ TopLevelStruct $
+              Struct
+                { structIdentifier = "K",
+                  structFields = [],
+                  structAbilities = [Key]
+                }
           ]
       }
 
@@ -38,3 +55,4 @@ spec :: Spec
 spec = do
   testParseEmptyModule
   testParseModuleOneEmptyStruct
+  testParseModuleKeyAbility
