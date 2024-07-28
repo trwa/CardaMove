@@ -18,7 +18,7 @@ testScanModule = describe "Parse module" $ do
   testScan "module" [TokenKeywordModule]
   testScan "module " [TokenKeywordModule]
   testScan "module {" [TokenKeywordModule, TokenSeparatorLBrace]
-  testScan "module { }" [TokenKeywordModule, TokenSeparatorLBrace, TokenSeparatorRBrace]
+  testScan "module culo {}" [TokenKeywordModule, TokenIdentifier "culo", TokenSeparatorLBrace, TokenSeparatorRBrace]
   testScan "module abc::def {}" [TokenKeywordModule, TokenIdentifier "abc", TokenSeparatorDColon, TokenIdentifier "def", TokenSeparatorLBrace, TokenSeparatorRBrace]
   testScan "module 0xABCD::culo {}" [TokenKeywordModule, TokenLiteralIntHex "0xABCD", TokenSeparatorDColon, TokenIdentifier "culo", TokenSeparatorLBrace, TokenSeparatorRBrace]
 

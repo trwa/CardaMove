@@ -32,8 +32,6 @@ tokens :-
   \"($digit|$alpha)*\"          { \s -> TokenLiteralString s              }
   true                          { \_ -> TokenLiteralBool True             } 
   false                         { \_ -> TokenLiteralBool False            }
-  -- Identifiers
-  $alpha($alpha | $digit)*      { \s -> TokenIdentifier s                 }
   -- Keywords: Module, Script
   const                         { \_ -> TokenKeywordConst                 }
   friend                        { \_ -> TokenKeywordFriend                }
@@ -77,6 +75,8 @@ tokens :-
   \&                            { \_ -> TokenOperatorRef                  }
   \.                            { \_ -> TokenOperatorDot                  }
   \@                            { \_ -> TokenOperatorAt                   }
+  -- Identifiers
+  $alpha($alpha | $digit)*      { \s -> TokenIdentifier s                 }
 
 {
 data Token 

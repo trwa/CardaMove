@@ -1,10 +1,7 @@
 {
-module Move.Parser (
-  Module(..),
-  Address(..),
-  parseMove,
-  parseError
-  ) where
+module Move.Parser (parseMove, parseError) where
+
+import Move.AST
 import Move.Lexer
 }
 
@@ -28,8 +25,6 @@ import Move.Lexer
   string    { TokenLiteralString $$     }
   true      { TokenLiteralBool True     }
   false     { TokenLiteralBool False    }
-  -- Identifiers
-  symbol    { TokenIdentifier $$        }
   -- Keywords: Module, Script
   const     { TokenKeywordConst         }
   friend    { TokenKeywordFriend        }
@@ -57,17 +52,74 @@ import Move.Lexer
   -- Operators
   '+'       { TokenOperatorPlus         }
   '-'       { TokenOperatorMinus        }
+  -- Identifiers
+  symbol    { TokenIdentifier $$        }
 
 %right in
 
 %%
 
-Module :: { Module }
-  : module int '::' symbol '{' '}' { Module (AddressInt $2) $4 }
-  | module hex '::' symbol '{' '}' { Module (AddressHex $2) $4 }
-  | module symbol '::' symbol '{' '}' { Module (AddressSym $2) $4 }
+-- Module
 
-{-}
+Module :: { Module }
+  : module symbol '::' symbol '{' TopLevels '}' { 
+      Module {
+        moduleAddress = $2,
+        moduleIdentifier = $4,
+        moduleTopLevels = $6
+      }
+    }
+
+TopLevels :: { [TopLevel] }
+  : {- empty -}         { [] }
+  | TopLevel            { [$1] }
+  | TopLevels TopLevel  { $2 : $1 }
+
+TopLevel :: { TopLevel }
+  : Struct  { TopLevelStruct $1 }
+
+-- Struct
+
+Struct :: { Struct }
+  : struct symbol '{' Fields '}' { 
+      Struct {
+        structIdentifier = $2,
+        structFields = $4,
+        structAbilities = []
+      }
+    }
+  | struct symbol has Abilities '{' Fields '}'  {
+      Struct {
+        structIdentifier = $2,
+        structFields = $6,
+        structAbilities = $4
+      }
+    }
+
+Abilities ::  { [Ability] }
+  : Ability               { [$1] }
+  | Abilities ',' Ability { $3 : $1 }
+
+Ability ::  { Ability }
+  : copy  { Copy }
+  | drop  { Drop }
+  | key   { Key }
+  | store { Store }
+
+Fields :: { [Field] }
+  : {- empty -}       { [] }
+  | Field             { [$1] }
+  | Fields ',' Field  { $3 : $1 }
+
+Field ::  { Field }
+  : symbol ':' symbol {
+      Field {
+        fieldIdentifier = $1,
+        fieldType = $3
+      }
+    }
+
+{-
 Uses :: { [Use] }
   : Use { [$1] }
   | Uses Use { $2 : $1 }
@@ -103,62 +155,6 @@ Arg :: { (Identifier, Type) }
 -}
 
 {
-data Module
-  = Module Address String {-[Use] [Friend] [Struct] [Function] [Constant] Expr-}
-  deriving (Eq, Show)
-
-data Address 
-  = AddressInt Int
-  | AddressHex String
-  | AddressSym String
-  deriving (Eq, Show)
-
-{-
-newtype Identifier = Identifier String
-  deriving (Eq, Show)
-
-newtype Type = Type String
-  deriving (Eq, Show)
-
-data Use
-  = Use Address Identifier
-  deriving (Eq, Show)
-
-data Constant
-  = Constant Identifier Type Expr
-  deriving (Eq, Show)
-
-data Function
-  = Function Identifier [(Identifier, Type)] Type [Stmt]
-  deriving (Eq, Show)
-
-data Expr
-  = Var Identifier
-  | Let Identifier Expr Expr
-  deriving (Eq, Show)
-
-newtype Stmt = Stmt Expr
-  deriving (Eq, Show)
-
--- | friend <address>::<module>
-data Friend
-  = Friend String String
-  deriving (Eq, Show)
-
--- | drop, copy, store, key
-data Ability
-  = Drop
-  | Copy
-  | Store
-  | Key
-  deriving (Eq, Show)
-
--- | struct <name> { <record: type>* } has <ability>
-data Struct
-  = Struct String [(String, String)] [Ability]
-  deriving (Eq, Show)
--}
-
 parseError :: [Token] -> a
-parseError _ = error "Parse error"
+parseError tokens = error $ "Parse error on tokens: " ++ show tokens
 }

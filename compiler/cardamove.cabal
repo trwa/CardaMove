@@ -20,8 +20,12 @@ extra-source-files:
 
 library
   exposed-modules:
+      Aiken.AST
+      Aiken.Writer
+      Move.AST
       Move.Lexer
       Move.Parser
+      Translation
   other-modules:
       Paths_cardamove
   hs-source-dirs:
@@ -63,6 +67,7 @@ test-suite cardamove-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Aiken.WriterSpec
       Move.LexerSpec
       Move.ParserSpec
       Paths_cardamove
