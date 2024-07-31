@@ -60,7 +60,14 @@ main = do
   let mov = parse $ scan mod
   let aik :: Aiken.AST.Module = translate (mov :: Move.AST.Module)
   let src = unLex $ unParse aik
+  print "Move source code:"
   print mod
+  putStrLn ""
+  putStrLn "Move AST:"
   print mov
+  putStrLn ""
+  putStrLn "Aiken AST:"
   print aik
+  putStrLn ""
+  putStrLn "Aiken source code:"
   print src

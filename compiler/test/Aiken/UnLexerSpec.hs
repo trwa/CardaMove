@@ -1,6 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-module Aiken.WriterSpec (spec) where
+module Aiken.UnLexerSpec (spec) where
 
 import Test.Hspec
 

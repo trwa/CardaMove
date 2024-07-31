@@ -1,20 +1,20 @@
-module Aiken.Token where
+module Aiken.Token (Token (..)) where
 
 data Token
-  -- Separators
-  = TokenSeparatorLParen
+  = -- Separators
+    TokenSeparatorLParen
   | TokenSeparatorRParen
   | TokenSeparatorLBrace
   | TokenSeparatorRBrace
   | TokenSeparatorComma
   | TokenSeparatorColon
   | TokenSeparatorSlash
-  -- Literals
-  | TokenLiteralIntDec Int
+  | -- Literals
+    TokenLiteralIntDec Int
   | TokenLiteralString String
   | TokenLiteralBool Bool
-  -- Keywords
-  | TokenKeywordFn
+  | -- Keywords
+    TokenKeywordFn
   | TokenKeywordUse
   | TokenKeywordType
   | TokenKeywordPub
@@ -23,8 +23,8 @@ data Token
   | TokenKeywordElse
   | TokenKeywordLet
   | TokenKeywordIn
-  -- Operators
-  | TokenOperatorPlus
+  | -- Operators
+    TokenOperatorPlus
   | TokenOperatorMinus
   | TokenOperatorTimes
   | TokenOperatorDiv
@@ -43,6 +43,6 @@ data Token
   | TokenOperatorDDot
   | TokenOperatorBackArrow
   | TokenOperatorArrow
-  -- Identifiers
-  | TokenIdentifier String
+  | -- Identifiers
+    TokenIdentifier String
   deriving (Show, Eq)

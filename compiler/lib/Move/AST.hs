@@ -1,4 +1,11 @@
-module Move.AST where
+module Move.AST
+  ( Ability (..),
+    Field (..),
+    Module (..),
+    Struct (..),
+    TopLevel (..),
+  )
+where
 
 data Module
   = Module

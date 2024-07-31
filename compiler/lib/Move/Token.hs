@@ -1,4 +1,4 @@
-module Move.Token where
+module Move.Token (Token (..)) where
 
 data Token
   = -- Separators

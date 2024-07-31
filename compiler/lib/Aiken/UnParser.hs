@@ -1,8 +1,8 @@
-module Aiken.UnParser where
+module Aiken.UnParser (unParse) where
 
 import Aiken.AST
 import Aiken.Token
-import Data.List (intercalate, intersperse)
+import Data.List (intercalate)
 
 class UnParse t where
   unParse :: t -> [Token]

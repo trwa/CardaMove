@@ -3,8 +3,8 @@ module Translator (translate) where
 import Aiken.AST qualified as Aiken
 import Move.AST qualified as Move
 
-class Translate a b where
-  translate :: a -> b
+class Translate m a where
+  translate :: m -> a
 
 instance Translate Move.Module Aiken.Module where
   translate m =

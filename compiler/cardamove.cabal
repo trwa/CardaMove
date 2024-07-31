@@ -75,7 +75,7 @@ test-suite cardamove-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Aiken.WriterSpec
+      Aiken.UnLexerSpec
       Move.LexerSpec
       Move.ParserSpec
       TranslatorSpec
