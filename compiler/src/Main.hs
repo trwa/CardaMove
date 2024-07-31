@@ -2,11 +2,14 @@
 
 module Main (main) where
 
-import Move.AST
+import Aiken.UnLexer
+import Aiken.UnParser
 import Move.Lexer
 import Move.Parser
-import Move.Token
+import Move.AST
+import Aiken.AST
 import Options.Applicative
+import Translator (translate)
 
 data Sample = Sample
   { hello :: String,
@@ -36,8 +39,8 @@ sample =
           <> metavar "INT"
       )
 
-main :: IO ()
-main = greet =<< execParser opts
+main2 :: IO ()
+main2 = greet =<< execParser opts
   where
     opts =
       info
@@ -51,10 +54,13 @@ greet :: Sample -> IO ()
 greet (Sample h False n) = putStrLn $ "Hello, " ++ h ++ replicate n '!'
 greet _ = return ()
 
-{-
+main :: IO ()
 main = do
-  let script = "script { fun foo ( x : u8 ) : u8 { let x = 6 in x } }"
-  let tokens = scan script
-  -- let parsed = parseMove tokens
-  print tokens
--}
+  let mod = "module foo::bar { struct Baz has key { a: bool, b: u8 } }"
+  let mov = parse $ scan mod
+  let aik :: Aiken.AST.Module = translate (mov :: Move.AST.Module)
+  let src = unLex $ unParse aik
+  print mod
+  print mov
+  print aik
+  print src

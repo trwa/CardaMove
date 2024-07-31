@@ -42,6 +42,7 @@ data Token
   | TokenOperatorDot
   | TokenOperatorDDot
   | TokenOperatorBackArrow
+  | TokenOperatorArrow
   -- Identifiers
   | TokenIdentifier String
   deriving (Show, Eq)

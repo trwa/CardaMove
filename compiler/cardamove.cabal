@@ -22,7 +22,8 @@ library
   exposed-modules:
       Aiken.AST
       Aiken.Token
-      Aiken.Writer
+      Aiken.UnLexer
+      Aiken.UnParser
       Move.AST
       Move.Lexer
       Move.Parser
