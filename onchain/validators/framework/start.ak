@@ -5,7 +5,7 @@ use aiken/transaction.{
 }
 use aiken/transaction/value.{AssetName, MintedValue, quantity_of}
 
-validator(address: AssetName, utxo: OutputReference) {
+validator(name: AssetName, utxo: OutputReference) {
   fn run(_redeemer: Data, context: ScriptContext) -> Bool {
     let transaction: Transaction = context.transaction
     let inputs: List<Input> = transaction.inputs
@@ -23,20 +23,19 @@ validator(address: AssetName, utxo: OutputReference) {
         |> dict.to_list()
     // 2. There is a single NFT minted in this transaction, with unit amount
     expect [(asset, 1)] = tokens
-    // 3. The asset name of the NFT is the address
-    expect asset == address
+    // 3. The asset name of the NFT is correct
+    expect asset == name
     let outputs: List<Output> = transaction.outputs
     // 4. There is only one output with the NFT minted
     expect [output] =
       list.filter(
         outputs,
-        fn(output) { 1 == quantity_of(output.value, policy_id, address) },
+        fn(output) { 1 == quantity_of(output.value, policy_id, name) },
       )
     // 5. The datum of the NFT output is a InlineDatum
     expect InlineDatum(datum) = output.datum
     // 6. The datum is an empty list of AssetName(s)
-    expect addresses: List<AssetName> = datum
-    // 7. The list of addresses is empty
-    addresses == []
+    expect []: List<AssetName> = datum
+    True
   }
 }
