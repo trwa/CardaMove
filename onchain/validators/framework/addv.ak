@@ -10,9 +10,7 @@ validator(name: AssetName, start: PolicyId, addm: PolicyId) {
     context: ScriptContext,
   ) -> Bool {
     // 0. The transaction is a spending transaction
-    expect Spend(_output_reference) = context.purpose
-    // 1. The new_address is not in the list of old_addresses
-    expect False == list.has(old_addresses, new_address)
+    expect Spend(_outref) = context.purpose
     // 2. There is a single minting redeemer with the given policy ID
     // TODO: here I check that also the minting redeemer is the one I expect (with the new_address)
     expect True == ( context.transaction.redeemers |> dict.has_key(Mint(addm)) )
@@ -26,15 +24,16 @@ validator(name: AssetName, start: PolicyId, addm: PolicyId) {
     expect InlineDatum(datum) = output.datum
     // 5. The datum is a list of AssetName(s)
     expect new_addresses: List<AssetName> = datum
-    let unique_old_addresses = list.unique(old_addresses)
-    let unique_new_addresses = list.unique(new_addresses)
-    // 6. The new old_addresses are the old old_addresses plus the new address
+    let unique_old_addresses: List<AssetName> = list.unique(old_addresses)
+    let unique_new_addresses: List<AssetName> = list.unique(new_addresses)
+    // 6. The new_addresses are the old_addresses plus the new_address
     expect
-      list.length(unique_new_addresses) == list.length(unique_old_addresses) + 1
+      1 == list.length(unique_new_addresses) - list.length(unique_old_addresses)
     expect
-      list.difference(unique_new_addresses, unique_old_addresses) == [
-        new_address,
-      ]
+      [new_address] == list.difference(
+        unique_new_addresses,
+        unique_old_addresses,
+      )
     True
   }
 }
