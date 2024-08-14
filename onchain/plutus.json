@@ -65,20 +65,20 @@
     {
       "title": "framework/addm.run",
       "redeemer": {
-        "title": "_r",
+        "title": "_redeemer",
         "schema": {
           "$ref": "#/definitions/Data"
         }
       },
       "parameters": [
         {
-          "title": "start",
+          "title": "_name",
           "schema": {
             "$ref": "#/definitions/ByteArray"
           }
         },
         {
-          "title": "name",
+          "title": "_start",
           "schema": {
             "$ref": "#/definitions/ByteArray"
           }
