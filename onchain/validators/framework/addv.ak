@@ -24,9 +24,9 @@ validator(name: AssetName, start: PolicyId, addm: PolicyId) {
     expect InlineDatum(datum) = output.datum
     // 5. The datum is a list of AssetName(s)
     expect new_addresses: List<AssetName> = datum
+    // 6. The new_addresses are the old_addresses plus the new_address
     let unique_old_addresses: List<AssetName> = list.unique(old_addresses)
     let unique_new_addresses: List<AssetName> = list.unique(new_addresses)
-    // 6. The new_addresses are the old_addresses plus the new_address
     expect
       1 == list.length(unique_new_addresses) - list.length(unique_old_addresses)
     expect
