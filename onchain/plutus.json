@@ -63,7 +63,82 @@
       "hash": "b19dd980d6b717812cc1fab8803a4b1ce26439bfd75a0652fe1e8ef2"
     },
     {
+      "title": "framework/extend.run",
+      "redeemer": {
+        "title": "_r",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "parameters": [
+        {
+          "title": "start",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        }
+      ],
+      "compiledCode": "5901580100003232323232323223222533300532323253330083370e900018049baa001132323232533300f3012002132533300d3370e6eb4c03c009200213371e0029111a544f444f3a207265706c616365207769746820616464726573730014a06eb8c03400458c040004cc88c94ccc034cdc3a4004601c6ea800452f5bded8c026eacc048c03cdd500099198008008019129998088008a6103d87a8000132323253330113371e00c6eb8c04800c4cdd2a40006602a6e980052f5c026600a00a0046eacc048008c054008c04c004c8cc004004dd5980818089808980898088019129998078008a5eb7bdb1804c8c8c8c94ccc040cdc7a45000021003133014337606ea4008dd3000998030030019bab3011003375c601e004602600460220026eb8c03cc030dd50019bac300e001300a37540042c6018601a0046016002600e6ea800452613656375c002ae6955ceaab9e5573eae815d0aba21",
+      "hash": "3100e6cfb850c1f56fc63ad5432cb0f2df66c43c80a55fc5744382e2"
+    },
+    {
+      "title": "framework/propagate.run",
+      "datum": {
+        "title": "addresses",
+        "schema": {
+          "$ref": "#/definitions/List$ByteArray"
+        }
+      },
+      "redeemer": {
+        "title": "_r",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "parameters": [
+        {
+          "title": "start",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        },
+        {
+          "title": "propagate",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        }
+      ],
+      "compiledCode": "5843010000323232322322322322253330094a029309b2b19198008009bac00222533300900114984c8cc00c00cc030008dd718050009bae001375c002ae6955cfaba15745",
+      "hash": "8245c60e04de2a924a13fc8e8ae5d187f93cff8bc00f313ec6854434"
+    },
+    {
       "title": "framework/start.run",
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Data"
+        }
+      },
+      "parameters": [
+        {
+          "title": "address",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        },
+        {
+          "title": "utxo",
+          "schema": {
+            "$ref": "#/definitions/aiken~1transaction~1OutputReference"
+          }
+        }
+      ],
+      "compiledCode": "5902b60100003232323232323223222253330063253323300853330083370e900018049baa32330010013758600660166ea8c00cc02cdd50021129998068008a6103d87a800013232533300c3375e600c601c6ea80080244c014cc0400092f5c02660080080026022004601e002294452809919191919299980699b8748000c038dd5000899191919299980a180b8010991919299980b980d001099299980a99b8748010c058dd500089919299980b99baf374e00498010180001300900614a0646600200200444a66603600229309919801801980f8011bae301d00137586034602e6ea800458c028c058dd50008b180c00099198008009bac30093015375401044a66602e002297ae013232533301630083253330173009301837540022900009bad301c3019375400264a66602e601260306ea80045300103d87a8000132330010013756603a60346ea8008894ccc070004530103d87a80001323232533301c3371e0346eb8c07400c4c054cc080dd4000a5eb804cc014014008dd6980e8011810001180f000998071bab300d3018375400401226603400466008008002266008008002603600460320026eb4c04c00458c054004c94ccc040c008c044dd50008a5eb7bdb1804dd5980a98091baa0013300732330010013756602a602c602c602c602c60246ea8014894ccc05000452f5bded8c0264646464a66602a66e3d2201000021003133019337606ea4008dd3000998030030019bab3016003375c60280046030004602c0020046e1d2002375c6024601e6ea800458c00cc038dd5003980298069baa00623010301130110012300f301000122323300100100322533300f00114c103d87a80001323232533300f3371e00c6eb8c04000c4c020cc04cdd3000a5eb804cc014014008dd59808001180980118088009ba548000528118060008a4c26cac6eb80055cd2ab9d5573caae7d5d02ba15745",
+      "hash": "ba1277fa6b921817f019522d4ee21f102e1ed9a76b439230884a7285"
+    },
+    {
+      "title": "old/start.run",
       "datum": {
         "title": "datum",
         "schema": {
@@ -109,8 +184,18 @@
     "ByteArray": {
       "dataType": "bytes"
     },
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
     "Int": {
       "dataType": "integer"
+    },
+    "List$ByteArray": {
+      "dataType": "list",
+      "items": {
+        "$ref": "#/definitions/ByteArray"
+      }
     },
     "List$aiken/transaction/credential/Address": {
       "dataType": "list",
@@ -207,6 +292,44 @@
           "dataType": "constructor",
           "index": 1,
           "fields": []
+        }
+      ]
+    },
+    "aiken/transaction/OutputReference": {
+      "title": "OutputReference",
+      "description": "An `OutputReference` is a unique reference to an output on-chain. The `output_index`\n corresponds to the position in the output list of the transaction (identified by its id)\n that produced that output",
+      "anyOf": [
+        {
+          "title": "OutputReference",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "transaction_id",
+              "$ref": "#/definitions/aiken~1transaction~1TransactionId"
+            },
+            {
+              "title": "output_index",
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        }
+      ]
+    },
+    "aiken/transaction/TransactionId": {
+      "title": "TransactionId",
+      "description": "A unique transaction identifier, as the hash of a transaction body. Note that the transaction id\n isn't a direct hash of the `Transaction` as visible on-chain. Rather, they correspond to hash\n digests of transaction body as they are serialized on the network.",
+      "anyOf": [
+        {
+          "title": "TransactionId",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "hash",
+              "$ref": "#/definitions/ByteArray"
+            }
+          ]
         }
       ]
     },
