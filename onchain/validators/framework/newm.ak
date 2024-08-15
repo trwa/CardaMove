@@ -1,8 +1,6 @@
 use aiken/dict
 use aiken/list
-use aiken/transaction.{
-  InlineDatum, Input, Mint, Output, OutputReference, ScriptContext,
-}
+use aiken/transaction.{Input, Mint, Output, OutputReference, ScriptContext}
 use aiken/transaction/value.{AssetName, quantity_of}
 
 validator(name: AssetName, utxo: OutputReference) {
@@ -22,17 +20,13 @@ validator(name: AssetName, utxo: OutputReference) {
     // 3. The asset name of the NFT is correct
     expect asset == name
     // 4. There is only one output with the NFT minted
-    expect [output] =
+    expect [_] =
       context.transaction.outputs
         |> list.filter(
             fn(output: Output) {
               1 == quantity_of(output.value, policy_id, name)
             },
           )
-    // 5. The datum of the NFT output is a InlineDatum
-    expect InlineDatum(datum) = output.datum
-    // 6. The datum is an empty list of AssetName(s)
-    expect []: List<AssetName> = datum
     True
   }
 }
