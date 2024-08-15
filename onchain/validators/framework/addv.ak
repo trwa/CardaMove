@@ -2,6 +2,7 @@ use aiken/dict
 use aiken/list
 use aiken/transaction.{InlineDatum,
   Mint, Output, Redeemer, ScriptContext, Spend}
+use aiken/transaction/credential.{Address}
 use aiken/transaction/value.{AssetName, PolicyId, quantity_of}
 
 validator(name: AssetName, start: PolicyId, addm: PolicyId) {
@@ -11,7 +12,10 @@ validator(name: AssetName, start: PolicyId, addm: PolicyId) {
     context: ScriptContext,
   ) -> Bool {
     // 0. The transaction is a spending transaction
-    expect Spend(_outref) = context.purpose
+    expect Spend(outref) = context.purpose
+    expect Some(self_input) =
+      context.transaction.inputs |> list.at(outref.output_index)
+    let self_address: Address = self_input.output.address
     // 2. There is a minting redeemer (with the given policy ID) containing the new address as well
     expect Some(redeemer): Option<Redeemer> =
       context.transaction.redeemers |> dict.get(Mint(addm))
@@ -21,8 +25,12 @@ validator(name: AssetName, start: PolicyId, addm: PolicyId) {
     expect [output] =
       context.transaction.outputs
         |> list.filter(
-            fn(output: Output) { 1 == quantity_of(output.value, start, name) },
+            fn(output: Output) {
+              1 == quantity_of(output.value, start, name) && output.address == self_address
+            },
           )
+    // The output is spent to this validator
+    //expect output. == name
     // 4. The datum of the NFT output is a InlineDatum
     expect InlineDatum(datum) = output.datum
     // 5. The datum is a list of AssetName(s)
