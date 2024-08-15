@@ -1,6 +1,7 @@
 use aiken/dict
 use aiken/list
-use aiken/transaction.{InlineDatum, Mint, Output, ScriptContext, Spend}
+use aiken/transaction.{InlineDatum,
+  Mint, Output, Redeemer, ScriptContext, Spend}
 use aiken/transaction/value.{AssetName, PolicyId, quantity_of}
 
 validator(name: AssetName, start: PolicyId, addm: PolicyId) {
@@ -11,9 +12,11 @@ validator(name: AssetName, start: PolicyId, addm: PolicyId) {
   ) -> Bool {
     // 0. The transaction is a spending transaction
     expect Spend(_outref) = context.purpose
-    // 2. There is a single minting redeemer with the given policy ID
-    // TODO: here I check that also the minting redeemer is the one I expect (with the new_address)
-    expect True == ( context.transaction.redeemers |> dict.has_key(Mint(addm)) )
+    // 2. There is a minting redeemer (with the given policy ID) containing the new address as well
+    expect Some(redeemer): Option<Redeemer> =
+      context.transaction.redeemers |> dict.get(Mint(addm))
+    expect address: AssetName = redeemer
+    expect address == new_address
     // 3. There is a single output with the start NFT
     expect [output] =
       context.transaction.outputs
