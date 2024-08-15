@@ -3,8 +3,8 @@ use aiken/list
 use aiken/transaction.{Mint, Output, ScriptContext}
 use aiken/transaction/value.{AssetName, PolicyId, quantity_of}
 
-validator(startm_script: PolicyId, startm_asset: AssetName) {
-  fn run(new_asset: AssetName, context: ScriptContext) -> Bool {
+validator(newm_script: PolicyId, newm_asset: AssetName) {
+  fn run(redeemer: AssetName, context: ScriptContext) -> Bool {
     // 0. The ScriptPurpose is to Mint a new Token
     expect Mint(policy_id) = context.purpose
     // 1. There is a single minted asset
@@ -15,15 +15,15 @@ validator(startm_script: PolicyId, startm_asset: AssetName) {
         |> dict.to_list()
     // 2. The amount of the minted asset is 1
     expect 1 == amount
-    // 3. The name of the new asset is new_asset
-    expect asset == new_asset
-    // 4. There is one output UTxO with the new_asset
+    // 3. The name of the new asset is redeemer
+    expect asset == redeemer
+    // 4. There is one output UTxO with the redeemer
     // TODO: This might be an unnecessary check.
     expect [_] =
       context.transaction.outputs
         |> list.filter(
             fn(output: Output) {
-              1 == quantity_of(output.value, policy_id, new_asset)
+              1 == quantity_of(output.value, policy_id, redeemer)
             },
           )
     // 5. There is one output UTxO with the authorizing start NFT
@@ -31,9 +31,10 @@ validator(startm_script: PolicyId, startm_asset: AssetName) {
       context.transaction.outputs
         |> list.filter(
             fn(output: Output) {
-              1 == quantity_of(output.value, startm_script, startm_asset)
+              1 == quantity_of(output.value, newm_script, newm_asset)
             },
           )
+    // TODO: 6. The minted NFT is paid to the script in the datum of the addv
     True
   }
 }
