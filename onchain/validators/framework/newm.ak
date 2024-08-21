@@ -5,7 +5,7 @@ use aiken/transaction.{
 }
 use aiken/transaction/value.{AssetName, quantity_of}
 
-validator(name: AssetName, utxo: OutputReference) {
+validator(utxo: OutputReference) {
   fn run(_redeemer: Data, context: ScriptContext) -> Bool {
     // 0. The UTXO is consumed in the inputs
     expect Some(_input) =
@@ -19,14 +19,14 @@ validator(name: AssetName, utxo: OutputReference) {
         |> value.from_minted_value()
         |> value.tokens(policy_id)
         |> dict.to_list()
-    // 3. The asset name of the NFT is correct
-    expect asset == name
+    // 3. The asset name of the NFT is "Auth"
+    expect asset == "Auth"
     // 4. There is only one output with the NFT minted
     expect [output] =
       context.transaction.outputs
         |> list.filter(
             fn(output: Output) {
-              1 == quantity_of(output.value, policy_id, name)
+              1 == quantity_of(output.value, policy_id, "Auth")
             },
           )
     // 5. The datum of the NFT output is a InlineDatum

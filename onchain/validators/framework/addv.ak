@@ -8,7 +8,7 @@ use aiken/transaction.{
 use aiken/transaction/credential.{Address, Script}
 use aiken/transaction/value.{AssetName, PolicyId, quantity_of}
 
-validator(newm_script: PolicyId, newm_asset: AssetName, addm_script: PolicyId) {
+validator(newm_script: PolicyId, addm_script: PolicyId) {
   fn run(
     datum: (List<AssetName>, Hash<Blake2b_224, Script>),
     redeemer: AssetName,
@@ -30,7 +30,7 @@ validator(newm_script: PolicyId, newm_asset: AssetName, addm_script: PolicyId) {
       context.transaction.outputs
         |> list.filter(fn(output: Output) { output.address == self_address })
     // 4. The output UTxO has the authorizing start NFT
-    expect 1 == quantity_of(output.value, newm_script, newm_asset)
+    expect 1 == quantity_of(output.value, newm_script, "Auth")
     // 5. The datum of the output UTxO is the correct list of new_addm_assets
     expect InlineDatum(inline_output_datum) = output.datum
     expect output_datum: (List<AssetName>, Hash<Blake2b_224, Script>) =

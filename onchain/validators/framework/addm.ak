@@ -3,7 +3,7 @@ use aiken/list
 use aiken/transaction.{Mint, Output, ScriptContext}
 use aiken/transaction/value.{AssetName, PolicyId, quantity_of}
 
-validator(newm_script: PolicyId, newm_asset: AssetName) {
+validator(newm_script: PolicyId) {
   fn run(redeemer: AssetName, context: ScriptContext) -> Bool {
     // 0. The ScriptPurpose is to Mint a new Token
     expect Mint(policy_id) = context.purpose
@@ -31,10 +31,9 @@ validator(newm_script: PolicyId, newm_asset: AssetName) {
       context.transaction.outputs
         |> list.filter(
             fn(output: Output) {
-              1 == quantity_of(output.value, newm_script, newm_asset)
+              1 == quantity_of(output.value, newm_script, "Auth")
             },
           )
-    // TODO: 6. The minted NFT is paid to the script in the datum of the addv
     True
   }
 }
