@@ -1,12 +1,12 @@
 use aiken/dict
 use aiken/list
 use aiken/transaction.{
-  InlineDatum, Input, Mint, Output, OutputReference, ScriptContext,
+  InlineDatum, Input, Mint, Output, OutputReference, Redeemer, ScriptContext,
 }
 use aiken/transaction/value.{AssetName, quantity_of}
 
 validator(utxo: OutputReference) {
-  fn run(_redeemer: Data, context: ScriptContext) -> Bool {
+  fn run(_redeemer: Redeemer, context: ScriptContext) -> Bool {
     // 0. The UTXO is consumed in the inputs
     expect Some(_input) =
       context.transaction.inputs

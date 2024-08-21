@@ -15,10 +15,9 @@ validator(newm_script: PolicyId) {
         |> dict.to_list()
     // 2. The amount of the minted asset is 1
     expect 1 == amount
-    // 3. The name of the new asset is redeemer
+    // 3. The name of the new asset is the redeemer
     expect asset == redeemer
     // 4. There is one output UTxO with the redeemer
-    // TODO: This might be an unnecessary check.
     expect [_] =
       context.transaction.outputs
         |> list.filter(
@@ -27,6 +26,7 @@ validator(newm_script: PolicyId) {
             },
           )
     // 5. There is one output UTxO with the authorizing start NFT
+    // This makes sure that the addv script is called, since the Auth NFT is locked in the addv script
     expect [_] =
       context.transaction.outputs
         |> list.filter(
