@@ -7,7 +7,32 @@ use cardano/transaction.{Datum, Output, OutputReference, Redeemer, Transaction}
 
 validator start(output_reference: OutputReference) {
   mint(_redeemer: Redeemer, policy_id: PolicyId, transaction: Transaction) {
-    todo @"Implement the mint validator"
+    // 1. The output reference is consumed by the transaction
+    expect Some(_input) =
+      transaction.inputs
+        |> list.find(fn(input) { input.output_reference == output_reference })
+    // 2. There is a single NFT in the minted assets
+    expect [Pair(asset_name, 1)]: Pairs<AssetName, Int> =
+      transaction.mint |> tokens(policy_id) |> dict.to_pairs
+    // 3. There is a single output with the minted NFT
+    expect [output] =
+      transaction.outputs
+        |> list.filter(
+            fn(output: Output) {
+              1 == quantity_of(output.value, policy_id, "Auth")
+            },
+          )
+    expect [] =
+      transaction.outputs
+        |> list.filter(
+            fn(output: Output) {
+              1 != quantity_of(output.value, policy_id, "Auth")
+            },
+          )
+    // 4. The minted NFT is in a UTxO with an empty list as Datum
+    expect InlineDatum(datum) = output.datum
+    expect []: List<AssetName> = datum
+    True
   }
 
   else(_) {
