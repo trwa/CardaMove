@@ -1,0 +1,250 @@
+{
+  "preamble": {
+    "title": "trwa/cardamove",
+    "description": "Aiken contracts for project 'trwa/cardamove'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.3+3d77b5c"
+    },
+    "license": "AGPL-3.0"
+  },
+  "validators": [
+    {
+      "title": "storage.add_key.spend",
+      "datum": {
+        "title": "_datum",
+        "schema": {
+          "$ref": "#/definitions/cardano~1transaction~1Datum"
+        }
+      },
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Redeemer"
+        }
+      },
+      "parameters": [
+        {
+          "title": "start_policy_id",
+          "schema": {
+            "$ref": "#/definitions/PolicyId"
+          }
+        }
+      ],
+      "compiledCode": "5873010100323232323223225333004323232323232533300a3370e90010008991919318079808001180700098061baa0021533300a3370e900000089931bae300d300c37540042c60146ea8004c02cc030008c028004c028008c020004c018dd50008a4c26cac6eb80055cd2ab9d5573cae855d11",
+      "hash": "53c619f5e485062fe156f4d7f7c036dfc89f82565b2cf15bb269b4f9"
+    },
+    {
+      "title": "storage.add_key.mint",
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Redeemer"
+        }
+      },
+      "parameters": [
+        {
+          "title": "start_policy_id",
+          "schema": {
+            "$ref": "#/definitions/PolicyId"
+          }
+        }
+      ],
+      "compiledCode": "5873010100323232323223225333004323232323232533300a3370e90010008991919318079808001180700098061baa0021533300a3370e900000089931bae300d300c37540042c60146ea8004c02cc030008c028004c028008c020004c018dd50008a4c26cac6eb80055cd2ab9d5573cae855d11",
+      "hash": "53c619f5e485062fe156f4d7f7c036dfc89f82565b2cf15bb269b4f9"
+    },
+    {
+      "title": "storage.add_key.else",
+      "parameters": [
+        {
+          "title": "start_policy_id",
+          "schema": {
+            "$ref": "#/definitions/PolicyId"
+          }
+        }
+      ],
+      "compiledCode": "5873010100323232323223225333004323232323232533300a3370e90010008991919318079808001180700098061baa0021533300a3370e900000089931bae300d300c37540042c60146ea8004c02cc030008c028004c028008c020004c018dd50008a4c26cac6eb80055cd2ab9d5573cae855d11",
+      "hash": "53c619f5e485062fe156f4d7f7c036dfc89f82565b2cf15bb269b4f9"
+    },
+    {
+      "title": "storage.auth.spend",
+      "datum": {
+        "title": "_datum",
+        "schema": {
+          "$ref": "#/definitions/cardano~1transaction~1Datum"
+        }
+      },
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Redeemer"
+        }
+      },
+      "parameters": [
+        {
+          "title": "start_policy_id",
+          "schema": {
+            "$ref": "#/definitions/PolicyId"
+          }
+        },
+        {
+          "title": "add_key_spend",
+          "schema": {
+            "$ref": "#/definitions/ScriptHash"
+          }
+        },
+        {
+          "title": "add_key_mint",
+          "schema": {
+            "$ref": "#/definitions/ScriptHash"
+          }
+        }
+      ],
+      "compiledCode": "58650101003232323232232232232253330083232323232533300d3370e900118071baa00113232326301230130023011001300f37540022c601e6020004601c002601c004601800260146ea800452613656375c0026eb8004dd7000ab9a5573aaae795d0aba21",
+      "hash": "105ae42271f87d5e84e21eff5947cd03112e6b54d830fa0b29d8247d"
+    },
+    {
+      "title": "storage.auth.else",
+      "parameters": [
+        {
+          "title": "start_policy_id",
+          "schema": {
+            "$ref": "#/definitions/PolicyId"
+          }
+        },
+        {
+          "title": "add_key_spend",
+          "schema": {
+            "$ref": "#/definitions/ScriptHash"
+          }
+        },
+        {
+          "title": "add_key_mint",
+          "schema": {
+            "$ref": "#/definitions/ScriptHash"
+          }
+        }
+      ],
+      "compiledCode": "58650101003232323232232232232253330083232323232533300d3370e900118071baa00113232326301230130023011001300f37540022c601e6020004601c002601c004601800260146ea800452613656375c0026eb8004dd7000ab9a5573aaae795d0aba21",
+      "hash": "105ae42271f87d5e84e21eff5947cd03112e6b54d830fa0b29d8247d"
+    },
+    {
+      "title": "storage.start.mint",
+      "redeemer": {
+        "title": "_redeemer",
+        "schema": {
+          "$ref": "#/definitions/Redeemer"
+        }
+      },
+      "parameters": [
+        {
+          "title": "output_reference",
+          "schema": {
+            "$ref": "#/definitions/cardano~1transaction~1OutputReference"
+          }
+        }
+      ],
+      "compiledCode": "58500101003232323232225333003323232323253330083370e900018049baa0011326375c601660146ea800458c028c02c008c024004c024008c01c004c014dd50008a4c26cacae6955ceaab9e5742ae881",
+      "hash": "924e9b6c2b9b00465623c94121106950aaf23f3c48c91935462075b7"
+    },
+    {
+      "title": "storage.start.else",
+      "parameters": [
+        {
+          "title": "output_reference",
+          "schema": {
+            "$ref": "#/definitions/cardano~1transaction~1OutputReference"
+          }
+        }
+      ],
+      "compiledCode": "58500101003232323232225333003323232323253330083370e900018049baa0011326375c601660146ea800458c028c02c008c024004c024008c01c004c014dd50008a4c26cacae6955ceaab9e5742ae881",
+      "hash": "924e9b6c2b9b00465623c94121106950aaf23f3c48c91935462075b7"
+    }
+  ],
+  "definitions": {
+    "ByteArray": {
+      "title": "ByteArray",
+      "dataType": "bytes"
+    },
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
+    "DataHash": {
+      "title": "DataHash",
+      "dataType": "bytes"
+    },
+    "Int": {
+      "dataType": "integer"
+    },
+    "PolicyId": {
+      "title": "PolicyId",
+      "dataType": "bytes"
+    },
+    "Redeemer": {
+      "title": "Redeemer",
+      "description": "Any Plutus data."
+    },
+    "ScriptHash": {
+      "title": "ScriptHash",
+      "dataType": "bytes"
+    },
+    "cardano/transaction/Datum": {
+      "title": "Datum",
+      "description": "An output `Datum`.",
+      "anyOf": [
+        {
+          "title": "NoDatum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        },
+        {
+          "title": "DatumHash",
+          "description": "A datum referenced by its hash digest.",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": [
+            {
+              "$ref": "#/definitions/DataHash"
+            }
+          ]
+        },
+        {
+          "title": "InlineDatum",
+          "description": "A datum completely inlined in the output.",
+          "dataType": "constructor",
+          "index": 2,
+          "fields": [
+            {
+              "$ref": "#/definitions/Data"
+            }
+          ]
+        }
+      ]
+    },
+    "cardano/transaction/OutputReference": {
+      "title": "OutputReference",
+      "description": "An `OutputReference` is a unique reference to an output on-chain. The `output_index`\n corresponds to the position in the output list of the transaction (identified by its id)\n that produced that output",
+      "anyOf": [
+        {
+          "title": "OutputReference",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "transaction_id",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "output_index",
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
