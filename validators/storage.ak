@@ -3,36 +3,76 @@ use aiken/collection/list.{filter, find}
 use aiken/collection/pairs
 use aiken/crypto.{ScriptHash, VerificationKeyHash}
 use cardano/assets.{AssetName, PolicyId, quantity_of, tokens}
-use cardano/transaction.{Datum, Output, OutputReference, Redeemer, Transaction}
+use cardano/transaction.{
+  Datum, InlineDatum, Output, OutputReference, Redeemer, Transaction,
+}
 
-validator start(output_reference: OutputReference) {
+// =====================================================================================================================
+// Datums
+// =====================================================================================================================
+
+type StateThreadDatum {
+  started: Bool,
+}
+
+type AddressList =
+  List<ScriptHash>
+
+// Mi servono 3 datim
+// 1. Quello dello startscript e' totalmente ininfluente, quindi e' il generico Datum
+// 
+
+const stt_name = "STT"
+
+fn stt__utxo_is_spent(transaction: Transaction, utxo: OutputReference) -> Bool {
+  when
+    transaction.inputs
+      |> list.find(fn(input) { input.output_reference == utxo })
+  is {
+    Some(_) -> True
+    None -> False
+  }
+}
+
+fn stt__one_token_is_minted(
+  transaction: Transaction,
+  policy_id: PolicyId,
+) -> Bool {
+  let pairs = transaction.mint |> tokens(policy_id) |> dict.to_pairs
+  when pairs is {
+    [Pair(asset_name, amount)] -> amount == 1 && stt_name == asset_name
+    _ -> False
+  }
+}
+
+fn stt__correct_datum(transaction: Transaction, policy_id: PolicyId) -> Bool {
+  let outputs =
+    transaction.outputs
+      |> list.filter(
+          fn(output: Output) {
+            1 == quantity_of(output.value, policy_id, stt_name)
+          },
+        )
+  when outputs is {
+    [output] ->
+      when output.datum is {
+        InlineDatum(datum) -> {
+          expect StateThreadDatum { started: False } = datum
+          True
+        }
+        _ -> False
+      }
+    _ -> False
+  }
+}
+
+validator create_stt(output_reference: OutputReference) {
   mint(_redeemer: Redeemer, policy_id: PolicyId, transaction: Transaction) {
-    // 1. The output reference is consumed by the transaction
-    expect Some(_input) =
-      transaction.inputs
-        |> list.find(fn(input) { input.output_reference == output_reference })
-    // 2. There is a single NFT in the minted assets
-    expect [Pair(asset_name, 1)]: Pairs<AssetName, Int> =
-      transaction.mint |> tokens(policy_id) |> dict.to_pairs
-    // 3. There is a single output with the minted NFT
-    expect [output] =
-      transaction.outputs
-        |> list.filter(
-            fn(output: Output) {
-              1 == quantity_of(output.value, policy_id, "Auth")
-            },
-          )
-    expect [] =
-      transaction.outputs
-        |> list.filter(
-            fn(output: Output) {
-              1 != quantity_of(output.value, policy_id, "Auth")
-            },
-          )
-    // 4. The minted NFT is in a UTxO with an empty list as Datum
-    expect InlineDatum(datum) = output.datum
-    expect []: List<AssetName> = datum
-    True
+    and {
+      stt__utxo_is_spent(transaction, output_reference),
+      stt__one_token_is_minted(transaction, policy_id),
+      stt__correct_datum(transaction, policy_id),
+    }
   }
 
   else(_) {
