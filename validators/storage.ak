@@ -27,21 +27,27 @@ pub type KeyDatum {
 // =====================================================================================================================
 
 type MainInput {
-  started: Bool,
+  script_address: ScriptHash,
+  has_started: Bool,
 }
 
 type MainOutput =
   MainInput
 
 type KeyInput {
+  script_address: ScriptHash,
   ordered_keys: List<AssetName>,
   lower_key: AssetName,
   upper_key: AssetName,
 }
 
 type KeyOutput {
-  WithSplit { left: KeyInput, right: KeyInput }
-  WithoutSplit { middle: KeyInput }
+  WithSplit {
+    left_output: KeyInput,
+    right_output: KeyInput,
+    minted_key: AssetName,
+  }
+  WithoutSplit { only_output: KeyInput, minted_key: AssetName }
 }
 
 // =====================================================================================================================
@@ -164,18 +170,82 @@ fn outputs_with_token(
 }
 
 // =====================================================================================================================
-// Functions
+// Helper functions
 // =====================================================================================================================
+
+fn to_main_input(inputs: Pairs<Input, Pairs<AssetName, Int>>) -> MainInput {
+  expect [
+    Pair(Input {
+      output: Output {
+        address: Address { payment_credential: Script(main_hash1), .. },
+        datum: InlineDatum(main_datum1),
+        ..
+      },
+      ..
+    },
+    [Pair(stt_name1, stt_amount1)]),
+  ] = inputs
+  expect stt_name1 == stt_name
+  expect stt_amount1 == 1
+  expect MainDatum { started: main_started1 } = main_datum1
+  // TODO: main_hash1
+  MainInput { script_address: main_hash1, has_started: main_started1 }
+}
+
+fn to_main_output(outputs: Pairs<Output, Pairs<AssetName, Int>>) -> MainOutput {
+  expect [
+    Pair(Output {
+      address: Address { payment_credential: Script(main_hash2), .. },
+      datum: InlineDatum(main_datum2),
+      ..
+    },
+    [Pair(stt_name2, stt_amount2)]),
+  ] = outputs
+  expect stt_name2 == stt_name
+  expect stt_amount2 == 1
+  expect MainDatum { started: main_started2 } = main_datum2
+  // TODO: main_hash2
+  MainInput { script_address: main_hash2, has_started: main_started2 }
+}
+
+fn to_key_input(inputs: Pairs<Input, Pairs<AssetName, Int>>) -> KeyInput {
+  expect [
+    Pair(Input {
+      output: Output {
+        address: Address { payment_credential: Script(key_hash1), .. },
+        datum: InlineDatum(key_datum1),
+        ..
+      },
+      ..
+    },
+    [Pair(key_name1a, key_amount1a), Pair(key_name1b, key_amount1b)]),
+  ] = inputs
+  expect bytearray.compare(key_name1a, key_name1b) != Equal
+  expect key_amount1a == 1
+  expect key_amount1b == 1
+  expect KeyDatum { keys: key_keys1 } = key_datum1
+  // TODO: key_hash1
+  KeyInput {
+    script_address: key_hash1,
+    ordered_keys: key_keys1,
+    lower_key: key_name1a,
+    upper_key: key_name1b,
+  }
+}
+
+fn to_key_output(outputs: Pairs<Output, Pairs<AssetName, Int>>) -> KeyOutput {
+  todo @"to_key_output"
+}
 
 // =====================================================================================================================
 // Validators
 // =====================================================================================================================
 
-validator stt(output_reference: OutputReference) {
+validator stt_make(output_reference: OutputReference) {
   mint(_redeemer: Redeemer, policy_id: PolicyId, transaction: Transaction) {
     // Condition. The output is spent in the transaction
     expect utxo_is_spent(transaction, output_reference)
-    // Condition. 1 STT is minted
+    // Condition. 1 STT is minted_key
     expect token_is_minted(transaction, policy_id, stt_name, 1)
     // Condition. 1 STT is in the outputs
     expect token_in_outputs(transaction, policy_id, stt_name, 1)
@@ -199,133 +269,65 @@ validator main(
   key_spend: ScriptHash,
   _max_split: Int,
 ) {
-  spend(
-    _datum: Option<Datum>,
-    _redeemer: Redeemer,
-    output_reference: OutputReference,
-    transaction: Transaction,
-  ) {
-    // =================================================================================================================
-    // Condition. STT in the input
-    // =================================================================================================================
-    expect [
-      Pair(Input {
-        output: Output {
-          address: Address { payment_credential: Script(main_hash1), .. },
-          datum: InlineDatum(main_datum1),
-          ..
-        },
-        ..
-      },
-      [Pair(stt_name1, stt_amount1)]),
-    ]: Pairs<Input, Pairs<AssetName, Int>> =
+  spend(_datum, _redeemer, _output_reference, transaction: Transaction) {
+    let main_input =
       inputs_with_tokens_given_policy(transaction, stt_policy)
-    expect stt_name1 == stt_name
-    expect stt_amount1 == 1
-    expect MainDatum { started: main_started1 } = main_datum1
-    // TODO: main_hash1
-    // =================================================================================================================
-    // Condition. STT in the output
-    // =================================================================================================================
-    expect [
-      Pair(Output {
-        address: Address { payment_credential: Script(main_hash2), .. },
-        datum: InlineDatum(main_datum2),
-        ..
-      },
-      [Pair(stt_name2, stt_amount2)]),
-    ]: Pairs<Output, Pairs<AssetName, Int>> =
+        |> to_main_input()
+    let main_output =
       outputs_with_tokens_given_policy(transaction, stt_policy)
-    expect stt_name2 == stt_name
-    expect stt_amount2 == 1
-    expect MainDatum { started: main_started2 } = main_datum2
-    // TODO: main_hash2
-    // =================================================================================================================
-    // Condition. Key tokens in the input
-    // =================================================================================================================
-    expect [
-      Pair(Input {
-        output: Output {
-          address: Address { payment_credential: Script(key_hash1), .. },
-          datum: InlineDatum(key_datum1),
-          ..
-        },
-        ..
-      },
-      [Pair(key_name1a, key_amount1a), Pair(key_name1b, key_amount1b)]),
-    ]: Pairs<Input, Pairs<AssetName, Int>> =
-      inputs_with_tokens_given_policy(transaction, key_mint)
-    expect bytearray.compare(key_name1a, key_name1b) != Equal
-    expect key_amount1a == 1
-    expect key_amount1b == 1
-    expect KeyDatum { keys: key_keys1 } = key_datum1
-    expect key_hash1 == key_spend
-    // =================================================================================================================
-    // Condition. Key tokens in the output
-    // =================================================================================================================
-    let key_outputs = outputs_with_tokens_given_policy(transaction, key_mint)
-    let _ =
-      when key_outputs is {
-        // NO SPLIT
-        [
-          // Key propagation
-          Pair(Output {
-            address: Address { payment_credential: Script(key_hash2), .. },
-            datum: InlineDatum(key_datum2),
-            ..
-          },
-          // New key
-          [Pair(key_name2a, key_amount2a), Pair(key_name2b, key_amount2b)]),
-          Pair(Output {
-            address: Address { payment_credential: Script(key_hash2), .. },
-            datum: InlineDatum(key_datum2),
-            ..
-          },
-          [Pair(key_name2a, key_amount2a), Pair(key_name2b, key_amount2b)]),
-        ] -> True
-        // Alternative. Split happened
-        [
-          // Left
-          Pair(Output {
-            address: Address { payment_credential: Script(key_hash2l), .. },
-            datum: InlineDatum(key_datum2l),
-            ..
-          },
-          [Pair(key_name2la, key_amount2la), Pair(key_name2lb, key_amount2lb)]),
-          // Right
-          Pair(Output {
-            address: Address { payment_credential: Script(key_hash2r), .. },
-            datum: InlineDatum(key_datum2r),
-            ..
-          },
-          [Pair(key_name1a, key_amount1a), Pair(key_name1b, key_amount1b)]),
-        ] -> True
-        _ -> False
+        |> to_main_output()
+    let key_output =
+      outputs_with_tokens_given_policy(transaction, key_mint) |> to_key_output()
+    if !main_input.has_started {
+      expect [] == inputs_with_tokens_given_policy(transaction, key_mint)
+      True
+    } else {
+      let key_input =
+        inputs_with_tokens_given_policy(transaction, key_mint)
+          |> to_key_input()
+      expect key_input.script_address == key_spend
+      when key_output is {
+        WithoutSplit(only_output, minted_key) -> {
+          // Condition. Output is Input + Minted
+          expect
+            only_output.ordered_keys == list.sort(
+              list.push(key_input.ordered_keys, minted_key),
+              bytearray.compare,
+            )
+          expect
+            list.length(only_output.ordered_keys) == list.length(
+              key_input.ordered_keys,
+            ) + 1
+          // Condition. Middle is paid to the script
+          expect only_output.script_address == key_spend
+          True
+        }
+        WithSplit(left_output, right_output, minted_key) -> {
+          // Condition. Output is Input + Minted
+          expect
+            list.concat(left_output.ordered_keys, right_output.ordered_keys) == list.sort(
+              list.push(key_input.ordered_keys, minted_key),
+              bytearray.compare,
+            )
+          expect
+            list.length(left_output.ordered_keys) == list.length(
+              right_output.ordered_keys,
+            ) + 1 || list.length(left_output.ordered_keys) + 1 == list.length(
+              right_output.ordered_keys,
+            )
+          expect
+            list.length(left_output.ordered_keys) == list.length(
+              key_input.ordered_keys,
+            ) || list.length(right_output.ordered_keys) == list.length(
+              key_input.ordered_keys,
+            )
+          // Condition. Left and right_output are paid to the script
+          expect left_output.script_address == key_spend
+          expect right_output.script_address == key_spend
+          True
+        }
       }
-    // -----------------------------------------------------------------------------------------------------------------
-    // STT validation
-    // -----------------------------------------------------------------------------------------------------------------
-    // Condition. STT is in the inputs
-    expect token_in_inputs(transaction, stt_policy, stt_name, 1)
-    // Condition. STT is in the outputs
-    expect token_in_outputs(transaction, stt_policy, stt_name, 1)
-    // Condition. STT is in its own input
-    expect [Pair(_, 1)] =
-      tokens_with_policy(transaction, output_reference, stt_policy)
-    // Condition. The key_new mint is in involved in the transaction
-    expect transaction.redeemers |> pairs.has_key(Mint(key_mint))
-    // Condition. The key_propagate script is involved in the transaction
-    expect [_input] =
-      transaction.inputs
-        |> list.filter(
-            fn(input) {
-              input.output.address == Address {
-                payment_credential: Script(key_spend),
-                stake_credential: None,
-              }
-            },
-          )
-    True
+    }
   }
 
   else(_) {
@@ -333,76 +335,20 @@ validator main(
   }
 }
 
-validator key(stt_policy: PolicyId) {
-  mint(_redeemer: Redeemer, _policy_id: PolicyId, transaction: Transaction) {
+validator key_add(stt_policy: PolicyId) {
+  mint(_redeemer, _policy_id, transaction: Transaction) {
     // Condition. STT is in the inputs
     expect token_in_inputs(transaction, stt_policy, stt_policy, 1)
     // Condition. STT is in the outputs
     expect token_in_outputs(transaction, stt_policy, stt_name, 1)
-    // Binding. Minted tokens
-    //let minted: Pairs<AssetName, Int> =      transaction.mint |> tokens(policy_id) |> dict.to_pairs
-    //when minted is {
-    // Alternative. One key is minted (no split)
-    //[Pair(_, 1)] ->
-    // TODO Condition. 
-    //True
-    // Alternative. Two keys are minted (split)
-    //[Pair(name, 1), Pair(key1, 1), Pair(key2, 1)] ->
-    // TODO Condition.
-    //True
-    //_ -> False
-    //}
     True
   }
 
-  spend(
-    _datum: Option<Datum>,
-    _redeemer: Redeemer,
-    _output_reference: OutputReference,
-    transaction: Transaction,
-  ) {
+  spend(_datum, _redeemer, _output_reference, transaction: Transaction) {
     // Condition. STT is in the inputs
     expect token_in_inputs(transaction, stt_policy, stt_name, 1)
     // Condition. STT is in the outputs
     expect token_in_outputs(transaction, stt_policy, stt_name, 1)
-    // Condition. Datum is present
-    //expect Some(KeyDatum { keys }) = datum
-    // Condition. Existing keys are lexicographically ordered
-    //expect keys == list.sort(keys, bytearray.compare)
-    // Condition. The Output being spent has 2 tokens of key_policy
-    //expect [Pair(key1, 1),
-    //  Pair(key2, 1)]: Pairs<AssetName, Int> =
-    //  tokens_with_policy(transaction, output_reference, key_policy)
-    // Binding. Lower and upper keys
-    //let lowr =
-    //  if bytearray.compare(key1, key2) == Less {
-    //    key1
-    //  } else {
-    //    key2
-    //  }
-    //let uppr =
-    //  if bytearray.compare(key1, key2) == Less {
-    //    key2
-    //  } else {
-    //    key1
-    //  }
-    //when keys is {
-    //  [] ->
-    //    // TODO
-    //    True
-    //  _ -> {
-    //    // Binding. First and last keys
-    //    expect Some(first) = list.head(keys)
-    //   expect Some(last) = list.last(keys)
-    //    // Condition. Lowr <= first key
-    //    expect bytearray.compare(lowr, first) != Greater
-    //    // Condition. Last key <= uppr
-    //    expect bytearray.compare(last, uppr) != Greater
-    //    // Condition. Number of keys is less than max_size
-    //   expect list.length(keys) <= max_size
-    //   True
-    // }
-    //}
     True
   }
 
