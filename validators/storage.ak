@@ -3,18 +3,149 @@ use aiken/collection/list.{filter, find}
 use aiken/collection/pairs
 use aiken/crypto.{ScriptHash, VerificationKeyHash}
 use aiken/primitive/bytearray
-use cardano/address.{Address, Script, StakeCredential}
-use cardano/assets.{AssetName, PolicyId, quantity_of, tokens}
+use cardano/address.{Address, Script, StakeCredential, VerificationKey}
+use cardano/assets.{AssetName, PolicyId, flatten, quantity_of, tokens}
 use cardano/transaction.{
   Datum, InlineDatum, Input, Mint, Output, OutputReference, Redeemer, Spend,
   Transaction,
 }
 
 // =====================================================================================================================
+// Transaction Raw I/O
+// =====================================================================================================================
+
+type Asset =
+  (PolicyId, AssetName, Int)
+
+type UserUTxO {
+  user_address: VerificationKeyHash,
+  assets: List<Asset>,
+}
+
+type ScriptUTxO<d> {
+  script_address: ScriptHash,
+  datum: d,
+  assets: List<Asset>,
+}
+
+type UserInput {
+  output_reference: OutputReference,
+  utxo: UserUTxO,
+}
+
+type ScriptInput<d> {
+  output_reference: OutputReference,
+  utxo: ScriptUTxO<d>,
+}
+
+type UserOutput {
+  utxo: UserUTxO,
+}
+
+type ScriptOutput<d> {
+  utxo: ScriptUTxO<d>,
+}
+
+type Boundary {
+  user_inputs: List<UserInput>,
+  user_outputs: List<UserOutput>,
+  script_inputs: List<ScriptInput<Datum>>,
+  script_outputs: List<ScriptOutput<Datum>>,
+}
+
+fn get_user_inputs(self: Transaction) -> List<UserInput> {
+  self.inputs
+    |> list.filter_map(
+        fn(input: Input) {
+          when input.output.address.payment_credential is {
+            VerificationKey(hash) ->
+              Some(
+                UserInput {
+                  output_reference: input.output_reference,
+                  utxo: UserUTxO {
+                    user_address: hash,
+                    assets: flatten(input.output.value),
+                  },
+                },
+              )
+            _ -> None
+          }
+        },
+      )
+}
+
+fn get_script_inputs(self: Transaction) -> List<ScriptInput<Data>> {
+  self.inputs
+    |> list.filter_map(
+        fn(input: Input) {
+          when input.output.address.payment_credential is {
+            Script(hash) -> {
+              expect InlineDatum(data) = input.output.datum
+              Some(
+                ScriptInput {
+                  output_reference: input.output_reference,
+                  utxo: ScriptUTxO {
+                    script_address: hash,
+                    assets: flatten(input.output.value),
+                    datum: data,
+                  },
+                },
+              )
+            }
+            _ -> None
+          }
+        },
+      )
+}
+
+fn get_user_outputs(self: Transaction) -> List<UserOutput> {
+  self.outputs
+    |> list.filter_map(
+        fn(output: Output) {
+          when output.address.payment_credential is {
+            VerificationKey(hash) ->
+              Some(
+                UserOutput {
+                  utxo: UserUTxO {
+                    user_address: hash,
+                    assets: flatten(output.value),
+                  },
+                },
+              )
+            _ -> None
+          }
+        },
+      )
+}
+
+fn get_script_outputs(self: Transaction) -> List<ScriptOutput<Data>> {
+  self.outputs
+    |> list.filter_map(
+        fn(output: Output) {
+          when output.address.payment_credential is {
+            Script(hash) -> {
+              expect InlineDatum(data) = output.datum
+              Some(
+                ScriptOutput {
+                  utxo: ScriptUTxO {
+                    script_address: hash,
+                    assets: flatten(output.value),
+                    datum: data,
+                  },
+                },
+              )
+            }
+            _ -> None
+          }
+        },
+      )
+}
+
+// =====================================================================================================================
 // Datums
 // =====================================================================================================================
 
-pub type MainDatum {
+pub type SttPropagateDatum {
   started: Bool,
 }
 
@@ -23,7 +154,7 @@ pub type KeyDatum {
 }
 
 // =====================================================================================================================
-// Types
+// From Raw I/O to Typed I/O
 // =====================================================================================================================
 
 type MainInput {
@@ -59,29 +190,6 @@ const stt_name: AssetName = "STT"
 // =====================================================================================================================
 // Functions Old
 // =====================================================================================================================
-
-fn utxo_is_spent(transaction: Transaction, utxo: OutputReference) -> Bool {
-  when
-    transaction.inputs
-      |> list.find(fn(input) { input.output_reference == utxo })
-  is {
-    Some(_) -> True
-    None -> False
-  }
-}
-
-fn token_is_minted(
-  transaction: Transaction,
-  policy_id: PolicyId,
-  asset_name: AssetName,
-  amount: Int,
-) -> Bool {
-  let tokens = transaction.mint |> tokens(policy_id) |> dict.to_pairs
-  when tokens is {
-    [Pair(name, amt)] -> amount == amt && name == asset_name
-    _ -> False
-  }
-}
 
 fn token_in_inputs(
   transaction: Transaction,
@@ -141,34 +249,6 @@ fn outputs_with_tokens_given_policy(
     |> list.filter(fn(Pair(_, tokens)) { tokens != [] })
 }
 
-fn inputs_with_token(
-  transaction: Transaction,
-  policy_id: PolicyId,
-  asset_name: AssetName,
-  amount: Int,
-) -> List<Input> {
-  transaction.inputs
-    |> list.filter(
-        fn(input: Input) {
-          amount == quantity_of(input.output.value, policy_id, asset_name)
-        },
-      )
-}
-
-fn outputs_with_token(
-  transaction: Transaction,
-  policy_id: PolicyId,
-  asset_name: AssetName,
-  amount: Int,
-) -> List<Output> {
-  transaction.outputs
-    |> list.filter(
-        fn(output: Output) {
-          amount == quantity_of(output.value, policy_id, asset_name)
-        },
-      )
-}
-
 // =====================================================================================================================
 // Helper functions
 // =====================================================================================================================
@@ -187,7 +267,7 @@ fn to_main_input(inputs: Pairs<Input, Pairs<AssetName, Int>>) -> MainInput {
   ] = inputs
   expect stt_name1 == stt_name
   expect stt_amount1 == 1
-  expect MainDatum { started: main_started1 } = main_datum1
+  expect SttPropagateDatum { started: main_started1 } = main_datum1
   // TODO: main_hash1
   MainInput { script_address: main_hash1, has_started: main_started1 }
 }
@@ -203,7 +283,7 @@ fn to_main_output(outputs: Pairs<Output, Pairs<AssetName, Int>>) -> MainOutput {
   ] = outputs
   expect stt_name2 == stt_name
   expect stt_amount2 == 1
-  expect MainDatum { started: main_started2 } = main_datum2
+  expect SttPropagateDatum { started: main_started2 } = main_datum2
   // TODO: main_hash2
   MainInput { script_address: main_hash2, has_started: main_started2 }
 }
@@ -243,18 +323,56 @@ fn to_key_output(outputs: Pairs<Output, Pairs<AssetName, Int>>) -> KeyOutput {
 
 validator stt_make(output_reference: OutputReference) {
   mint(_redeemer: Redeemer, policy_id: PolicyId, transaction: Transaction) {
-    // Condition. The output is spent in the transaction
-    expect utxo_is_spent(transaction, output_reference)
-    // Condition. 1 STT is minted_key
-    expect token_is_minted(transaction, policy_id, stt_name, 1)
-    // Condition. 1 STT is in the outputs
-    expect token_in_outputs(transaction, policy_id, stt_name, 1)
-    // Binding. STT is in a UTxO
-    expect [output] = outputs_with_token(transaction, policy_id, stt_name, 1)
-    // Binding. UTxO has an InlineDatum
-    expect InlineDatum(datum) = output.datum
-    // Condition. Datum is a MainDatum
-    expect MainDatum { started: False } = datum
+    // Condition. The output_reference is spent during the transaction
+    let user_inputs_with_output_reference =
+      get_user_inputs(transaction)
+        |> list.filter(fn(input) { input.output_reference == output_reference })
+    let script_inputs_with_output_reference =
+      get_script_inputs(transaction)
+        |> list.filter(fn(input) { input.output_reference == output_reference })
+    expect or {
+        and {
+          [] != user_inputs_with_output_reference,
+          [] == script_inputs_with_output_reference,
+        },
+        and {
+          [] == user_inputs_with_output_reference,
+          [] != script_inputs_with_output_reference,
+        },
+      }
+    // Condition. There is no STT paid to any user in the outputs
+    let user_outputs_with_token =
+      get_user_outputs(transaction)
+        |> list.filter(
+            fn(output) {
+              list.any(output.utxo.assets, fn(asset) { asset.1st == policy_id })
+            },
+          )
+    expect [] == user_outputs_with_token
+    // Condition. There is one output with "some" STT
+    let script_outputs_with_token =
+      get_script_outputs(transaction)
+        |> list.filter(
+            fn(output) {
+              list.any(output.utxo.assets, fn(asset) { asset.1st == policy_id })
+            },
+          )
+    expect [output] = script_outputs_with_token
+    // Condition. The output has exactly 1 STT with asset_name = address of the script it is paid to
+    let assets = output.utxo.assets
+    // From https://aiken-lang.github.io/stdlib/aiken/crypto.html#Hash
+    // A Hash is nothing more than a ByteArray, but it carries extra information for readability.
+    // On-chain, any hash digest value is represented as a plain ‘ByteArray’.
+    // Though in practice, hashes come from different sources and have different semantics.
+    let paid_to: ByteArray = output.utxo.script_address
+    let list_one =
+      fn(xs, pred) { 1 == list.count(xs, pred) }
+    expect and {
+        list_one(assets, fn(asset) { asset.1st == policy_id }),
+        list_one(assets, fn(asset) { asset == (policy_id, paid_to, 1) }),
+      }
+    // Condition. The SttPropagateDatum encodes that the process has not started
+    expect SttPropagateDatum { started: False } = output.utxo.datum
     True
   }
 
@@ -263,13 +381,23 @@ validator stt_make(output_reference: OutputReference) {
   }
 }
 
-validator main(
+validator stt_propagate(
   stt_policy: PolicyId,
   key_mint: PolicyId,
   key_spend: ScriptHash,
   _max_split: Int,
 ) {
-  spend(_datum, _redeemer, _output_reference, transaction: Transaction) {
+  spend(
+    _datum: Option<SttPropagateDatum>,
+    _redeemer: Redeemer,
+    _output_reference: OutputReference,
+    transaction: Transaction,
+  ) {
+    let user_inputs = get_user_inputs(transaction)
+    let user_outputs = get_user_outputs(transaction)
+    let script_inputs = get_script_inputs(transaction)
+    let script_outputs = get_script_outputs(transaction)
+
     let main_input =
       inputs_with_tokens_given_policy(transaction, stt_policy)
         |> to_main_input()
