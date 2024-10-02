@@ -96,16 +96,28 @@ pub fn run_spend(
   expect
     own_output.utxo.assets
       |> list.any(fn(asset) { asset == (stt_policy, run_hash, 1) })
+  let key_inputs =
+    io.script_inputs
+      |> list.filter(fn(input) { input.utxo.script_address == key_hash })
+      |> list.map(to_key_input)
   let key_outputs =
     io.script_outputs
       |> list.filter(fn(output) { output.utxo.script_address == key_hash })
       |> list.map(to_key_output)
   if own_input.utxo.datum.started {
-    todo True
+    expect [key_input] = key_inputs
+    when key_outputs is {
+      // TODO: ododododo
+      [key_output] -> {
+        expect key_input.utxo.datum.keys == key_output.utxo.datum.keys
+        expect key_input.utxo.assets == key_output.utxo.assets
+        expect key_input.utxo.script_address == key_output.utxo.script_address
+        True
+      }
+      _ -> False
+    }
   } else {
-    expect [] =
-      io.script_inputs
-        |> list.filter(fn(input) { input.utxo.script_address == key_hash })
+    expect [] == key_inputs
     expect [key_output] = key_outputs
     expect list.is_empty(key_output.utxo.datum.keys)
     expect [(policy1, key_lower, 1),
