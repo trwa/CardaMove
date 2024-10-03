@@ -14,9 +14,9 @@
     {
       "title": "storage.key.mint",
       "redeemer": {
-        "title": "_redeemer",
+        "title": "_r",
         "schema": {
-          "$ref": "#/definitions/Redeemer"
+          "$ref": "#/definitions/Data"
         }
       },
       "parameters": [
@@ -33,15 +33,15 @@
     {
       "title": "storage.key.spend",
       "datum": {
-        "title": "_datum",
+        "title": "_d",
         "schema": {
           "$ref": "#/definitions/cardamove~1validators~1KeyDatum"
         }
       },
       "redeemer": {
-        "title": "_redeemer",
+        "title": "_r",
         "schema": {
-          "$ref": "#/definitions/Redeemer"
+          "$ref": "#/definitions/Data"
         }
       },
       "parameters": [
@@ -71,15 +71,15 @@
     {
       "title": "storage.run.spend",
       "datum": {
-        "title": "_datum",
+        "title": "_d",
         "schema": {
           "$ref": "#/definitions/cardamove~1validators~1RunDatum"
         }
       },
       "redeemer": {
-        "title": "_redeemer",
+        "title": "_r",
         "schema": {
-          "$ref": "#/definitions/Redeemer"
+          "$ref": "#/definitions/Data"
         }
       },
       "parameters": [
@@ -157,9 +157,9 @@
     {
       "title": "storage.stt.mint",
       "redeemer": {
-        "title": "_redeemer",
+        "title": "_r",
         "schema": {
-          "$ref": "#/definitions/Redeemer"
+          "$ref": "#/definitions/Data"
         }
       },
       "parameters": [
@@ -213,6 +213,10 @@
       "title": "ByteArray",
       "dataType": "bytes"
     },
+    "Data": {
+      "title": "Data",
+      "description": "Any Plutus data."
+    },
     "Int": {
       "dataType": "integer"
     },
@@ -225,10 +229,6 @@
     "PolicyId": {
       "title": "PolicyId",
       "dataType": "bytes"
-    },
-    "Redeemer": {
-      "title": "Redeemer",
-      "description": "Any Plutus data."
     },
     "ScriptHash": {
       "title": "ScriptHash",
