@@ -80,30 +80,55 @@ pub fn run_spend(
   key_hash: ScriptHash,
   max_size: Int,
 ) -> Bool {
-  // Condition. There is only one invocation of the script
+  // -------------------------------------------------------------------------------------------------------------------
+  // Condition. There is only one invocation of the script in the transaction
+  // -------------------------------------------------------------------------------------------------------------------
   expect [own_input] =
     io.script_inputs
       |> list.filter(fn(input) { input.utxo.script_address == run_hash })
       |> list.map(to_run_input)
+  //
+  // -------------------------------------------------------------------------------------------------------------------
+  // Condition. There is only one output of the script in the transaction
+  // -------------------------------------------------------------------------------------------------------------------
   expect [own_output] =
     io.script_outputs
       |> list.filter(fn(output) { output.utxo.script_address == run_hash })
       |> list.map(to_run_output)
-  // Condition. There is one STT paid to the script
+  // 
+  // -------------------------------------------------------------------------------------------------------------------
+  // Condition. There is one STT paid to the script in the inputs
+  // -------------------------------------------------------------------------------------------------------------------
   expect
     own_input.utxo.assets
       |> list.any(fn(asset) { asset == (stt_policy, run_hash, 1) })
+  //
+  // -------------------------------------------------------------------------------------------------------------------
+  // Condition. There is one STT paid to the script in the outputs
+  // -------------------------------------------------------------------------------------------------------------------
   expect
     own_output.utxo.assets
       |> list.any(fn(asset) { asset == (stt_policy, run_hash, 1) })
+  //
+  // -------------------------------------------------------------------------------------------------------------------
+  // Binding. Get all the inputs of the key spending validator
+  // -------------------------------------------------------------------------------------------------------------------
   let key_inputs =
     io.script_inputs
       |> list.filter(fn(input) { input.utxo.script_address == key_hash })
       |> list.map(to_key_input)
+  //
+  // -------------------------------------------------------------------------------------------------------------------
+  // Binding. Get all the outputs of the key spending validator
+  // -------------------------------------------------------------------------------------------------------------------
   let key_outputs =
     io.script_outputs
       |> list.filter(fn(output) { output.utxo.script_address == key_hash })
       |> list.map(to_key_output)
+  //
+  // -------------------------------------------------------------------------------------------------------------------
+  // Case analysis. The process has started, or not
+  // -------------------------------------------------------------------------------------------------------------------
   if own_input.utxo.datum.started {
     expect [key_input] = key_inputs
     when key_outputs is {
@@ -117,21 +142,38 @@ pub fn run_spend(
       _ -> False
     }
   } else {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Condition. Since the process has not started, the key spend script has not been called
+    // -----------------------------------------------------------------------------------------------------------------
     expect [] == key_inputs
+    //
+    // -----------------------------------------------------------------------------------------------------------------
+    // Condition. There is only one output with the list of minted keys
+    // -----------------------------------------------------------------------------------------------------------------
     expect [key_output] = key_outputs
+    //
+    // -----------------------------------------------------------------------------------------------------------------
+    // Condition. There are no minted keys, yet
+    // -----------------------------------------------------------------------------------------------------------------
     expect list.is_empty(key_output.utxo.datum.keys)
+    //
+    // -----------------------------------------------------------------------------------------------------------------
+    // Condition. There are the two tokens representing the maximum range of keys
+    // -----------------------------------------------------------------------------------------------------------------
     expect [(policy1, key_lower, 1),
       (policy2, key_upper, 1)] =
       key_output.utxo.assets
-        |> list.sort(
-            fn((_, keya, _), (_, keyb, _)) { bytearray.compare(keya, keyb) },
-          )
+        |> list.sort(fn((_, a, _), (_, b, _)) { bytearray.compare(a, b) })
     expect policy1 == key_policy
     expect policy2 == key_policy
     expect and {
         @"00000000000000000000000000000000" == bytearray.to_hex(key_lower),
         @"ffffffffffffffffffffffffffffffff" == bytearray.to_hex(key_upper),
       }
+    //
+    // -----------------------------------------------------------------------------------------------------------------
+    // Ok. The conditions are met
+    // -----------------------------------------------------------------------------------------------------------------
     True
   }
 }
