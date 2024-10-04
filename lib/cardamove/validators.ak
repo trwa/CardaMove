@@ -130,13 +130,44 @@ pub fn run_spend(
   // Case analysis. The process has started, or not
   // -------------------------------------------------------------------------------------------------------------------
   if own_input.utxo.datum.started {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Condition. The process has started, the key spend script has been called
+    // -----------------------------------------------------------------------------------------------------------------
     expect [key_input] = key_inputs
+    //
+    // -----------------------------------------------------------------------------------------------------------------
+    // Case analysis. The key spend script has split the output, or not
+    // -----------------------------------------------------------------------------------------------------------------
     when key_outputs is {
-      // TODO: ododododo
+      //
+      // ---------------------------------------------------------------------------------------------------------------
+      // Case 1 of 2. The key spend script has not split the output
+      // ---------------------------------------------------------------------------------------------------------------
       [key_output] -> {
         expect key_input.utxo.datum.keys == key_output.utxo.datum.keys
         expect key_input.utxo.assets == key_output.utxo.assets
         expect key_input.utxo.script_address == key_output.utxo.script_address
+        True
+      }
+      //
+      // ---------------------------------------------------------------------------------------------------------------
+      // Case 2 of 2. The key spend script has split the output
+      // ---------------------------------------------------------------------------------------------------------------
+      [key_output1, key_output2] -> {
+        expect [(policy11, key_lower1, 1),
+          (policy21, key_upper1, 1)] =
+          key_output1.utxo.assets
+            |> list.sort(fn((_, a, _), (_, b, _)) { bytearray.compare(a, b) })
+        expect policy11 == key_policy
+        expect policy21 == key_policy
+
+        expect [(policy12, key_lower2, 1),
+          (policy22, key_upper2, 1)] =
+          key_output2.utxo.assets
+            |> list.sort(fn((_, a, _), (_, b, _)) { bytearray.compare(a, b) })
+        expect policy12 == key_policy
+        expect policy22 == key_policy
+
         True
       }
       _ -> False
