@@ -1,7 +1,3 @@
-pub type Unit {
-  Unit
-}
-
 // TODO: Make it parametric over the currency
 pub type Coin {
   ada: Int,

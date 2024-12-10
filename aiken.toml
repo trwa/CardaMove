@@ -1,5 +1,5 @@
 name = "trwa/cardamove"
-version = "0.0.0"
+version = "1.0.0"
 license = "Apache-2.0"
 description = "Aiken contracts for project 'trwa/cardamove'"
 
@@ -10,5 +10,5 @@ platform = "github"
 
 [[dependencies]]
 name = "aiken-lang/stdlib"
-version = "1.8.0"
+version = "2.1.0"
 source = "github"
