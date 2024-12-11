@@ -64,15 +64,15 @@ fn state_pure(x: a) -> State<s, a> {
 }
 
 // (<*>) :: Applicative f => f (a -> b) -> f a -> f b
-fn state_ap(mf: State<s, fn(a) -> b>, ma: State<s, a>) -> State<s, b> {
-  state_state(
-    fn(s) {
-      let (f, s1) = state_run_state(mf, s)
-      let (x, s2) = state_run_state(ma, s1)
-      (f(x), s2)
-    },
-  )
-}
+//fn state_ap(mf: State<s, fn(a) -> b>, ma: State<s, a>) -> State<s, b> {
+//  state_state(
+//    fn(s) {
+//      let (f, s1) = state_run_state(mf, s)
+//      let (x, s2) = state_run_state(ma, s1)
+//      (f(x), s2)
+//    },
+//  )
+//}
 
 // return :: Monad m => a -> m a
 fn state_return(x: a) -> State<s, a> {
@@ -103,43 +103,39 @@ fn state_then(ma: State<s, a>, mb: State<s, b>) -> State<s, b> {
 type Address =
   ByteArray
 
-type Signer =
-  Address
-
-type Storage<t> {
-  impl: Dict<Address, t>,
-}
+type Storage<t> =
+  Dict<Address, t>
 
 fn storage_has_key(storage: Storage<t>, address: Address) -> Bool {
-  dict.has_key(storage.impl, address)
+  dict.has_key(storage, address)
 }
 
 fn storage_get(storage: Storage<t>, address: Address) -> Option<t> {
-  dict.get(storage.internal, address)
+  dict.get(storage, address)
 }
 
 fn storage_insert(storage: Storage<t>, address: Address, value: t) -> Storage<t> {
-  Storage { impl: dict.insert(storage.internal, address, value) }
+  dict.insert(storage, address, value)
 }
 
 fn storage_delete(storage: Storage<t>, address: Address) -> Storage<t> {
-  Storage { impl: dict.delete(storage.internal, address) }
+  dict.delete(storage, address)
 }
 
 fn storage_from_pairs(pairs: Pairs<Address, t>) -> Storage<t> {
-  Storage { impl: dict.from_pairs(pairs) }
+  dict.from_pairs(pairs)
 }
 
 // =====================================================================================================================
 // Reference (TODO: Must be changed to use Path)
 // =====================================================================================================================
 
-opaque type Reference<t> {
+type Reference<t> {
   address: Address,
   value: t,
 }
 
-pub fn reference_dereference(a: Reference<t>) -> t {
+fn reference_dereference(a: Reference<t>) -> t {
   a.value
 }
 
@@ -163,10 +159,6 @@ fn program_return(a: a) -> Program<s, a> {
   state_return(Some(a))
 }
 
-fn program_halt() -> Program<s, a> {
-  state_return(None)
-}
-
 fn program_assert(condition: Bool) -> Program<g, Void> {
   if condition {
     state_return(Some(Void))
@@ -175,72 +167,73 @@ fn program_assert(condition: Bool) -> Program<g, Void> {
   }
 }
 
-pub fn program_move_to(
+fn program_move_to(
   address: Address,
   value: t,
-  get_storage: fn(g) -> Storage<t>,
-  set_storage: fn(g, Storage<t>) -> g,
+  select: fn(g) -> Storage<t>,
+  update: fn(g, Storage<t>) -> g,
 ) -> Program<g, Void> {
   let s0: g <- state_bind(state_get())
-  let storage = get_storage(s0)
+  let storage = select(s0)
   if storage_has_key(storage, address) {
-    program_halt()
+    state_return(None)
   } else {
-    let s1 = set_storage(s0, storage_insert(storage, address, value))
+    let s1 = update(s0, storage_insert(storage, address, value))
     let _ <- state_bind(state_put(s1))
     program_return(Void)
   }
 }
 
-pub fn program_move_from(
+fn program_move_from(
   address: Address,
-  get_storage: fn(g) -> Storage<t>,
-  set_storage: fn(g, Storage<t>) -> g,
+  select: fn(g) -> Storage<t>,
+  update: fn(g, Storage<t>) -> g,
 ) -> Program<g, t> {
   let s0: g <- state_bind(state_get())
-  let storage = get_storage(s0)
+  let storage = select(s0)
   when storage_get(storage, address) is {
-    None -> program_halt()
+    None -> state_return(None)
     Some(value) -> {
-      let s1 = set_storage(s0, storage_delete(storage, address))
+      let s1 = update(s0, storage_delete(storage, address))
       let _ <- state_bind(state_put(s1))
       program_return(value)
     }
   }
 }
 
-pub fn program_borrow_global(
+fn program_borrow_global(
   address: Address,
-  get_storage: fn(g) -> Storage<t>,
-  _set_storage: fn(g, Storage<t>) -> g,
+  select: fn(g) -> Storage<t>,
+  _update: fn(g, Storage<t>) -> g,
 ) -> Program<g, Reference<t>> {
   let s: g <- state_bind(state_get())
-  let o = storage_get(get_storage(s), address)
+  let o = storage_get(select(s), address)
   when o is {
-    None -> program_halt()
+    None -> state_return(None)
     Some(value) -> program_return(Reference { address, value })
   }
 }
 
-pub fn program_assign(
+fn program_assign(
   reference: Reference<t>,
   value: t,
-  get_storage: fn(g) -> Storage<t>,
-  set_storage: fn(g, Storage<t>) -> g,
+  select: fn(g) -> Storage<t>,
+  update: fn(g, Storage<t>) -> g,
 ) -> Program<g, Reference<t>> {
   let s0: g <- state_bind(state_get())
-  let storage = get_storage(s0)
-  let s1 = set_storage(s0, storage_insert(storage, reference.address, value))
+  let storage = select(s0)
+  let s1 = update(s0, storage_insert(storage, reference.address, value))
   let _ <- state_bind(state_put(s1))
   program_return(Reference { address: reference.address, value })
 }
 
-pub fn program_exists(
+fn program_exists(
   address: Address,
-  get_storage: fn(g) -> Storage<t>,
+  select: fn(g) -> Storage<t>,
+  _update: fn(g, Storage<t>) -> g,
 ) -> Program<g, Bool> {
   let s: g <- state_bind(state_get())
-  let storage = get_storage(s)
+  let storage = select(s)
   program_return(storage_has_key(storage, address))
 }
 
@@ -248,25 +241,15 @@ pub fn program_exists(
 // Auction Smart contract
 // =====================================================================================================================
 
-// =====================================================================================================================
-// All the types that have the 'key' ability and are defined at module level
-// =====================================================================================================================
-
-type Auction {
+pub type Auction {
   auctioneer: Address,
   top_bidder: Address,
   expired: Bool,
 }
 
-type Bid {
+pub type Bid {
   coins: Coin,
 }
-
-// =====================================================================================================================
-// Global Storage
-// ---
-// We **must** generate the record selectors and updaters for the global storage.
-// =====================================================================================================================
 
 type GlobalStorage {
   auction: Storage<Auction>,
@@ -274,27 +257,41 @@ type GlobalStorage {
   coin: Storage<Coin>,
 }
 
-fn get_storage_auction(g: GlobalStorage) -> Storage<Auction> {
+pub type SerializedGlobalStorage {
+  auction: Pairs<Address, Auction>,
+  bid: Pairs<Address, Bid>,
+  coin: Pairs<Address, Coin>,
+}
+
+fn global_storage_parse(gs: SerializedGlobalStorage) -> GlobalStorage {
+  GlobalStorage {
+    auction: storage_from_pairs(gs.auction),
+    bid: storage_from_pairs(gs.bid),
+    coin: storage_from_pairs(gs.coin),
+  }
+}
+
+fn select_auction(g: GlobalStorage) -> Storage<Auction> {
   g.auction
 }
 
-fn set_storage_auction(g: GlobalStorage, s: Storage<Auction>) -> GlobalStorage {
+fn update_auction(g: GlobalStorage, s: Storage<Auction>) -> GlobalStorage {
   GlobalStorage { ..g, auction: s }
 }
 
-fn get_storage_bid(g: GlobalStorage) -> Storage<Bid> {
+fn select_bid(g: GlobalStorage) -> Storage<Bid> {
   g.bid
 }
 
-fn set_storage_bid(g: GlobalStorage, s: Storage<Bid>) -> GlobalStorage {
+fn update_bid(g: GlobalStorage, s: Storage<Bid>) -> GlobalStorage {
   GlobalStorage { ..g, bid: s }
 }
 
-fn get_storage_coin(g: GlobalStorage) -> Storage<Coin> {
+fn select_coin(g: GlobalStorage) -> Storage<Coin> {
   g.coin
 }
 
-fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
+fn update_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
   GlobalStorage { ..g, coin: s }
 }
 
@@ -302,44 +299,30 @@ fn set_storage_coin(g: GlobalStorage, s: Storage<Coin>) -> GlobalStorage {
 // Entry points
 // =====================================================================================================================
 
-fn start(auctioneer: Signer, base: Coin) -> Program<GlobalStorage, Void> {
+fn start(auctioneer: Address, base: Coin) -> Program<GlobalStorage, Void> {
   let auction = Auction { auctioneer, top_bidder: auctioneer, expired: False }
   let _: Void <-
     program_bind(
-      program_move_to(
-        auctioneer,
-        auction,
-        get_storage_auction,
-        set_storage_auction,
-      ),
+      program_move_to(auctioneer, auction, select_auction, update_auction),
     )
   let _: Void <-
     program_bind(
-      program_move_to(
-        auctioneer,
-        Bid { coins: base },
-        get_storage_bid,
-        set_storage_bid,
-      ),
+      program_move_to(auctioneer, Bid { coins: base }, select_bid, update_bid),
     )
   program_return(Void)
 }
 
 fn bid(
-  bidder: Signer,
+  bidder: Address,
   auctioneer: Address,
   coins: Coin,
 ) -> Program<GlobalStorage, Void> {
   let auction: Reference<Auction> <-
     program_bind(
-      program_borrow_global(
-        auctioneer,
-        get_storage_auction,
-        set_storage_auction,
-      ),
+      program_borrow_global(auctioneer, select_auction, update_auction),
     )
   let Bid { coins: top_bid } <-
-    program_bind(program_move_from(bidder, get_storage_bid, set_storage_bid))
+    program_bind(program_move_from(bidder, select_bid, update_bid))
   let _: Void <-
     program_bind(
       program_assert(reference_dereference(auction).expired == False),
@@ -350,8 +333,8 @@ fn bid(
       program_move_to(
         reference_dereference(auction).top_bidder,
         coins,
-        get_storage_coin,
-        set_storage_coin,
+        select_coin,
+        update_coin,
       ),
     )
   let _: Reference<Auction> <-
@@ -359,81 +342,74 @@ fn bid(
       program_assign(
         auction,
         Auction { ..reference_dereference(auction), top_bidder: bidder },
-        get_storage_auction,
-        set_storage_auction,
+        select_auction,
+        update_auction,
       ),
     )
   let _: Void <-
-    program_bind(
-      program_move_to(bidder, Bid { coins }, get_storage_bid, set_storage_bid),
-    )
+    program_bind(program_move_to(bidder, Bid { coins }, select_bid, update_bid))
   program_return(Void)
 }
 
-fn end(auctioneer: Signer) -> Program<GlobalStorage, Void> {
+fn end(auctioneer: Address) -> Program<GlobalStorage, Void> {
   let auction: Reference<Auction> <-
-    bind(
-      borrow_global_mut(auctioneer, get_storage_auction, set_storage_auction),
+    program_bind(
+      program_borrow_global(auctioneer, select_auction, update_auction),
     )
-  let _: Void <- bind(assert(deref_mut(auction).auctioneer == auctioneer))
+  let _: Void <-
+    program_bind(
+      program_assert(reference_dereference(auction).auctioneer == auctioneer),
+    )
   let auction: Reference<Auction> <-
-    bind(
-      assign_mut(
+    program_bind(
+      program_assign(
         auction,
-        Auction { ..deref_mut(auction), expired: True },
-        get_storage_auction,
-        set_storage_auction,
+        Auction { ..reference_dereference(auction), expired: True },
+        select_auction,
+        update_auction,
       ),
     )
   let Bid { coins: top_bid } <-
-    bind(
-      move_from(deref_mut(auction).top_bidder, get_storage_bid, set_storage_bid),
+    program_bind(
+      program_move_from(
+        reference_dereference(auction).top_bidder,
+        select_bid,
+        update_bid,
+      ),
     )
   let _: Void <-
-    bind(move_to(auctioneer, top_bid, get_storage_coin, set_storage_coin))
-  return(Void)
+    program_bind(program_move_to(auctioneer, top_bid, select_coin, update_coin))
+  program_return(Void)
 }
 
 // =====================================================================================================================
 // Validator
 // =====================================================================================================================
 
-type StorageSnapshot {
-  auction: Pairs<Address, Auction>,
-  bid: Pairs<Address, Bid>,
-  coin: Pairs<Address, Coin>,
-}
-
-type Dispatch {
-  CheckStart { auctioneer: Signer, base: Coin }
-  CheckBid { bidder: Signer, auctioneer: Address, coins: Coin }
-  CheckEnd { auctioneer: Signer }
-}
-
-fn parse(dump: StorageSnapshot) -> GlobalStorage {
-  GlobalStorage {
-    auction: storage_from_pairs(dump.auction),
-    bid: storage_from_pairs(dump.bid),
-    coin: storage_from_pairs(dump.coin),
-  }
+pub type EntryPoint {
+  EntryPointStart { auctioneer: Address, base: Coin }
+  EntryPointBid { bidder: Address, auctioneer: Address, coins: Coin }
+  EntryPointEnd { auctioneer: Address }
 }
 
 validator auction {
   spend(
-    output_datum: Option<StorageSnapshot>,
-    redeemer: Dispatch,
-    input_reference: OutputReference,
+    datum: Option<SerializedGlobalStorage>,
+    redeemer: EntryPoint,
+    input: OutputReference,
     self: Transaction,
   ) {
-    // IO boundaries
-    expect InlineDatum(data) = input_reference.output.datum
-    expect input_datum: StorageSnapshot = data
+    expect Some(input_serialized_global_storage) = datum
+    let before: GlobalStorage =
+      global_storage_parse(input_serialized_global_storage)
 
-    // Normal code starts here
-    let before: GlobalStorage = parse(input_datum)
-    let after: GlobalStorage = parse(output_datum)
+    expect [output] = self.outputs
+    expect InlineDatum(data) = output.datum
+    expect output_serialized_global_storage: SerializedGlobalStorage = data
+    let after: GlobalStorage =
+      global_storage_parse(output_serialized_global_storage)
     when redeemer is {
-      CheckStart { auctioneer, base } -> {
+      EntryPointStart { auctioneer, base } -> {
         let (assert, expected) =
           start(auctioneer, base) |> state_run_state(before)
         when assert is {
@@ -441,7 +417,7 @@ validator auction {
           _ -> expected == after
         }
       }
-      CheckBid { bidder, auctioneer, coins } -> {
+      EntryPointBid { bidder, auctioneer, coins } -> {
         let (assert, expected) =
           bid(bidder, auctioneer, coins) |> state_run_state(before)
         when assert is {
@@ -449,7 +425,7 @@ validator auction {
           _ -> expected == after
         }
       }
-      CheckEnd { auctioneer } -> {
+      EntryPointEnd { auctioneer } -> {
         let (assert, expected) = end(auctioneer) |> state_run_state(before)
         when assert is {
           None -> False
