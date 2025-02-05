@@ -1,5 +1,5 @@
 import {C, Data, Tx, TxComplete, TxSigned} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
-import {setup} from "../setup.ts";
+import {setupLucid} from "../src/setup.ts";
 import {ContractDatum} from "../framework/internal/datum.ts";
 import {Contract} from "../framework/contract.ts";
 import {makeStartDatum, Start} from "../framework/start.ts";
@@ -17,7 +17,7 @@ import {
 } from "../framework/ll.ts";
 
 if (import.meta.main) {
-    const lucid = await setup();
+    const lucid = await lucid();
 
     const contract = new Contract(
         lucid,

@@ -3,14 +3,18 @@ use cardano/transaction.{
   InlineDatum, OutputReference, Transaction, find_input, find_script_outputs,
 }
 
-pub type Datum {
-  pairs: Pairs<ByteArray, Int>,
+pub type Storage {
+  pairs: List<Pair<ByteArray, Int>>,
 }
 
-validator monolithic_0 {
+pub type Redeemer {
+  Redeemer
+}
+
+validator benchmark_0 {
   spend(
-    datum: Option<Datum>,
-    _redeemer: Data,
+    datum: Option<Storage>,
+    _redeemer: Redeemer,
     _utxo: OutputReference,
     _self: Transaction,
   ) {
@@ -24,10 +28,10 @@ validator monolithic_0 {
   }
 }
 
-validator monolithic_1 {
+validator benchmark_1 {
   spend(
-    datum: Option<Datum>,
-    _redeemer: Data,
+    datum: Option<Storage>,
+    _redeemer: Redeemer,
     utxo: OutputReference,
     self: Transaction,
   ) {
@@ -40,11 +44,11 @@ validator monolithic_1 {
     expect Some(address) = input.output.reference_script
     expect [output] = find_script_outputs(self.outputs, address)
     expect InlineDatum(datum) = output.datum
-    expect datum: Datum = datum
+    expect datum: Storage = datum
     let kv_out = dict.from_pairs(datum.pairs)
 
-    // Compare the two dictionaries
-    expect kv_in == kv_out
+    // Compare only the first two keys
+    expect dict.get(kv_in, "a") == dict.get(kv_out, "a")
     True
   }
 

@@ -1,5 +1,5 @@
 import {UTxO} from "https://deno.land/x/lucid@0.10.7/src/types/types.ts";
-import {scriptApplyToString,} from "./internal/script.ts";
+import {scriptApplyStringParam,} from "../src/script.ts";
 import {Lucid} from "https://deno.land/x/lucid@0.10.7/src/lucid/lucid.ts";
 import {Validator} from "./internal/validator.ts";
 import {Contract} from "./contract.ts";
@@ -16,7 +16,7 @@ export class Start extends Validator {
         contract: Contract,
     ) {
         super(lucid, path, title);
-        this.script = scriptApplyToString(this.script, contract.getAddress());
+        this.script = scriptApplyStringParam(this.script, contract.getAddress());
     }
 
     public async run(keys: string[]): Promise<UTxO[]> {

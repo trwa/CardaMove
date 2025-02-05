@@ -1,5 +1,5 @@
 import {Lucid, UTxO,} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
-import {scriptGetAllUtxos,} from "./internal/script.ts";
+import {scriptGetAllUtxos,} from "../src/script.ts";
 import {Validator} from "./internal/validator.ts";
 
 export class Contract extends Validator {

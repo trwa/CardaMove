@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deno: monolythic.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/monolythic.ts" programParameters="run --allow-net --allow-read">
+    <method v="2" />
+  </configuration>
+</component>

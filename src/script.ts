@@ -1,16 +1,14 @@
 import {
-    applyDoubleCborEncoding,
     applyParamsToScript,
     fromText,
     Lucid,
-    SpendingValidator,
-    UTxO,
-} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
+} from "jsr:@spacebudz/lucid";
 
-export function scriptLoadFromPlutusJson(
+/*
+export function scriptFromJson(
     path: string,
     title: string,
-): SpendingValidator {
+): Script {
     const validators: {
         title: string;
         datum: [object];
@@ -26,10 +24,12 @@ export function scriptLoadFromPlutusJson(
     };
 }
 
-export function scriptApplyToString(
-    script: SpendingValidator,
+
+
+export function scriptApplyStringParam(
+    script: Script
     s: string,
-): SpendingValidator {
+): Script {
     return {
         type: script.type,
         script: applyDoubleCborEncoding(
@@ -54,3 +54,4 @@ export function scriptGetAllUtxos(
 ): Promise<UTxO[]> {
     return lucid.utxosAt(scriptGetAddress(lucid, script));
 }
+*/

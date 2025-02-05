@@ -1,8 +1,8 @@
 import {Contract} from "../framework/contract.ts";
-import {setup} from "../setup.ts";
+import {setupLucid} from "../src/setup.ts";
 import {Constr, Data, fromText,} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
 
-const lucid = await setup();
+const lucid = await lucid();
 
 async function getPaymentCredentialHash(): Promise<string> {
     const walletAddress = await lucid.wallet.address();
