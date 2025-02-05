@@ -3,7 +3,7 @@ import {
   ByteArray,
   Int,
   MonolithicBenchmark_0Spend,
-  MonolithicStorage,
+  MonolithicStorage, MonolithicStupidSpend,
 } from "./benchmark/plutus.ts";
 import { Data } from "https://deno.land/x/lucid@0.20.4/mod.ts";
 
@@ -11,7 +11,7 @@ if (import.meta.main) {
   const lucid = setupLucid();
   console.log(lucid);
 
-  const script = new MonolithicBenchmark_0Spend();
+  const script = new MonolithicStupidSpend();
   console.log(script);
 
   const pairs = new Map<ByteArray, Int>();
@@ -38,7 +38,7 @@ if (import.meta.main) {
 
   let tx = lucid.newTx()
       .attachScript(script)
-      .payToContract(address, datum, { lovelace: 100n })
+      .payToContract(address, Data.to(""), { lovelace: 100n })
 
   console.log(tx);
 

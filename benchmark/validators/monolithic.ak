@@ -56,3 +56,13 @@ validator benchmark_1 {
     fail
   }
 }
+
+validator stupid {
+  spend(_d, _r, _u, _s) {
+    True
+  }
+
+  else(_) {
+    fail
+  }
+}
