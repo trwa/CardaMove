@@ -11,7 +11,7 @@ import {
 import { Lucid } from "https://deno.land/x/lucid@0.20.4/src/mod.ts";
 import { Script } from "https://deno.land/x/lucid@0.20.4/mod.ts";
 
-function makeStorage(n: number): SingleStorage {
+export function makeStorage(n: number): SingleStorage {
     const pairs = new Map<ByteArray, Int>();
     for (let i = 0; i < n; i++) {
         pairs.set(stringToHex(i.toString()), BigInt(i));
@@ -40,7 +40,7 @@ async function submitTx(lucid: Lucid, script: Script, datum: string) {
     console.log("Tx hash:", txHash);
 }
 
-async function waitSeconds(seconds: number) {
+export async function waitSeconds(seconds: number) {
     await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
