@@ -75,14 +75,14 @@ async function fundAccessTen(lucid: Lucid, id: string) {
 if (import.meta.main) {
     const lucid = getLucidInstance();
     const id = "0";
-    const storageSize = 100;
+    const storageSize = 1400;
     const seconds = 60;
 
-    await fundBaseline(lucid, id, storageSize);
-    await waitSeconds(seconds);
+    //await fundBaseline(lucid, id, storageSize);
+    //await waitSeconds(seconds);
 
-    await fundDoNothing(lucid, id, storageSize);
-    await waitSeconds(seconds);
+    //await fundDoNothing(lucid, id, storageSize);
+    //await waitSeconds(seconds);
 
     await fundAccessOne(lucid, id, storageSize);
     await waitSeconds(seconds);
