@@ -1,10 +1,10 @@
-import { getLucidInstance, serializeDatum, stringToHex } from "./common.ts";
+import { getLucidInstance, serializeDatum, stringToHex } from "../common.ts";
 import {
     ByteArray,
     Int,
     MonolithicBenchmark_1Spend,
     MonolithicStorage,
-} from "../benchmark/plutus.ts";
+} from "../../benchmark/plutus.ts";
 
 if (import.meta.main) {
     const lucid = getLucidInstance();
