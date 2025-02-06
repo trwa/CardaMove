@@ -1,4 +1,4 @@
-import {setupLucid} from "./src/setup.ts";
+import {getLucidInstance} from "./src/common.ts";
 import {Contract} from "./framework/contract.ts";
 import {Constr, Data, fromText, Lucid,} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
 
@@ -70,7 +70,7 @@ async function spendCorrect2UTxO(lucid: Lucid, contract: Contract) {
 }
 
 if (import.meta.main) {
-    const lucid = await setupLucid();
+    const lucid = await getLucidInstance();
 
     const contract = new Contract(
         lucid,

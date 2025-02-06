@@ -1,5 +1,5 @@
 import {C, Data, Tx, TxComplete, TxSigned} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
-import {setupLucid} from "../src/setup.ts";
+import {getLucidInstance} from "../src/common.ts";
 import {ContractDatum} from "../framework/internal/datum.ts";
 import {Contract} from "../framework/contract.ts";
 import {makeStartDatum, Start} from "../framework/start.ts";

@@ -1,5 +1,5 @@
 import {C, TxSigned} from "https://deno.land/x/lucid@0.10.7/src/mod.ts";
-import {setupBlockfrostQuery, setupLucid} from "../src/setup.ts";
+import {setupBlockfrostQuery, getLucidInstance} from "../src/common.ts";
 
 if (import.meta.main) {
   const query = setupBlockfrostQuery();

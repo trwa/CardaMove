@@ -11,7 +11,18 @@ pub type Redeemer {
   Redeemer
 }
 
-validator benchmark_0 {
+validator benchmark_0(_id: ByteArray) {
+  spend(_d, _r, _u, _s) {
+    trace @"datum": @"halting"
+    False
+  }
+
+  else(_) {
+    fail
+  }
+}
+
+validator benchmark_1(_id: ByteArray) {
   spend(
     datum: Option<Storage>,
     _redeemer: Redeemer,
@@ -28,7 +39,7 @@ validator benchmark_0 {
   }
 }
 
-validator benchmark_1 {
+validator benchmark_2(_id: ByteArray) {
   spend(
     datum: Option<Storage>,
     _redeemer: Redeemer,
@@ -49,16 +60,6 @@ validator benchmark_1 {
 
     // Compare only the first two keys
     expect dict.get(kv_in, "a") == dict.get(kv_out, "a")
-    True
-  }
-
-  else(_) {
-    fail
-  }
-}
-
-validator stupid {
-  spend(_d, _r, _u, _s) {
     True
   }
 
