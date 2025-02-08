@@ -44,38 +44,38 @@ export async function waitSeconds(seconds: number) {
     await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
 }
 
-async function fundBaseline(lucid: Lucid, id: string, n: number) {
+export async function fundBaseline(lucid: Lucid, id: string, n: number) {
     const script = new SingleBaselineSpend(stringToHex(id));
     const storage = makeStorage(n);
     const datum = serializeDatum(storage, SingleBaselineSpend._d);
     await submitTx(lucid, script, datum);
 }
 
-async function fundDoNothing(lucid: Lucid, id: string, n: number) {
+export async function fundDoNothing(lucid: Lucid, id: string, n: number) {
     const script = new SingleDoNothingSpend(stringToHex(id));
     const storage = makeStorage(n);
     const datum = serializeDatum(storage, SingleDoNothingSpend.datum);
     await submitTx(lucid, script, datum);
 }
 
-async function fundAccessOne(lucid: Lucid, id: string, n: number) {
+export async function fundAccessOne(lucid: Lucid, id: string, n: number) {
     const script = new SingleAccessOneSpend(stringToHex(id));
     const storage = makeStorage(n);
     const datum = serializeDatum(storage, SingleAccessOneSpend.datum);
     await submitTx(lucid, script, datum);
 }
 
-async function fundAccessTen(lucid: Lucid, id: string) {
+export async function fundAccessTen(lucid: Lucid, id: string, n: number) {
     const script = new SingleAccessTenSpend(stringToHex(id));
-    const storage = makeStorage(0);
+    const storage = makeStorage(n);
     const datum = serializeDatum(storage, SingleAccessTenSpend.datum);
     await submitTx(lucid, script, datum);
 }
 
 if (import.meta.main) {
     const lucid = getLucidInstance();
-    const id = "0";
-    const storageSize = 1400;
+    const id = "10";
+    const storageSize = 10;
     const seconds = 60;
 
     //await fundBaseline(lucid, id, storageSize);
