@@ -174,6 +174,82 @@
       ],
       "compiledCode": "590144010100229800aba2aba1aba0aab9faab9eaab9dab9a9bae0024888888896600264653001300900198049805000cc0240092225980099b8748008c020dd500144c8cc896600266e1d2000300b375400d15980098061baa0068acc004cdc3a400060166ea8006264944c8cc004004dd5980818069baa3010300d375400444b30010018a5eb7bdb182264664464660020026600c00c602c00a44b300100189980a99bb037520086ea000d2f5bded8c113298009bae30130019bad3014001980c0012444b300133720010007133019337606ea4020dd4003802c56600266e3c02000e26603266ec0dd48041ba800700189980c99bb037520066ea0008cc018018005015202a180b000a028375c601c0026eb4c03c004c04400500f45900a45900d45900a18068009806980700098049baa0028b200e180480098021baa0098a4d13656400801",
       "hash": "01b4c8ca13480a8a68f1a9a4c6cc478a64478e63eb88f6ecb1670fbf"
+    },
+    {
+      "title": "splilt.baseline.spend",
+      "datum": {
+        "title": "_d",
+        "schema": {
+          "$ref": "#/definitions/splilt~1Storage"
+        }
+      },
+      "redeemer": {
+        "title": "_r",
+        "schema": {
+          "$ref": "#/definitions/splilt~1Empty"
+        }
+      },
+      "parameters": [
+        {
+          "title": "_id",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        }
+      ],
+      "compiledCode": "587f010100229800aba2aba1aab9faab9eaab9dab9a9bae002488888896600264653001300800198041804800cc0200092225980099b8748008c020dd500144c8cc896600266e1d2000300b375400d15980098061baa0068a518b201a8b2014300c001300c300d0013009375400516401c300800130043754011149a26cac80101",
+      "hash": "39a59f37e1ba71c6729e5b4e6fdfae10e57897017c08e65f4ebf317c"
+    },
+    {
+      "title": "splilt.baseline.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "_id",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        }
+      ],
+      "compiledCode": "587f010100229800aba2aba1aab9faab9eaab9dab9a9bae002488888896600264653001300800198041804800cc0200092225980099b8748008c020dd500144c8cc896600266e1d2000300b375400d15980098061baa0068a518b201a8b2014300c001300c300d0013009375400516401c300800130043754011149a26cac80101",
+      "hash": "39a59f37e1ba71c6729e5b4e6fdfae10e57897017c08e65f4ebf317c"
+    },
+    {
+      "title": "splilt.token.mint",
+      "redeemer": {
+        "title": "_r",
+        "schema": {
+          "$ref": "#/definitions/splilt~1Empty"
+        }
+      },
+      "parameters": [
+        {
+          "title": "_id",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        }
+      ],
+      "compiledCode": "5878010100229800aba2aba1aab9faab9eaab9dab9a9bae002488888896600264653001300800198041804800cc0200092225980099b8748000c020dd500144c96600266e1d20003009375400915980098051baa0048a518b20168b2010375c601660126ea800a2c8038601000260086ea802229344d95900201",
+      "hash": "d7e4e37f64e4dd334034944f1b99128915eea34c03683131190cd7e7"
+    },
+    {
+      "title": "splilt.token.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "_id",
+          "schema": {
+            "$ref": "#/definitions/ByteArray"
+          }
+        }
+      ],
+      "compiledCode": "5878010100229800aba2aba1aab9faab9eaab9dab9a9bae002488888896600264653001300800198041804800cc0200092225980099b8748000c020dd500144c96600266e1d20003009375400915980098051baa0048a518b20168b2010375c601660126ea800a2c8038601000260086ea802229344d95900201",
+      "hash": "d7e4e37f64e4dd334034944f1b99128915eea34c03683131190cd7e7"
     }
   ],
   "definitions": {
@@ -215,6 +291,33 @@
             {
               "title": "pairs",
               "$ref": "#/definitions/Pairs$ByteArray_Int"
+            }
+          ]
+        }
+      ]
+    },
+    "splilt/Empty": {
+      "title": "Empty",
+      "anyOf": [
+        {
+          "title": "Empty",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        }
+      ]
+    },
+    "splilt/Storage": {
+      "title": "Storage",
+      "anyOf": [
+        {
+          "title": "Storage",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "value",
+              "$ref": "#/definitions/Int"
             }
           ]
         }

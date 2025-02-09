@@ -10,6 +10,8 @@ export type Int = bigint;
 export type PairsByteArrayInt = Map<ByteArray, Int>;
 export type SingleEmpty = undefined;
 export type SingleStorage = { pairs: PairsByteArrayInt };
+export type SpliltEmpty = undefined;
+export type SpliltStorage = { value: Int };
 
 const definitions = {
   "ByteArray": { "dataType": "bytes" },
@@ -39,6 +41,24 @@ const definitions = {
         "title": "pairs",
         "$ref": "#/definitions/Pairs$ByteArray_Int",
       }],
+    }],
+  },
+  "splilt/Empty": {
+    "title": "Empty",
+    "anyOf": [{
+      "title": "Empty",
+      "dataType": "constructor",
+      "index": 0,
+      "fields": [],
+    }],
+  },
+  "splilt/Storage": {
+    "title": "Storage",
+    "anyOf": [{
+      "title": "Storage",
+      "dataType": "constructor",
+      "index": 0,
+      "fields": [{ "title": "value", "$ref": "#/definitions/Int" }],
     }],
   },
 };
@@ -171,3 +191,55 @@ export const SingleDoNothingSpend = Object.assign(
     },
   },
 ) as unknown as SingleDoNothingSpend;
+
+export interface SpliltBaselineSpend {
+  new (_id: ByteArray): Script;
+  _d: SpliltStorage;
+  _r: SpliltEmpty;
+}
+
+export const SpliltBaselineSpend = Object.assign(
+  function (_id: ByteArray) {
+    return {
+      type: "PlutusV3",
+      script: applyParamsToScript(
+        [_id],
+        "587f010100229800aba2aba1aab9faab9eaab9dab9a9bae002488888896600264653001300800198041804800cc0200092225980099b8748008c020dd500144c8cc896600266e1d2000300b375400d15980098061baa0068a518b201a8b2014300c001300c300d0013009375400516401c300800130043754011149a26cac80101",
+        {
+          "shape": {
+            "dataType": "list",
+            "items": [{ "$ref": "#/definitions/ByteArray" }],
+          },
+          definitions,
+        } as any,
+      ),
+    };
+  },
+  { _d: { "shape": { "$ref": "#/definitions/splilt/Storage" }, definitions } },
+  { _r: { "shape": { "$ref": "#/definitions/splilt/Empty" }, definitions } },
+) as unknown as SpliltBaselineSpend;
+
+export interface SpliltTokenMint {
+  new (_id: ByteArray): Script;
+  _r: SpliltEmpty;
+}
+
+export const SpliltTokenMint = Object.assign(
+  function (_id: ByteArray) {
+    return {
+      type: "PlutusV3",
+      script: applyParamsToScript(
+        [_id],
+        "5878010100229800aba2aba1aab9faab9eaab9dab9a9bae002488888896600264653001300800198041804800cc0200092225980099b8748000c020dd500144c96600266e1d20003009375400915980098051baa0048a518b20168b2010375c601660126ea800a2c8038601000260086ea802229344d95900201",
+        {
+          "shape": {
+            "dataType": "list",
+            "items": [{ "$ref": "#/definitions/ByteArray" }],
+          },
+          definitions,
+        } as any,
+      ),
+    };
+  },
+  { _r: { "shape": { "$ref": "#/definitions/splilt/Empty" }, definitions } },
+) as unknown as SpliltTokenMint;
