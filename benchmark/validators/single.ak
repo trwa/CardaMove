@@ -1,4 +1,7 @@
 use aiken/collection/dict
+use aiken/collection/list
+use aiken/primitive/bytearray
+use aiken/primitive/int
 use cardano/transaction.{
   InlineDatum, OutputReference, Transaction, find_input, find_script_outputs,
 }
@@ -56,7 +59,7 @@ validator do_nothing(_id: ByteArray) {
   }
 }
 
-validator access_one(_id: ByteArray) {
+validator access_one_real(_id: ByteArray) {
   spend(
     datum: Option<Storage>,
     _redeemer: Empty,
@@ -93,6 +96,29 @@ validator access_ten(_id: ByteArray) {
     expect dict.get(in, "7") == dict.get(out, "7")
     expect dict.get(in, "8") == dict.get(out, "8")
     expect dict.get(in, "9") == dict.get(out, "9")
+    True
+  }
+
+  else(_) {
+    fail
+  }
+}
+
+validator access(_id: ByteArray, n: Int) {
+  spend(
+    datum: Option<Storage>,
+    _redeemer: Empty,
+    utxo: OutputReference,
+    self: Transaction,
+  ) {
+    let in = from_input(datum)
+    let out = from_output(self, utxo)
+
+    expect _ =
+      list.range(0, n)
+        |> list.map(int.to_string)
+        |> list.map(bytearray.from_string)
+        |> list.for_each(fn(i) { expect dict.get(in, i) == dict.get(out, i) })
     True
   }
 

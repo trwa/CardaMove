@@ -2,7 +2,7 @@ import { getLucidInstance, serializeDatum, stringToHex } from "../common.ts";
 import {
     ByteArray,
     Int,
-    SingleAccessOneSpend,
+    SingleAccessSpend,
     SingleAccessTenSpend,
     SingleBaselineSpend,
     SingleDoNothingSpend,
@@ -17,7 +17,7 @@ import { makeStorage } from "./fund.ts";
 // Numero di oggetti inserire (n)
 
 
-async function getUtxos(lucid: Lucid, script: Script) {
+export async function getUtxos(lucid: Lucid, script: Script) {
     const address = lucid.utils.scriptToAddress(script);
     return await lucid.utxosAt(address);
 }
@@ -59,13 +59,13 @@ export async function runBaseline(lucid: Lucid, id: string) {
     await submitTx(lucid, script, datum, utxos);
 }
 
-export async function runAccessOne(lucid: Lucid, id: string) {
+export async function runAccessOne(lucid: Lucid, id: string, accesses: number) {
     console.log("Running one step of access one...");
-    const script = new SingleAccessOneSpend(stringToHex(id));
+    const script = new SingleAccessSpend(stringToHex(id), BigInt(accesses));
     const utxos = await getUtxos(lucid, script);
     console.log("No. UTXOs: ", utxos.length);
     const storage = makeStorage(utxos.length);
-    const datum = serializeDatum(storage, SingleAccessOneSpend.datum);
+    const datum = serializeDatum(storage, SingleAccessSpend.datum);
     await submitTx(lucid, script, datum, utxos);
 }
 
@@ -82,5 +82,5 @@ export async function runAccessTen(lucid: Lucid, id: string) {
 if (import.meta.main) {
     const lucid = getLucidInstance();
     const id = "10";
-    await runAccessOne(lucid, id);
+    await runAccessOne(lucid, id, 1);
 }

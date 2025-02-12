@@ -7,7 +7,7 @@ import {
 } from "./fund.ts";
 import { runAccessOne, runAccessTen, runBaseline } from "./run.ts";
 
-function makeid(length: number) {
+export function makeid(length: number) {
   let result = "";
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -34,14 +34,14 @@ async function fullBaseline(id: string, storageSize: number) {
   );
 }
 
-async function fullAccessOne(id: string, storageSize: number) {
+async function fullAccessOne(id: string, storageSize: number, accesses: number) {
   console.log(
     "ACCESS ONE ===========================================================================================",
   );
   const lucid = getLucidInstance();
-  await fundAccessOne(lucid, id, storageSize);
+  await fundAccessOne(lucid, id, storageSize, accesses);
   await waitSeconds(60);
-  await runAccessOne(lucid, id);
+  await runAccessOne(lucid, id, accesses);
   await waitSeconds(60);
   console.log(
     "======================================================================================================",
@@ -61,6 +61,7 @@ async function fullAccessTen(id: string, storageSize: number) {
 
 if (import.meta.main) {
   const id = makeid(32);
-  const storageSize = 150;
-  await fullAccessTen(id, storageSize);
+  const storageSize = 100;
+  const accesses = 50;
+  await fullAccessOne(id, storageSize, accesses);
 }

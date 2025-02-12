@@ -2,7 +2,7 @@ import { getLucidInstance, serializeDatum, stringToHex } from "../common.ts";
 import {
     ByteArray,
     Int,
-    SingleAccessOneSpend,
+    SingleAccessSpend,
     SingleAccessTenSpend,
     SingleBaselineSpend,
     SingleDoNothingSpend,
@@ -58,10 +58,10 @@ export async function fundDoNothing(lucid: Lucid, id: string, n: number) {
     await submitTx(lucid, script, datum);
 }
 
-export async function fundAccessOne(lucid: Lucid, id: string, n: number) {
-    const script = new SingleAccessOneSpend(stringToHex(id));
+export async function fundAccessOne(lucid: Lucid, id: string, n: number, accesses: number) {
+    const script = new SingleAccessSpend(stringToHex(id), BigInt(accesses));
     const storage = makeStorage(n);
-    const datum = serializeDatum(storage, SingleAccessOneSpend.datum);
+    const datum = serializeDatum(storage, SingleAccessSpend.datum);
     await submitTx(lucid, script, datum);
 }
 
@@ -84,6 +84,6 @@ if (import.meta.main) {
     //await fundDoNothing(lucid, id, storageSize);
     //await waitSeconds(seconds);
 
-    await fundAccessOne(lucid, id, storageSize);
+    await fundAccessOne(lucid, id, storageSize, 1);
     await waitSeconds(seconds);
 }

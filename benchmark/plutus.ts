@@ -10,8 +10,8 @@ export type Int = bigint;
 export type PairsByteArrayInt = Map<ByteArray, Int>;
 export type SingleEmpty = undefined;
 export type SingleStorage = { pairs: PairsByteArrayInt };
-export type SpliltEmpty = undefined;
-export type SpliltStorage = { value: Int };
+export type SplitEmpty = undefined;
+export type SplitStorage = { value: Int };
 
 const definitions = {
   "ByteArray": { "dataType": "bytes" },
@@ -43,7 +43,7 @@ const definitions = {
       }],
     }],
   },
-  "splilt/Empty": {
+  "split/Empty": {
     "title": "Empty",
     "anyOf": [{
       "title": "Empty",
@@ -52,7 +52,7 @@ const definitions = {
       "fields": [],
     }],
   },
-  "splilt/Storage": {
+  "split/Storage": {
     "title": "Storage",
     "anyOf": [{
       "title": "Storage",
@@ -63,13 +63,49 @@ const definitions = {
   },
 };
 
-export interface SingleAccessOneSpend {
+export interface SingleAccessSpend {
+  new (_id: ByteArray, n: Int): Script;
+  datum: SingleStorage;
+  _redeemer: SingleEmpty;
+}
+
+export const SingleAccessSpend = Object.assign(
+  function (_id: ByteArray, n: Int) {
+    return {
+      type: "PlutusV3",
+      script: applyParamsToScript(
+        [_id, n],
+        "59068c0101002229800aba4aba2aba1aba0aab9faab9eaab9dab9a9bae0039bad002488888888896600264653001300a00198051805800cc0280092225980099b8748008c024dd500144ca6002601c003300e300f0019b874800122259800980098069baa0078acc004c038dd5003c4c8c8c8cc88c9289919800800991980080099199119801001000912cc004006297ae089980d1ba9373060066eb4c06c004cc008008c0700050191919800800a400044b30013371002800314bd7044cc068dd40009980100119b800014800901611919199119191b9933001375000e9110030010012223259800801c4c8c8cc88cc028008cdc5244101280059800800c4cdc52441035b5d2900006899b8a489035b5f20009800800ccdc52441025d2900006914c00402a00530070014029229800805400a002805100920465980099b880014803a266e0120f2010018acc004cdc4000a41000513370066e01208014001480362c80f101e1bac3020002375a603c0026466ec0dd4180f0009ba7301f001375400713259800800c4cdc52441027b7d00003899b8a489037b5f20003232330010010032259800800c400e264b30010018994c00402a6046003337149101023a200098008054c09000600a805100a181300144ca6002015302300199b8a489023a200098008054c090006600e66008008004805100a181300120483026001408c66e29220102207d0000340806eac00e264b3001001899b8a489025b5d00003899b8a489035b5f20009800800ccdc52441015d00003914c00401e0053004001401d229800803c00a002803900620403758007133006375a0060051323371491102682700329800800ccdc01b8d0024800666e292210127000044004444b3001337100049000440062646645300100699b800054800666e2ccdc00012cc004cdc4001240291481822903720463371666e000056600266e2000520148a40c11481b9023002200c33706002901019b8600148080cdc70020012040375c0068118dc5245022c200022323300100100322598009807800c4cdc52450130000038acc004cdc4000a40011337149101012d0033002002337029000000c4cc014cdc2000a402866e2ccdc019b85001480512060003406880d08888c8cc004004014896600200310058992cc004006266008604400400d1330053022002330030030014080604400280f8c0040048896600266e2400920008800c6600200733708004900a4cdc599b803370a004900a240c00028019017112cc004006297ae089980c1ba937306e64dd7180c80099801001180d000a02e2259800800c526899912cc004c8cdd79980080380199800803001911919800800801912cc004006298103d87a8000899192cc004cdc8802800c56600266e3c014006266e9520003301f301d0024bd7045300103d87a8000406d1330040043021003406c6eb8c06c004c07800501c45268b202a375c603000266004004603200280b166002600860206ea8016260026eacc050c044dd5180a18089baa0058b201e332259800980318091baa0018992cc004c01cc04cdd5000c4c96600260320031325980099b8748010c054dd5000c4c9660026014602c6ea8006264b3001301c001899198008009bab301c0022259800800c4c028dd5980e980d1baa00489919911980280298108021bae301a001375a6036002603a00280da2c80c8c05cdd5000c59015180c980b1baa0018b202830043015375460300031640586466446600400400244b30010018a5eb8226644b3001325980099b8748008c064dd5000c4cdc78031bae301d301a375400314a080c0c070c064dd5180e180c9baa00289980d80119802002000c4cc010010005017180d000980d800a03037586008602a6ea8030dd7180b980a1baa0018b2024301630173017301730133754602c602e60266ea8c058c04cdd5000c590111180a980b180b00099198008009bac30153012375401244b30010018a6103d87a80008992cc004cdd7980b980a1baa001009899ba548000cc0580052f5c113300300330180024048602c00280a08c008004c004004896600200314bd6f7b63044c8cc88c8cc004004cc018018c0600148966002003133017337606ea4010dd4001a5eb7bdb1822653001375c602a003375a602c003301a00248896600266e4002000e26603666ec0dd48041ba80070058acc004cdc7804001c4cc06ccdd81ba9008375000e00313301b337606ea400cdd400119803003000a02e405c301800140586eb8c040004dd698088009809800a0228b201e8b201818051baa0028b2010180500098029baa00b8a4d13656400c01",
+        {
+          "shape": {
+            "dataType": "list",
+            "items": [{ "$ref": "#/definitions/ByteArray" }, {
+              "$ref": "#/definitions/Int",
+            }],
+          },
+          definitions,
+        } as any,
+      ),
+    };
+  },
+  {
+    datum: { "shape": { "$ref": "#/definitions/single/Storage" }, definitions },
+  },
+  {
+    _redeemer: {
+      "shape": { "$ref": "#/definitions/single/Empty" },
+      definitions,
+    },
+  },
+) as unknown as SingleAccessSpend;
+
+export interface SingleAccessOneRealSpend {
   new (_id: ByteArray): Script;
   datum: SingleStorage;
   _redeemer: SingleEmpty;
 }
 
-export const SingleAccessOneSpend = Object.assign(
+export const SingleAccessOneRealSpend = Object.assign(
   function (_id: ByteArray) {
     return {
       type: "PlutusV3",
@@ -95,7 +131,7 @@ export const SingleAccessOneSpend = Object.assign(
       definitions,
     },
   },
-) as unknown as SingleAccessOneSpend;
+) as unknown as SingleAccessOneRealSpend;
 
 export interface SingleAccessTenSpend {
   new (_id: ByteArray): Script;
@@ -192,13 +228,47 @@ export const SingleDoNothingSpend = Object.assign(
   },
 ) as unknown as SingleDoNothingSpend;
 
-export interface SpliltBaselineSpend {
-  new (_id: ByteArray): Script;
-  _d: SpliltStorage;
-  _r: SpliltEmpty;
+export interface SplitAccessOneSpend {
+  new (mint: ByteArray): Script;
+  _datum: SplitStorage;
+  _redeemer: SplitEmpty;
 }
 
-export const SpliltBaselineSpend = Object.assign(
+export const SplitAccessOneSpend = Object.assign(
+  function (mint: ByteArray) {
+    return {
+      type: "PlutusV3",
+      script: applyParamsToScript(
+        [mint],
+        "5903c8010100229800aba2aba1aba0aab9faab9eaab9dab9a9bae0024888888896600264653001300900198049805000cdc3a400530090024888966002600460126ea800e2653001300e00198071807800cdc3a40009112cc004c004c034dd50044566002601c6ea8022330012301230130019ba548002460246026602660260032232330010010032259800800c52f5c11332259800992cc004c034c050dd5000c4cdc78031bae30183015375400314a08098c05cc050dd5180b980a1baa00289980b00119802002000c4cc010010005012180a800980b000a0269180918099809800a4444465300130010019119198008009919800800802112cc004006297ae089919912cc004c050c06cdd500144cc01401400626603c603e60386ea8008cc01401400501a19912cc0040060051598009810000c4c034cc078dd39980f180d980f8009980f1805180e1baa0034bd7025eb8200480e901d0a6103d87a800032598009809980d1baa0018a5eb7bdb18226eacc078c06cdd5000a03232330010013756601a60366ea8008896600200314c103d87a8000899192cc004cdc8804800c56600266e3c0240062601e66040603c00497ae08a60103d87a80004071133004004302200340706eb8c070004c07c00501d180f001180e000a0342259800800c52f5c113301a374e6464b3001300d301937540031323259800981000144cc078c07c010cc07800d2f5c11640746eb4c078004c068dd5000c5901818058009bac301b00133002002301c00140652232330010010032259800800c530103d87a80008992cc004cdd7980e180c9baa001004898051980d800a5eb82266006006603a00480b8c06c005019244464b3001300b3017375400313322598009806980c9baa0018992513758603a60346ea80062c80c0dd6180d980c1baa001330043300332598009806180c1baa0018992cc004c034c064dd5000c4cc024dd61804180d1baa011375c603a60346ea80062c80c0c024c064dd51805980c9baa301c3019375400316405c660046eb0c06cc060dd500780680aa4001164058660066600464b3001300b30173754003132598009806180c1baa00189980419198008009bac301d301a375402244b30010018a5eb8226603a601a60366ea8c078004cc008008c07c00501c1bae301c3019375400316405c601060306ea8c028c060dd5180d980c1baa0018b202c3300137586034602e6ea803803005120001112cc00400a298103d87a80008acc004c0240062600e66030603200497ae08cc00400e6034005337000029000a006405080b916403d164030300a3754007164020300900130043754013149a26cac8011",
+        {
+          "shape": {
+            "dataType": "list",
+            "items": [{ "$ref": "#/definitions/ByteArray" }],
+          },
+          definitions,
+        } as any,
+      ),
+    };
+  },
+  {
+    _datum: { "shape": { "$ref": "#/definitions/split/Storage" }, definitions },
+  },
+  {
+    _redeemer: {
+      "shape": { "$ref": "#/definitions/split/Empty" },
+      definitions,
+    },
+  },
+) as unknown as SplitAccessOneSpend;
+
+export interface SplitBaselineSpend {
+  new (_id: ByteArray): Script;
+  _d: SplitStorage;
+  _r: SplitEmpty;
+}
+
+export const SplitBaselineSpend = Object.assign(
   function (_id: ByteArray) {
     return {
       type: "PlutusV3",
@@ -215,16 +285,16 @@ export const SpliltBaselineSpend = Object.assign(
       ),
     };
   },
-  { _d: { "shape": { "$ref": "#/definitions/splilt/Storage" }, definitions } },
-  { _r: { "shape": { "$ref": "#/definitions/splilt/Empty" }, definitions } },
-) as unknown as SpliltBaselineSpend;
+  { _d: { "shape": { "$ref": "#/definitions/split/Storage" }, definitions } },
+  { _r: { "shape": { "$ref": "#/definitions/split/Empty" }, definitions } },
+) as unknown as SplitBaselineSpend;
 
-export interface SpliltTokenMint {
+export interface SplitTokenMint {
   new (_id: ByteArray): Script;
-  _r: SpliltEmpty;
+  _r: SplitEmpty;
 }
 
-export const SpliltTokenMint = Object.assign(
+export const SplitTokenMint = Object.assign(
   function (_id: ByteArray) {
     return {
       type: "PlutusV3",
@@ -241,5 +311,5 @@ export const SpliltTokenMint = Object.assign(
       ),
     };
   },
-  { _r: { "shape": { "$ref": "#/definitions/splilt/Empty" }, definitions } },
-) as unknown as SpliltTokenMint;
+  { _r: { "shape": { "$ref": "#/definitions/split/Empty" }, definitions } },
+) as unknown as SplitTokenMint;
