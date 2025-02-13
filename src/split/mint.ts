@@ -12,7 +12,7 @@ import {
 } from "https://deno.land/x/lucid@0.20.4/src/mod.ts";
 import { Data, Lucid, Script } from "https://deno.land/x/lucid@0.20.4/mod.ts";
 import { waitSeconds } from "../single/fund.ts";
-import { makeid } from "../single/full.ts";
+import { randomId } from "../single/single.ts";
 import { getUtxos } from "../single/run.ts";
 
 function asset(policy: Script, name: string, amount: bigint) {
@@ -87,7 +87,7 @@ async function spend(lucid: Lucid, scriptMint: Script, scriptSpend: Script, n: b
 
 if (import.meta.main) {
   const lucid = getLucidInstance();
-  const id = makeid(32);
+  const id = randomId(32);
   const scriptMint = new SplitTokenMint(fromText(id));
   const scriptSpend = new SplitAccessOneSpend(fromText(id));
   const n = 1n;
