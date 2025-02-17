@@ -14,15 +14,6 @@ import { makeStorage } from "./fund.ts";
 
 
 
-export async function runAccessOne(lucid: Lucid, id: string, accesses: number) {
-  console.log("Running one step of access one...");
-  const script = new SingleAccessSpend(stringToHex(id), BigInt(accesses));
-  const utxos = await getUtxos(lucid, script);
-  console.log("No. UTXOs: ", utxos.length);
-  const storage = makeStorage(utxos.length);
-  const datum = serializeDatum(storage, SingleAccessSpend.datum);
-  await submitTx(lucid, script, datum, utxos);
-}
 
 export async function runAccessTen(lucid: Lucid, id: string) {
   console.log("Running one step of access ten...");

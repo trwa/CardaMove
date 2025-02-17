@@ -88,25 +88,24 @@ export function serializeDatum<T = Data>(data: Exact<T>, type?: T): string {
   return Codec.encodeData(dataToJson(d));
 }
 
-export function setupBlockfrostQuery(): (txHash: string) => Promise<Response> {
-  return (txHash: string) => {
-    /*
-        curl -L -X GET 'https://cardano-mainnet.blockfrost.io/api/v0/txs/:hash' \
-        -H 'Accept: application/json' \
-        -H 'project_id: <API_KEY_VALUE>'
-        */
+export async function queryTx(txHash: string) {
+  /*
+    curl -L -X GET 'https://cardano-mainnet.blockfrost.io/api/v0/txs/:hash' \
+      -H 'Accept: application/json' \
+      -H 'project_id: <API_KEY_VALUE>'
+    */
 
-    const headers = new Headers();
+  const headers = new Headers();
+  headers.set("Accept", "application/json");
+  headers.set("Project_id", "preprodobfVdYEqrirr8GVwlyFRCDixOrKtEehY");
 
-    headers.set("Accept", "application/json");
-    headers.set("project_id", "preprodJhvjyIJRht5PD65tHuPS6TA0Vh06GElp");
+  const resp = await fetch(
+    `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}`,
+    {
+      method: "GET",
+      headers: headers,
+    },
+  );
 
-    return fetch(
-      `https://cardano-preprod.blockfrost.io/api/v0/txs/${txHash}`,
-      {
-        method: "GET",
-        headers: headers,
-      },
-    );
-  };
+  return await resp.json();
 }

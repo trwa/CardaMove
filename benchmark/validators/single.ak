@@ -43,8 +43,9 @@ fn dict_from_output(
 // Validators
 // =====================================================================================================================
 
-validator baseline(_id: ByteArray) {
-  spend(_d: Option<Storage>, _r: Empty, _u: OutputReference, _s: Transaction) {
+validator baseline(_id: ByteArray, _storage_size: Int) {
+  spend(datum: Option<Storage>, _r: Empty, _u: OutputReference, _s: Transaction) {
+    expect Some(_) = datum
     True
   }
 
@@ -53,7 +54,7 @@ validator baseline(_id: ByteArray) {
   }
 }
 
-validator read(_id: ByteArray, n: Int) {
+validator read(_id: ByteArray, _storage_size: Int, n_reads: Int) {
   spend(
     datum: Option<Storage>,
     _redeemer: Empty,
@@ -63,12 +64,22 @@ validator read(_id: ByteArray, n: Int) {
     let in = dict_from_input(datum)
     let out = dict_from_output(self, utxo)
 
-    expect _ =
-      list.range(0, n)
-        |> list.map(int.to_string)
-        |> list.map(bytearray.from_string)
-        |> list.for_each(fn(i) { expect dict.get(in, i) == dict.get(out, i) })
-    True
+    if n_reads == 0 {
+      True
+    } else {
+      let cond =
+        list.range(0, n_reads - 1)
+          |> list.map(int.to_string)
+          |> list.map(bytearray.from_string)
+          |> list.map(
+              fn(i) {
+                let l = dict.get(in, i)
+                let r = dict.get(out, i)
+                l == r
+              },
+            )
+      list.all(cond, fn(b) { b })
+    }
   }
 
   else(_) {
