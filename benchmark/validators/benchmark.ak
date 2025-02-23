@@ -15,7 +15,7 @@ pub type Empty {
   Empty
 }
 
-validator single(_id: ByteArray, _s: Int, _t: Int) {
+validator single(_id: ByteArray, _s: Int) {
   spend(
     datum: Option<Storage>,
     _redeemer: Empty,

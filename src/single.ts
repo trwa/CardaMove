@@ -1,4 +1,4 @@
-import {getLucidInstance, serializeDatum, stringToHex,} from "./common.ts";
+import {getLucidInstance, serializeDatum, stringToHex} from "./common.ts";
 import {BenchmarkSingleSpend, BenchmarkStorage, ByteArray,} from "../benchmark/plutus.ts";
 import {Data, Lucid, Script} from "https://deno.land/x/lucid@0.20.4/mod.ts";
 import {stringify} from "jsr:@std/csv";
@@ -74,12 +74,10 @@ async function fundSingle(
   lucid: Lucid,
   id: string,
   size: number,
-  transactions: number,
 ) {
   const script = new BenchmarkSingleSpend(
     stringToHex(id),
     BigInt(size),
-    BigInt(transactions),
   );
   const storage = makeStorage(size);
   const datum = serializeDatum(storage, BenchmarkSingleSpend.datum);
@@ -90,43 +88,55 @@ async function runSingle(
   lucid: Lucid,
   id: string,
   size: number,
-  transactions: number,
 ) {
-  const script = new BenchmarkSingleSpend(
-    stringToHex(id),
-    BigInt(size),
-    BigInt(transactions),
-  );
+  const script = new BenchmarkSingleSpend(stringToHex(id), BigInt(size));
   const storage = makeStorage(size);
   const datum = serializeDatum(storage, BenchmarkSingleSpend.datum);
   return await txRun(lucid, script, datum);
 }
 
+const text = `
+id,size,hash
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,100,f5ffba886446b52d90f005b8d331b4c996fdce66c132c6da3b6a960e311d9661
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,90,1d9fba62400d27426abe0caa02b64a653acea484e9423474bece260359891092
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,80,e55d7c465f33cac7e9490930a380de86f2c229fb6ca42a3b09c92f483b8ce1b1
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,70,9eba3dda5d4d80b67d3ba637fe640cfc3d80918057fb806ebf0f0fa36fd2fb74
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,60,5cef47102bb9ce055f53f16d4bdc64cb787b750f651772bdd228893db6561f02
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,50,070c10adf65121386c51212ace18e99c75acd4c2b403a32ad25311f49d73a62b
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,40,980425611b807df8987d596ebdb53fb8a2f7f6b7a5b9cdda59f620c82270f1e7
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,30,f91dd62dc30ea8cda935ad8736f03eb55622ca8b2b5b4e9ac270e218c64ed5cb
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,20,afa89b08ddd509f36e15bad49be2609ca2e6c09b17cbfc706540f270d379bb70
+fBjS09mEwASybjCqv5fPBlcKyyDcja4l,10,3b58ee3e30a99291a1c6accc63f4f5603e09eb2d1af2f593b7f4b83719044b4c
+`
+
 if (import.meta.main) {
   const lucid = getLucidInstance();
-  let id = makeRandomId();
-  const delay = 2 * 60;
+  const id = makeRandomId();
+  const delay = 60;
 
-  const ts = [1, 5, 10];
   const ss = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10];
 
   //const ns = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   //const cs = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-  const fundings: Array<{ size: number; transactions: number; hash: string }> =
-    [];
-  for (const t of ts) {
-    for (const s of ss) {
+  const fundings: Array<{ id: string; size: number; hash: string }> = [];
+  let i = 0;
+  while (i < ss.length) {
+    try {
       await waitSeconds(delay);
-      console.log(`[size ${s}] [transactions ${t}] fund`);
-      const hash = await fundSingle(lucid, id, s, t);
-      fundings.push({ size: s, transactions: t, hash: hash });
+      console.log(`[size ${ss[i]}] fund`);
+      const hash = await runSingle(lucid, id, ss[i]);
+      fundings.push({ id: id, size: ss[i], hash: hash });
+      i += 1;
+    } catch (_) {
+      console.error("retrying...");
     }
   }
+
   const csv = stringify(fundings, {
     columns: [
+      "id",
       "size",
-      "transactions",
       "hash",
     ],
   });

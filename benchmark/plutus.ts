@@ -86,24 +86,24 @@ export const BenchmarkMultiSpend = Object.assign(
 ) as unknown as BenchmarkMultiSpend;
 
 export interface BenchmarkSingleSpend {
-  new (_id: ByteArray, _s: Int, _t: Int): Script;
+  new (_id: ByteArray, _s: Int): Script;
   datum: BenchmarkStorage;
   _redeemer: BenchmarkEmpty;
 }
 
 export const BenchmarkSingleSpend = Object.assign(
-  function (_id: ByteArray, _s: Int, _t: Int) {
+  function (_id: ByteArray, _s: Int) {
     return {
       type: "PlutusV3",
       script: applyParamsToScript(
-        [_id, _s, _t],
-        "589601010022229800aba2aba1aab9faab9eaab9dab9a9bae0049bad0039bad00248888888896600264653001300a00198051805800cc0280092225980099b8748008c028dd500144c8c96600266e1d2000300c375400b15980098069baa0058acc004cdc3a400060186ea8c03cc04000a29462c805a2c80722c8058c038004c02cdd50014590090c028004c018dd5005452689b2b200801",
+        [_id, _s],
+        "58910101002229800aba2aba1aab9faab9eaab9dab9a9bae0039bad0024888888896600264653001300900198049805000cc0240092225980099b8748008c024dd500144c8c96600266e1d2000300b375400b15980098061baa0058acc004cdc3a400060166ea8c038c03c00a29462c80522c806a2c8050c034004c028dd50014590080c024004c014dd5004c52689b2b20061",
         {
           "shape": {
             "dataType": "list",
             "items": [{ "$ref": "#/definitions/ByteArray" }, {
               "$ref": "#/definitions/Int",
-            }, { "$ref": "#/definitions/Int" }],
+            }],
           },
           definitions,
         } as any,
