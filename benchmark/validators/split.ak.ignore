@@ -107,3 +107,33 @@ validator access_one(mint: ByteArray) {
     fail
   }
 }
+
+
+// Get the inputs that have the token
+    let tokens_datums: Pairs<AssetName, Storage> =
+      self.inputs 
+        |> list.map(fn(input) { input.output })
+        |> list.filter(
+            fn(output) { policies(output.value) |> list.has(policy_id) },
+          )
+        |> list.map(
+            fn(output) {
+              expect [pair]: Pairs<AssetName, Int> =
+                tokens(output.value, policy_id) |> dict.to_pairs
+
+              expect InlineDatum(datum) = output.datum
+              expect storage: Storage = datum
+              Pair(pair.1st, storage)
+            },
+          )
+        |> list.map(
+            fn(pair) {
+              let name: AssetName = pair.1st
+              compare(name, )
+              Pair(name, storage)
+            },
+          )
+        )
+
+    // Check that my asset is the smallest
+    |> list.all

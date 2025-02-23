@@ -1,8 +1,7 @@
 use aiken/collection/dict
 use aiken/collection/list
 use aiken/primitive/bytearray
-use aiken/primitive/int
-use cardano/assets.{AssetName, PolicyId, policies, tokens}
+use cardano/assets.{PolicyId, tokens}
 use cardano/transaction.{
   InlineDatum, Output, OutputReference, Transaction, find_input,
   find_script_outputs,
@@ -48,52 +47,64 @@ validator token {
 
 validator multi(policy_id: ByteArray, _c: Int, _n: Int, _t: Int) {
   spend(
-    datum: Option<Storage>,
+    _datum: Option<Storage>,
     _redeemer: Empty,
     output_reference: OutputReference,
     self: Transaction,
   ) {
-    // Force the validator to read the datum
-    expect Some(_) = datum
+    // Get own input
+    expect Some(input) = find_input(self.inputs, output_reference)
 
-    // Get own output
-    let input: Output =
-      find_script_outputs(self.outputs, output_reference) |> list.head
+    // Get the assets in the own input
+    let assets = tokens(input.output.value, policy_id)
 
-    // Get input token
-    let token = tokens(input.value, policy_id)
-    
+    // There must be exactly one key asset in the own input
+    expect [key] = dict.keys(assets)
 
-    // Get the inputs that have the token
-    let tokens_datums: Pairs<AssetName, Storage> =
-      self.inputs 
-        |> list.map(fn(input) { input.output })
-        |> list.filter(
-            fn(output) { policies(output.value) |> list.has(policy_id) },
-          )
+    // Get own hash
+    expect Some(script_hash) = input.output.reference_script
+
+    // Get all inputs to the "multi" scripts
+    let inputs: List<Output> =
+      find_script_outputs(
+        self.inputs |> list.map(fn(input) { input.output }),
+        script_hash,
+      )
+
+    // Get all keys in the inputs 
+    let keys =
+      inputs
         |> list.map(
-            fn(output) {
-              expect [pair]: Pairs<AssetName, Int> =
-                tokens(output.value, policy_id) |> dict.to_pairs
-
-              expect InlineDatum(datum) = output.datum
-              expect storage: Storage = datum
-              Pair(pair.1st, storage)
+            fn(input) {
+              let assets = tokens(input.value, policy_id)
+              expect [key] = dict.keys(assets)
+              key
             },
           )
-        |> list.map(
-            fn(pair) {
-              let name: AssetName = pair.1st
-              compare(name, )
-              Pair(name, storage)
-            },
-          )
-        )
 
-    // Check that my asset is the smallest
-    |> list.all
+    // Sort the keys
+    let sorted_keys = list.sort(keys, bytearray.compare)
 
-    True
+    // Get the smallest key
+    expect Some(smallest_key) = list.head(sorted_keys)
+
+    // The smallest key must be the same as the key in the own input
+    if smallest_key == key {
+      // Force the validator to read all the pairs from all scripts
+      expect _ =
+        inputs
+          |> list.flat_map(
+              fn(input) {
+                expect InlineDatum(datum) = input.datum
+                expect storage: Storage = datum
+                storage.pairs
+              },
+            )
+      True
+    } else {
+      // Just return true
+      True
+    }
   }
 
   else(_) {
