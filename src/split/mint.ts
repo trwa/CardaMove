@@ -12,7 +12,7 @@ import {
 } from "https://deno.land/x/lucid@0.20.4/src/mod.ts";
 import { Data, Lucid, Script } from "https://deno.land/x/lucid@0.20.4/mod.ts";
 import { waitSeconds } from "../single/fund.ts";
-import { randomId } from "../single/single.ts";
+import { randomId } from "../single.ts";
 import { getUtxos } from "../single/run.ts";
 
 function asset(policy: Script, name: string, amount: bigint) {
