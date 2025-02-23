@@ -1,7 +1,7 @@
 import {getLucidInstance, serializeDatum, stringToHex} from "./common.ts";
 import {BenchmarkSingleSpend, BenchmarkStorage, ByteArray,} from "../benchmark/plutus.ts";
 import {Data, Lucid, Script} from "https://deno.land/x/lucid@0.20.4/mod.ts";
-import {stringify} from "jsr:@std/csv";
+import {parse, stringify} from "jsr:@std/csv";
 
 async function waitSeconds(seconds: number) {
   console.log(`delay ${seconds}s...`);
@@ -58,6 +58,9 @@ async function txRun(
   const address = lucid.utils.scriptToAddress(script);
   const utxos = await lucid.utxosAt(address);
   console.log("n.utxo ", utxos.length);
+  if (utxos.length === 0) {
+    throw new Error("no utxo");
+  }
   const tx = lucid.newTx()
     .collectFrom(utxos, redeemer)
     .payToContract(
@@ -75,10 +78,7 @@ async function fundSingle(
   id: string,
   size: number,
 ) {
-  const script = new BenchmarkSingleSpend(
-    stringToHex(id),
-    BigInt(size),
-  );
+  const script = new BenchmarkSingleSpend(stringToHex(id), BigInt(size));
   const storage = makeStorage(size);
   const datum = serializeDatum(storage, BenchmarkSingleSpend.datum);
   return await txFund(lucid, script, datum);
@@ -107,33 +107,60 @@ fBjS09mEwASybjCqv5fPBlcKyyDcja4l,40,980425611b807df8987d596ebdb53fb8a2f7f6b7a5b9
 fBjS09mEwASybjCqv5fPBlcKyyDcja4l,30,f91dd62dc30ea8cda935ad8736f03eb55622ca8b2b5b4e9ac270e218c64ed5cb
 fBjS09mEwASybjCqv5fPBlcKyyDcja4l,20,afa89b08ddd509f36e15bad49be2609ca2e6c09b17cbfc706540f270d379bb70
 fBjS09mEwASybjCqv5fPBlcKyyDcja4l,10,3b58ee3e30a99291a1c6accc63f4f5603e09eb2d1af2f593b7f4b83719044b4c
-`
+`;
 
 if (import.meta.main) {
   const lucid = getLucidInstance();
   const id = makeRandomId();
   const delay = 60;
 
-  const ss = [100, 90, 80, 70, 60, 50, 40, 30, 20, 10];
+  const ss = [
+    1000,
+    900,
+    800,
+    700,
+    600,
+    500,
+    400,
+    300,
+    200,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4,
+    3,
+    2,
+    1,
+  ];
 
   //const ns = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   //const cs = [1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-  const fundings: Array<{ id: string; size: number; hash: string }> = [];
+  const fundings = parse(text, {
+    columns: ["id", "size", "hash"],
+    skipFirstRow: true,
+  });
+  console.log(fundings);
+  const transactions: Array<{ id: string; size: number; hash: string }> = [];
   let i = 0;
   while (i < ss.length) {
     try {
       await waitSeconds(delay);
-      console.log(`[size ${ss[i]}] fund`);
-      const hash = await runSingle(lucid, id, ss[i]);
-      fundings.push({ id: id, size: ss[i], hash: hash });
+      //const id = fundings[i].id;
+      //const size = parseInt(fundings[i].size);
+      const size = ss[i];
+      const hash = await fundSingle(lucid, id, size);
+      console.log(`[size ${size}] run`);
+      transactions.push({ id: id, size: size, hash: hash });
       i += 1;
     } catch (_) {
       console.error("retrying...");
     }
   }
 
-  const csv = stringify(fundings, {
+  const csv = stringify(transactions, {
     columns: [
       "id",
       "size",
