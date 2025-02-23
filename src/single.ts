@@ -115,14 +115,6 @@ if (import.meta.main) {
   const delay = 60;
 
   const ss = [
-    1000,
-    900,
-    800,
-    700,
-    600,
-    500,
-    400,
-    300,
     200,
     9,
     8,
@@ -147,7 +139,6 @@ if (import.meta.main) {
   let i = 0;
   while (i < ss.length) {
     try {
-      await waitSeconds(delay);
       //const id = fundings[i].id;
       //const size = parseInt(fundings[i].size);
       const size = ss[i];
@@ -155,8 +146,10 @@ if (import.meta.main) {
       console.log(`[size ${size}] run`);
       transactions.push({ id: id, size: size, hash: hash });
       i += 1;
+      await waitSeconds(delay);
     } catch (_) {
       console.error("retrying...");
+      await waitSeconds(delay);
     }
   }
 
