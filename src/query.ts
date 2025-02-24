@@ -309,7 +309,6 @@ if (import.meta.main) {
       "hash",
     ],
   });
-  console.log(single_fund_fees_csv);
 
   // ===================================================================================================================================================================
   // Single Run Csv
@@ -317,6 +316,30 @@ if (import.meta.main) {
   const single_run_csv = parse(single_run, {
     columns: ["id", "size", "hash"],
     skipFirstRow: true,
+  });
+  const single_run_fees = Array<
+    { id: string; size: number; bytes: number; fees: number; hash: string }
+  >();
+  for (const row of single_run_csv) {
+    const id = row.id;
+    const size = parseInt(row.size);
+    const hash = row.hash;
+    const tx = await queryTx(hash);
+    const bytes = tx.size;
+    const fees = parseInt(tx.fees);
+    const record = { id, size, bytes, fees, hash };
+    console.log(record);
+    single_run_fees.push(record);
+    await waitSeconds(1);
+  }
+  const single_run_fees_csv = stringify(single_run_fees, {
+    columns: [
+      "id",
+      "size",
+      "bytes",
+      "fees",
+      "hash",
+    ],
   });
 
   // ===================================================================================================================================================================
@@ -326,6 +349,39 @@ if (import.meta.main) {
     columns: ["id", "nChunks", "chunkSize", "hash"],
     skipFirstRow: true,
   });
+  const multi_fund_fees = Array<
+    {
+      id: string;
+      nChunks: number;
+      chunkSize: number;
+      bytes: number;
+      fees: number;
+      hash: string;
+    }
+  >();
+  for (const row of multi_fund_csv) {
+    const id = row.id;
+    const nChunks = parseInt(row.nChunks);
+    const chunkSize = parseInt(row.chunkSize);
+    const hash = row.hash;
+    const tx = await queryTx(hash);
+    const bytes = tx.size;
+    const fees = parseInt(tx.fees);
+    const record = { id, nChunks, chunkSize, bytes, fees, hash };
+    console.log(record);
+    multi_fund_fees.push(record);
+    await waitSeconds(1);
+  }
+  const multi_fund_fees_csv = stringify(multi_fund_fees, {
+    columns: [
+      "id",
+      "nChunks",
+      "chunkSize",
+      "bytes",
+      "fees",
+      "hash",
+    ],
+  });
 
   // ===================================================================================================================================================================
   // Multi Run Csv
@@ -334,4 +390,42 @@ if (import.meta.main) {
     columns: ["id", "nChunks", "chunkSize", "hash"],
     skipFirstRow: true,
   });
+  const multi_run_fees = Array<
+    {
+      id: string;
+      nChunks: number;
+      chunkSize: number;
+      bytes: number;
+      fees: number;
+      hash: string;
+    }
+  >();
+  for (const row of multi_run_csv) {
+    const id = row.id;
+    const nChunks = parseInt(row.nChunks);
+    const chunkSize = parseInt(row.chunkSize);
+    const hash = row.hash;
+    const tx = await queryTx(hash);
+    const bytes = tx.size;
+    const fees = parseInt(tx.fees);
+    const record = { id, nChunks, chunkSize, bytes, fees, hash };
+    console.log(record);
+    multi_run_fees.push(record);
+    await waitSeconds(1);
+  }
+  const multi_run_fees_csv = stringify(multi_run_fees, {
+    columns: [
+      "id",
+      "nChunks",
+      "chunkSize",
+      "bytes",
+      "fees",
+      "hash",
+    ],
+  });
+
+  console.log(single_fund_fees_csv);
+  console.log(single_run_fees_csv);
+  console.log(multi_fund_fees_csv);
+  console.log(multi_run_fees_csv);
 }
