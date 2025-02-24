@@ -48,7 +48,7 @@ async function fundMulti(
 
   for (let i = 0; i < nChunks; i++) {
     const storage: BenchmarkStorage = makeStorage(chunkSize);
-    const datum: string = serializeDatum(storage, BenchmarkMultiSpend._datum);
+    const datum: string = serializeDatum(storage, BenchmarkMultiSpend.datum);
     const key = makeAsset(policy, makeKey32(i), 1n);
     tx = tx.payToContract(
       address,
@@ -122,11 +122,11 @@ if (import.meta.main) {
   ];
 
   let nci = 0;
-  let csi = 0;
   const transactions: Array<
     { id: string; nChunks: number; chunkSize: number; hash: string }
   > = [];
   while (nci < nChunks.length) {
+    let csi = 0;
     while (csi < chunkSize.length) {
       try {
         const cs = chunkSize[csi];

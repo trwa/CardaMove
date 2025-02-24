@@ -45,66 +45,16 @@ validator token {
   }
 }
 
-validator multi(_id: ByteArray, policy_id: ByteArray, _c: Int, _n: Int) {
+validator multi(_id: ByteArray, _policy_id: ByteArray, _c: Int, _n: Int) {
   spend(
-    _datum: Option<Storage>,
+    datum: Option<Storage>,
     _redeemer: Empty,
-    output_reference: OutputReference,
-    self: Transaction,
+    _output_reference: OutputReference,
+    _self: Transaction,
   ) {
-    // Get own input
-    expect Some(input) = find_input(self.inputs, output_reference)
-
-    // Get the assets in the own input
-    let assets = tokens(input.output.value, policy_id)
-
-    // There must be exactly one key asset in the own input
-    expect [key] = dict.keys(assets)
-
-    // Get own hash
-    expect Some(script_hash) = input.output.reference_script
-
-    // Get all inputs to the "multi" scripts
-    let inputs: List<Output> =
-      find_script_outputs(
-        self.inputs |> list.map(fn(input) { input.output }),
-        script_hash,
-      )
-
-    // Get all keys in the inputs 
-    let keys =
-      inputs
-        |> list.map(
-            fn(input) {
-              let assets = tokens(input.value, policy_id)
-              expect [key] = dict.keys(assets)
-              key
-            },
-          )
-
-    // Sort the keys
-    let sorted_keys = list.sort(keys, bytearray.compare)
-
-    // Get the smallest key
-    expect Some(smallest_key) = list.head(sorted_keys)
-
-    // The smallest key must be the same as the key in the own input
-    if smallest_key == key {
-      // Force the validator to read all the pairs from all scripts
-      expect _ =
-        inputs
-          |> list.flat_map(
-              fn(input) {
-                expect InlineDatum(datum) = input.datum
-                expect storage: Storage = datum
-                storage.pairs
-              },
-            )
-      True
-    } else {
-      // Just return true
-      True
-    }
+    // Force the validator to read the datum
+    expect Some(_) = datum
+    True
   }
 
   else(_) {
