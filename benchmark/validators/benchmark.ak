@@ -45,7 +45,7 @@ validator token {
   }
 }
 
-validator multi(policy_id: ByteArray, _c: Int, _n: Int, _t: Int) {
+validator multi(_id: ByteArray, policy_id: ByteArray, _c: Int, _n: Int) {
   spend(
     _datum: Option<Storage>,
     _redeemer: Empty,
